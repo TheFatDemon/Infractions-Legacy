@@ -77,16 +77,7 @@ public class Infractions extends JavaPlugin implements Listener {
 		CommandManager ce = new CommandManager(this);
 		//general
 		getServer().getPluginManager().registerEvents(ce, this);
-		getCommand("dg").setExecutor(ce);
-		getCommand("check").setExecutor(ce);
-		getCommand("claim").setExecutor(ce);
-		getCommand("alliance").setExecutor(ce);
-		getCommand("perks").setExecutor(ce);
-		getCommand("checkplayer").setExecutor(ce);
-		getCommand("removeplayer").setExecutor(ce);
-		getCommand("value").setExecutor(ce);
-		getCommand("bindings").setExecutor(ce);
-		getCommand("debugplayer").setExecutor(ce);
+		getCommand("infractions").setExecutor(ce);
 	}
 
 	public void loadListeners(){
