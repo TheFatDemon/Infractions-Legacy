@@ -1,0 +1,4 @@
+#default config.yml
+#Infractions Configuration File
+#Global Settings
+motd: true

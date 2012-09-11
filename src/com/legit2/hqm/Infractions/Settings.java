@@ -1,9 +1,5 @@
 package com.legit2.hqm.Infractions;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.bukkit.World;
-
 public class Settings {
 
 	static Infractions plugin;
@@ -32,23 +28,5 @@ public class Settings {
 		if (plugin.getConfig().isDouble(id))
 			return plugin.getConfig().getDouble(id);
 		else return -1;
-	}
-	public static List<World> getEnabledWorlds() {
-		if (!plugin.getConfig().isList("active_worlds"))
-			enableWorlds();
-		else if (plugin.getConfig().getStringList("active_worlds").contains("DEFAULT"))
-			enableWorlds();
-		ArrayList<World> worlds = new ArrayList<World>();
-		for (String s : plugin.getConfig().getStringList("active_worlds")) {
-			worlds.add(plugin.getServer().getWorld(s));
-		}
-		return worlds;
-	}
-	public static void enableWorlds() {
-		ArrayList<String> worlds = new ArrayList<String>();
-		for (World w : plugin.getServer().getWorlds())
-			worlds.add(w.getName());
-		plugin.getConfig().set("active_worlds", worlds);
-		plugin.saveConfig();
 	}
 }
