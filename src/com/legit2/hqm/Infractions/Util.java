@@ -17,7 +17,7 @@ public class Util {
 
 	private static Infractions plugin; // obviously needed
 	static Logger log = Logger.getLogger("Minecraft");
-	public static int SCORECAP = Settings.getSettingInt("score_cap"); // max score
+	public static int SCORECAP = Settings.getSettingInt("ban_at_score"); // max score
 	static Calendar ca1 = Calendar.getInstance();
     static int iDay = ca1.get(Calendar.DATE);
     static int iMonth = ca1.get(Calendar.MONTH) + 1;

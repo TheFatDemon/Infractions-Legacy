@@ -3,7 +3,7 @@
 #Global Settings
 motd: true
 save_interval_seconds: 30
-score_cap: 5
+ban_at_score: 5
 require_proof: false
 #Define Infraction Levels
 level_1:
