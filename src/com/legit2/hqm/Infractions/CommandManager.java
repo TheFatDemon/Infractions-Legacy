@@ -53,6 +53,9 @@ public class CommandManager implements CommandExecutor, Listener {
 					p.sendMessage(ChatColor.GRAY + "/uncite <player> <key>" + ChatColor.WHITE + " - Find the key with " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
 				}
 				p.sendMessage(ChatColor.GRAY + "/history <player>");
+				p.sendMessage(ChatColor.AQUA + "Using the GNU " + ChatColor.DARK_AQUA + "Affero" + ChatColor.AQUA + " General Public License.");
+				p.sendMessage(ChatColor.AQUA + "Read the AGPL at " + ChatColor.YELLOW + "http://bit.ly/TLY1xB");
+				p.sendMessage(ChatColor.AQUA + "Source: " + ChatColor.YELLOW + "https://github.com/HmmmQuestionMark/Infractions");
 				return true;
 			} else if (c.getName().equalsIgnoreCase("cite")) {
 				if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
