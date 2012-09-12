@@ -10,3 +10,9 @@ commands:
         description: Cite a player with an infraction.
         usage: /cite <player> <infraction> [proof-url]
         permission: infractions.mod
+    uncite:
+        description: Remove an infraction from a player.
+        usage: /uncite <player> <key>
+    history:
+        description: Check a player's infraction history.
+        usage: /history <player>

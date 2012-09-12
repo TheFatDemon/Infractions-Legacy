@@ -1,5 +1,11 @@
 package com.legit2.hqm.Infractions;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -9,10 +15,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
+import com.google.common.base.Strings;
+
 public class CommandManager implements CommandExecutor, Listener {
 
 	static Infractions plugin;
 	static Logger log = Logger.getLogger("Minecraft");
+	static Date date = new Date();
 
 	public CommandManager(Infractions i) {
 		plugin = i;
@@ -52,6 +61,8 @@ public class CommandManager implements CommandExecutor, Listener {
 					p.sendMessage("Not enough arguments.");
 					return false;
 				}
+				Random generator = new Random();
+				int id = generator.nextInt();
 				// Level 1
 				if (Levels.getLevel1().contains(args[1])) {
 					if (args.length == 3) {
@@ -64,15 +75,19 @@ public class CommandManager implements CommandExecutor, Listener {
 						p.sendMessage(ChatColor.GOLD + "Success! "
 								+ ChatColor.WHITE
 								+ "The level 1 infraction has been recieved.");
+						Util.setScore(Util.getInfractionsPlayer(args[0]), 1+Util.getScore(Util.getInfractionsPlayer(args[0])));
+						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 1, id, args[1], URLShortenUtil.convertURL(args[2]));
+						Util.checkScore(Util.getInfractionsPlayer(args[0]));
 						return true;
 					}
 					p.sendMessage(ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 1 infraction has been recieved.");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 1+Util.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 1, id, args[1], "No proof.");
+					Util.checkScore(Util.getInfractionsPlayer(args[0]));
 					return true;
-				}
-				// Level 2
-				if (Levels.getLevel2().contains(args[1])) {
+				} else if (Levels.getLevel2().contains(args[1])) {
 					if (args.length == 3) {
 						if (!Util.isValidURL(args[2])) {
 							p.sendMessage("You must provide a valid URL as proof.");
@@ -80,14 +95,22 @@ public class CommandManager implements CommandExecutor, Listener {
 						}
 						p.sendMessage("Proof URL: " + ChatColor.GOLD
 								+ URLShortenUtil.convertURL(args[2]));
+						p.sendMessage(ChatColor.GOLD + "Success! "
+								+ ChatColor.WHITE
+								+ "The level 2 infraction has been recieved.");
+						Util.setScore(Util.getInfractionsPlayer(args[0]), 2+Util.getScore(Util.getInfractionsPlayer(args[0])));
+						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 2, id, args[1], URLShortenUtil.convertURL(args[2]));
+						Util.checkScore(Util.getInfractionsPlayer(args[0]));
+						return true;
 					}
 					p.sendMessage(ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 2 infraction has been recieved.");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 2+Util.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 2, id, args[1], "No proof.");
+					Util.checkScore(Util.getInfractionsPlayer(args[0]));
 					return true;
-				}
-				// Level 3
-				if (Levels.getLevel3().contains(args[1])) {
+				} else if (Levels.getLevel3().contains(args[1])) {
 					if (args.length == 3) {
 						if (!Util.isValidURL(args[2])) {
 							p.sendMessage("You must provide a valid URL as proof.");
@@ -95,14 +118,22 @@ public class CommandManager implements CommandExecutor, Listener {
 						}
 						p.sendMessage("Proof URL: " + ChatColor.GOLD
 								+ URLShortenUtil.convertURL(args[2]));
+						p.sendMessage(ChatColor.GOLD + "Success! "
+								+ ChatColor.WHITE
+								+ "The level 3 infraction has been recieved.");
+						Util.setScore(Util.getInfractionsPlayer(args[0]), 3+Util.getScore(Util.getInfractionsPlayer(args[0])));
+						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 3, id, args[1], URLShortenUtil.convertURL(args[2]));
+						Util.checkScore(Util.getInfractionsPlayer(args[0]));
+						return true;
 					}
 					p.sendMessage(ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 3 infraction has been recieved.");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 3+Util.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 3, id, args[1], "No proof.");
+					Util.checkScore(Util.getInfractionsPlayer(args[0]));
 					return true;
-				}
-				// Level 4
-				if (Levels.getLevel4().contains(args[1])) {
+				} else if (Levels.getLevel4().contains(args[1])) {
 					if (args.length == 3) {
 						if (!Util.isValidURL(args[2])) {
 							p.sendMessage("You must provide a valid URL as proof.");
@@ -110,14 +141,22 @@ public class CommandManager implements CommandExecutor, Listener {
 						}
 						p.sendMessage("Proof URL: " + ChatColor.GOLD
 								+ URLShortenUtil.convertURL(args[2]));
+						p.sendMessage(ChatColor.GOLD + "Success! "
+								+ ChatColor.WHITE
+								+ "The level 4 infraction has been recieved.");
+						Util.setScore(Util.getInfractionsPlayer(args[0]), 4+Util.getScore(Util.getInfractionsPlayer(args[0])));
+						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 4, id, args[1], URLShortenUtil.convertURL(args[2]));
+						Util.checkScore(Util.getInfractionsPlayer(args[0]));
+						return true;
 					}
 					p.sendMessage(ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 4 infraction has been recieved.");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 4+Util.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 4, id, args[1], "No proof.");
+					Util.checkScore(Util.getInfractionsPlayer(args[0]));
 					return true;
-				}
-				// Level 5
-				if (Levels.getLevel5().contains(args[1])) {
+				} else if (Levels.getLevel5().contains(args[1])) {
 					if (args.length == 3) {
 						if (!Util.isValidURL(args[2])) {
 							p.sendMessage("You must provide a valid URL as proof.");
@@ -125,12 +164,60 @@ public class CommandManager implements CommandExecutor, Listener {
 						}
 						p.sendMessage("Proof URL: " + ChatColor.GOLD
 								+ URLShortenUtil.convertURL(args[2]));
+						p.sendMessage(ChatColor.GOLD + "Success! "
+								+ ChatColor.WHITE
+								+ "The level 5 infraction has been recieved.");
+						Util.setScore(Util.getInfractionsPlayer(args[0]), 5+Util.getScore(Util.getInfractionsPlayer(args[0])));
+						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 5, id, args[1], URLShortenUtil.convertURL(args[2]));
+						Util.checkScore(Util.getInfractionsPlayer(args[0]));
+						return true;
 					}
 					p.sendMessage(ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 5 infraction has been recieved.");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 5+Util.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 5, id, args[1], "No proof.");
+					Util.checkScore(Util.getInfractionsPlayer(args[0]));
+					return true;
+				} else {
+					p.sendMessage(ChatColor.YELLOW + "Not a valid infraction type.");
+				}
+				return true;
+			} else if (c.getName().equalsIgnoreCase("uncite")) {
+				Util.removeInfraction(Util.getInfractionsPlayer(args[0]), args[1]);
+				p.sendMessage("Infration ID " + args[1] + " removed.");
+				return true;
+			} else if (c.getName().equalsIgnoreCase("history")) {
+				if (!(args.length == 1)) {
+					p.sendMessage("Not enough arguments.");
+					return false;
+				}
+				/**
+				 *  DISPLAY ALL CURRENT INFRACTIONS
+				 */
+				p.sendMessage(ChatColor.WHITE+ "--- " + ChatColor.YELLOW + Util.getInfractionsPlayer(args[0]) + ChatColor.WHITE + " - " + Util.getScore(Util.getInfractionsPlayer(args[0])) + " ---");
+				try {
+					HashMap<String, String> infractions = Util.getInfractions(Util.getInfractionsPlayer(args[0]));
+			        Set<String> set = infractions.keySet();
+			        Collection<String> coll = infractions.values();
+			        Iterator<String> iterKey = set.iterator();
+			        Iterator<String> iterValue = coll.iterator();
+			        while (iterKey.hasNext())
+			        {
+			            Object oK = iterKey.next();
+			            Object oV = iterValue.next();
+			            String key = oK.toString();
+			            int lineKey = (40 - key.length());
+			            p.sendMessage(oV.toString());
+			            key += " " + ChatColor.WHITE + Strings.repeat("-", lineKey);
+			            p.sendMessage("Key: " + ChatColor.GOLD + key);
+			            return true;
+			        }
+				} catch (NullPointerException e) {
+					p.sendMessage("No infractions!");
 					return true;
 				}
+				p.sendMessage("No infractions!");
 				return true;
 			}
 		}

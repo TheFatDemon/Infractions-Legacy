@@ -178,7 +178,6 @@ public class Save {
 	public Save(String path) {
 		PATH = path;
 		SAVEDDATA = new HashMap<String, HashMap<String, Object>>();
-		int participants = 0;
 		File f1 = new File(PATH + "Players/");
 		if (!f1.exists()) {
 			log.info("[Infractions] Creating a new player save.");
@@ -204,7 +203,5 @@ public class Save {
 				}
 			}
 		}
-		log.info("[Infractions] Loaded " + participants + " Infractions from "
-				+ f1.listFiles().length + " player files.");
 	}
 }

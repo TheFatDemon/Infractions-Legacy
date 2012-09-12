@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -16,24 +17,28 @@ public class Util {
 
 	private static Infractions plugin; // obviously needed
 	static Logger log = Logger.getLogger("Minecraft");
-	public static int SCORECAP = Settings.getSettingInt("score_cap"); // max
-																		// score
+	public static int SCORECAP = Settings.getSettingInt("score_cap"); // max score
+	static Calendar ca1 = Calendar.getInstance();
+    static int iDay = ca1.get(Calendar.DATE);
+    static int iMonth = ca1.get(Calendar.MONTH) + 1;
+    static int iYear = ca1.get(Calendar.YEAR);
+    static String date = iYear + "," + iMonth + "," + iDay + "," + ca1.get(Calendar.HOUR_OF_DAY) + ":" + ca1.get(Calendar.MINUTE);
 
 	/**
 	 * Add a single infraction
 	 * 
-	 * @param p
-	 * @param crimename
-	 * @param lengthInSeconds
+	 * @param target
+	 * @param infraction
+	 * @param proof
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean addInfraction(String p, String crimename,
-			int lengthInSeconds) {
-		if (!Save.hasData(p, "INFRACTIONS")) {
-			setInfractions(p, new HashMap<String, Long>());
+	public static boolean addInfraction(String target,int level, int id, String infraction, String proof) {
+		if (!Save.hasData(target, "INFRACTIONS")) {
+			setInfractions(target, new HashMap<String, String>());
 		}
-		// TODO
+		String readableID = Integer.toString(id);
+		((HashMap<String, String>)Save.getData(target, "INFRACTIONS")).put(readableID, level + ":" + infraction + " - " + proof + " - " + date);
 		return true;
 	}
 
@@ -44,22 +49,33 @@ public class Util {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static HashMap<String, Long> getInfractions(String p) {
-		if (Save.hasData(p, "INFRACTIONS")) {
-			// TODO
+	public static HashMap<String, String> getInfractions(String target) {
+		if (Save.hasData(target, "INFRACTIONS")) {
+			HashMap<String, String> original = ((HashMap<String, String>)Save.getData(target, "INFRACTIONS"));
+			HashMap<String, String> toreturn = new HashMap<String, String>();
+			for (String s : original.keySet()) {
+					toreturn.put(s, original.get(s));
+			}
+			setInfractions(target, toreturn); //clean original
+			return toreturn;
 		}
 		return null;
 	}
 
 	/**
-	 * Returns the infractions on a player
+	 * Returns the infractions a player has
 	 * 
 	 * @param p
 	 * @return
 	 */
-	public static ArrayList<String> getInfractionsList(String p) {
-		if (Save.hasData(p, "INFRACTIONS")) {
-			// TODO
+	public static ArrayList<String> getInfractionsList(String target) {
+		if (Save.hasData(target, "INFRACTIONS")) {
+			HashMap<String, String> original = getInfractions(target);
+			ArrayList<String> toreturn = new ArrayList<String>();
+			for (String s : original.keySet()) {
+				toreturn.add(s);
+			}
+			return toreturn;
 		}
 		return null;
 	}
@@ -157,16 +173,18 @@ public class Util {
 	 * Remove a single infraction
 	 * 
 	 * @param p
-	 * @param crimename
-	 * @param lengthInSeconds
+	 * @param id
 	 * @return
 	 */
-	public static boolean removeInfraction(String p, String crimename) {
-		// TODO
+	public static boolean removeInfraction(String target, String givenID) {
+		for (String readableID : Util.getInfractionsList(target)) {
+			if (readableID.equals(givenID))
+				return (Util.getInfractions(target).remove(readableID) == null);
+		}
 		return false;
 	}
 
-	public static void setInfractions(String p, HashMap<String, Long> data) {
+	public static void setInfractions(String p, HashMap<String, String> data) {
 		Save.saveData(p, "INFRACTIONS", data);
 	}
 
@@ -194,5 +212,34 @@ public class Util {
 
 	public Util(Infractions i) {
 		plugin = i;
+	}
+	/**
+	 * Get a player's score.
+	 * @param p
+	 * @return
+	 */
+	public static int getScore(Player p) {
+		return getScore(p.getName());
+	}
+	/**
+	 * Get a player's score.
+	 * @param p
+	 * @return
+	 */
+	public static int getScore(String p) {
+		if (Save.hasData(p, "SCORE"))
+			return (Integer)Save.getData(p, "SCORE");
+		return -1;
+	}
+	/**
+	 * Get a player's score.
+	 * @param p
+	 */
+	public static void checkScore(String p) {
+		if (SCORECAP <= getScore(p)) {
+			Bukkit.getPlayer(p).setBanned(true);
+		} else {
+			Bukkit.getPlayer(p).setBanned(false);
+		}
 	}
 }

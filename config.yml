@@ -2,6 +2,7 @@
 #Infractions Configuration File
 #Global Settings
 motd: true
+save_interval_seconds: 30
 score_cap: 5
 require_proof: false
 #Define Infraction Levels

@@ -36,9 +36,6 @@ public class Infractions extends JavaPlugin implements Listener {
 					public void run() {
 						try {
 							Save.save(mainDirectory);
-							log.info("[Infractions] Saved data players. "
-									+ Save.getCompleteData().size()
-									+ " files total.");
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 							log.severe("[Infractions] Save location error. Screenshot the stack trace and send to marinating.");
@@ -51,13 +48,14 @@ public class Infractions extends JavaPlugin implements Listener {
 	}
 
 	public void loadCommands() {
-		// for help files
 		CommandManager ce = new CommandManager(this);
-		// general
+		// info
 		getServer().getPluginManager().registerEvents(ce, this);
 		getCommand("infractions").setExecutor(ce);
+		getCommand("history").setExecutor(ce);
+		// actions
 		getCommand("cite").setExecutor(ce);
-		// getCommand("").setExecutor(ce);
+		getCommand("uncite").setExecutor(ce);
 	}
 
 	public void loadListeners() {
@@ -83,7 +81,7 @@ public class Infractions extends JavaPlugin implements Listener {
 			if (bt.getOwner().equals(this))
 				c++;
 		this.getServer().getScheduler().cancelTasks(this);
-		log.info("[Infractions] Save completed and " + c + " tasuks cancelled.");
+		log.info("[Infractions] Save completed and " + c + " tasks cancelled.");
 	}
 
 	@Override
