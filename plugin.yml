@@ -6,3 +6,7 @@ author: HmmmQuestionMark
 commands:
     infractions:
         description: Important information.
+    cite:
+        description: Cite a player with an infraction.
+        usage: /cite <player> <infraction> [proof-url]
+        permission: infractions.mod

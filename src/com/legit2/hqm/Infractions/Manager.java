@@ -2,7 +2,6 @@ package com.legit2.hqm.Infractions;
 
 import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,10 +15,7 @@ public class Manager implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent e) { // sync to master file
 		final Player p = e.getPlayer();
 		if (Settings.getSettingBoolean("motd")) {
-			p.sendMessage("This server is running Infractions v"
-					+ ChatColor.YELLOW
-					+ Util.getPlugin().getDescription().getVersion()
-					+ ChatColor.WHITE + ".");
+			p.sendMessage("This server is policed with infractions.");
 		}
 		if (!Save.hasPlayer(p)) {
 			Logger.getLogger("Minecraft")

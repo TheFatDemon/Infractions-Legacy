@@ -2,3 +2,28 @@
 #Infractions Configuration File
 #Global Settings
 motd: true
+score_cap: 5
+require_proof: false
+use_bitly: true
+bitly_user: HmmmQuestionMark
+bitly_client_id: 3547fb3390b81da432eb593f741bfba270387dda
+#Define Infraction Levels
+level_1:
+  - flying
+  - sm-hacking
+  - sm-griefing
+level_2:
+  - advertising
+  - duping
+  - immaturity
+level_3:
+  - griefing
+  - disrespect
+  - racism
+  - bullying
+level_4:
+  - spamming
+  - team-griefing
+level_5:
+  - lg-hacking
+  - lg-griefing

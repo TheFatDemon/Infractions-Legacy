@@ -11,30 +11,57 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
 
-import com.legit2.hqm.Infractions.Util;
-
 public class Infractions extends JavaPlugin implements Listener {
 	public static Logger log = Logger.getLogger("Minecraft");
 	static String mainDirectory = "plugins/Infractions/";
-    Util initialize;
+	Util initialize;
 	Save SAVE;
 
-	public Infractions(){
+	public Infractions() {
 		super();
 	}
 
-	@Override
-	public void onEnable() {
-		long firstTime = System.currentTimeMillis();
-		log.info("[Infractions] Initializing.");
-		new Settings(this); // #1 (needed for Util to load)
-		log.info("[Infractions] Updating configuration.");
-		initialize = new Util(this); // #2 (needed for everything else to work)
-		SAVE = new Save(mainDirectory); // #3 (needed to start save system)
-		loadListeners(); // #4
-		loadCommands(); // #5 (needed)
-		initializeThreads(); // #6 (regen and etc)
-		log.info("[Infractions] Preparation completed in "+((double)(System.currentTimeMillis()-firstTime)/1000)+" seconds.");
+	private void initializeThreads() {
+		int startdelay = (int) (Settings
+				.getSettingDouble("start_delay_seconds") * 20);
+		int savefrequency = Settings.getSettingInt("save_interval_seconds") * 20;
+		if (startdelay <= 0)
+			startdelay = 1;
+		if (savefrequency <= 0)
+			savefrequency = 300;
+		// data save
+		getServer().getScheduler().scheduleSyncRepeatingTask(this,
+				new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Save.save(mainDirectory);
+							log.info("[Infractions] Saved data players. "
+									+ Save.getCompleteData().size()
+									+ " files total.");
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+							log.severe("[Infractions] Save location error. Screenshot the stack trace and send to marinating.");
+						} catch (IOException e) {
+							e.printStackTrace();
+							log.severe("[Infractions] Save write error. Screenshot the stack trace and send to marinating.");
+						}
+					}
+				}, startdelay, savefrequency);
+	}
+
+	public void loadCommands() {
+		// for help files
+		CommandManager ce = new CommandManager(this);
+		// general
+		getServer().getPluginManager().registerEvents(ce, this);
+		getCommand("infractions").setExecutor(ce);
+		getCommand("cite").setExecutor(ce);
+		// getCommand("").setExecutor(ce);
+	}
+
+	public void loadListeners() {
+		getServer().getPluginManager().registerEvents(new Manager(), this);
 	}
 
 	@Override
@@ -56,7 +83,23 @@ public class Infractions extends JavaPlugin implements Listener {
 			if (bt.getOwner().equals(this))
 				c++;
 		this.getServer().getScheduler().cancelTasks(this);
-		log.info("[Infractions] Save completed and "+c+" tasuks cancelled.");
+		log.info("[Infractions] Save completed and " + c + " tasuks cancelled.");
+	}
+
+	@Override
+	public void onEnable() {
+		long firstTime = System.currentTimeMillis();
+		log.info("[Infractions] Initializing.");
+		new Settings(this); // #1 (needed for Util to load)
+		log.info("[Infractions] Updating configuration.");
+		initialize = new Util(this); // #2 (needed for everything else to work)
+		SAVE = new Save(mainDirectory); // #3 (needed to start save system)
+		loadListeners(); // #4
+		loadCommands(); // #5 (needed)
+		initializeThreads(); // #6 (regen and etc)
+		log.info("[Infractions] Preparation completed in "
+				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
+				+ " seconds.");
 	}
 
 	@EventHandler
@@ -70,40 +113,5 @@ public class Infractions extends JavaPlugin implements Listener {
 			er.printStackTrace();
 			log.severe("[Infractions] Save write error. Screenshot the stack trace and send to marinating.");
 		}
-	}
-
-	public void loadCommands() {
-		//for help files
-		CommandManager ce = new CommandManager(this);
-		//general
-		getServer().getPluginManager().registerEvents(ce, this);
-		getCommand("infractions").setExecutor(ce);
-	}
-
-	public void loadListeners(){
-		getServer().getPluginManager().registerEvents(new Manager(), this);
-	}
-
-	private void initializeThreads() {
-		int startdelay = (int)(Settings.getSettingDouble("start_delay_seconds")*20);
-		int savefrequency = Settings.getSettingInt("save_interval_seconds")*20;
-		if (startdelay <= 0) startdelay = 1;
-		if (savefrequency <= 0) savefrequency = 300;
-		//data save
-		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Save.save(mainDirectory);
-					log.info("[Infractions] Saved data players. "+Save.getCompleteData().size()+" files total.");
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-					log.severe("[Infractions] Save location error. Screenshot the stack trace and send to marinating.");
-				} catch (IOException e) {
-					e.printStackTrace();
-					log.severe("[Infractions] Save write error. Screenshot the stack trace and send to marinating.");
-				}
-			}
-		}, startdelay, savefrequency);
 	}
 }
