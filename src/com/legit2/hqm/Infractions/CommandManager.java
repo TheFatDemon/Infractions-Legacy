@@ -35,15 +35,27 @@ public class CommandManager implements CommandExecutor, Listener {
 			p = (Player) sender;
 		if (p == null) {
 			if (c.getName().equalsIgnoreCase("infractions")) {
-				log.info("[Infractions] This is a test...");
-			} else if (c.getName().equalsIgnoreCase("cite")) {
-				log.info("[Infractions] You must log in to use this command.");
+				log.info("[Infractions] You cannot do anything from the console yet..."); // TODO
+			} else if (c.getName().equalsIgnoreCase("cite")) { // TODO
+				log.info("[Infractions] You must log in to use this command."); // TODO
+			} else if (c.getName().equalsIgnoreCase("uncite")) {
+				log.info("[Infractions] You must log in to use this command."); // TODO
+			} else if (c.getName().equalsIgnoreCase("history")) {
+				log.info("[Infractions] You must log in to use this command."); // TODO
 			}
+			
 		} else {
 			if (c.getName().equalsIgnoreCase("infractions")) {
-				p.sendMessage("This is a test...");
+				p.sendMessage("INFRACTIONS HELP");
+				p.sendMessage("----------------");
+				if (Util.hasPermissionOrOP(p, "infractions.mod")) {
+					p.sendMessage(ChatColor.GRAY + "/cite <player> <infraction> [proof-url]");
+					p.sendMessage(ChatColor.GRAY + "/uncite <player> <key>" + ChatColor.WHITE + " - Find the key with " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
+				}
+				p.sendMessage(ChatColor.GRAY + "/history <player>");
+				return true;
 			} else if (c.getName().equalsIgnoreCase("cite")) {
-				if (!Util.hasPermission(p, "infractions.mod")) {
+				if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
 					p.sendMessage("You do not have enough permissions.");
 					return true;
 				}
@@ -198,6 +210,10 @@ public class CommandManager implements CommandExecutor, Listener {
 					p.sendMessage("Not enough arguments.");
 					return false;
 				}
+				if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
+					p.sendMessage("You do not have enough permissions.");
+					return true;
+				}
 				try {
 					HashMap<String, String> infractions = Util.getInfractions(Util.getInfractionsPlayer(args[0]));
 			        Set<String> set = infractions.keySet();
@@ -230,6 +246,7 @@ public class CommandManager implements CommandExecutor, Listener {
 			            }
 			        }
 			        Util.removeInfraction(Util.getInfractionsPlayer(args[0]), args[1]);
+			        p.sendMessage("Infraction removed.");
 			        return true;
 				} catch (NullPointerException e) {
 					p.sendMessage("No such infraction exists.");
@@ -240,30 +257,33 @@ public class CommandManager implements CommandExecutor, Listener {
 					p.sendMessage("Not enough arguments.");
 					return false;
 				}
-				/**
-				 *  DISPLAY ALL CURRENT INFRACTIONS
-				 */
-				p.sendMessage(ChatColor.WHITE+ "--- " + ChatColor.YELLOW + Util.getInfractionsPlayer(args[0]) + ChatColor.WHITE + " - " + Util.getScore(Util.getInfractionsPlayer(args[0])) + " ---");
-				try {
-					HashMap<String, String> infractions = Util.getInfractions(Util.getInfractionsPlayer(args[0]));
-			        Set<String> set = infractions.keySet();
-			        Collection<String> coll = infractions.values();
-			        Iterator<String> iterKey = set.iterator();
-			        Iterator<String> iterValue = coll.iterator();
-			        while (iterKey.hasNext())
-			        {
-			            Object oK = iterKey.next();
-			            Object oV = iterValue.next();
-			            String key = oK.toString();
-			            int lineKey = (40 - key.length());
-			            p.sendMessage(oV.toString());
-			            key += " " + ChatColor.WHITE + Strings.repeat("-", lineKey);
-			            p.sendMessage("Key: " + ChatColor.GOLD + key);
-			        }
-			        return true;
-				} catch (NullPointerException e) {
-					p.sendMessage("No infractions!");
-					return true;
+				if (Util.hasPermissionOrOP(p, "infractions.mod") || Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).equals(p)) {
+					/**
+					 *  DISPLAY ALL CURRENT INFRACTIONS
+					 */
+					p.sendMessage(ChatColor.WHITE+ "--- " + ChatColor.YELLOW + Util.getInfractionsPlayer(args[0]) + ChatColor.WHITE + " - " + Util.getScore(Util.getInfractionsPlayer(args[0])) + " ---");
+					try {
+						HashMap<String, String> infractions = Util.getInfractions(Util.getInfractionsPlayer(args[0]));
+				        Set<String> set = infractions.keySet();
+				        Collection<String> coll = infractions.values();
+				        Iterator<String> iterKey = set.iterator();
+				        Iterator<String> iterValue = coll.iterator();
+				        while (iterKey.hasNext())
+				        {
+				            Object oK = iterKey.next();
+				            Object oV = iterValue.next();
+				            String key = oK.toString();
+				            int lineKey = (40 - key.length());
+				            p.sendMessage(oV.toString().substring(2));
+				            if (Util.hasPermissionOrOP(p, "infractions.mod")) {
+					            key += " " + ChatColor.WHITE + Strings.repeat("-", lineKey);
+					            p.sendMessage("Key: " + ChatColor.GOLD + key);
+				            }
+				        }
+				        return true;
+					} catch (NullPointerException e) {
+						return true;
+					}
 				}
 			}
 		}
