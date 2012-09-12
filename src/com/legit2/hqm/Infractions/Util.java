@@ -229,17 +229,22 @@ public class Util {
 	public static int getScore(String p) {
 		if (Save.hasData(p, "SCORE"))
 			return (Integer)Save.getData(p, "SCORE");
-		return -1;
+		return 0;
 	}
 	/**
-	 * Get a player's score.
+	 * Check a player's score to see if they should be banned.
 	 * @param p
 	 */
 	public static void checkScore(String p) {
 		if (SCORECAP <= getScore(p)) {
+			getOnlinePlayer(p).kickPlayer("You have been banned.");
 			Bukkit.getPlayer(p).setBanned(true);
 		} else {
 			Bukkit.getPlayer(p).setBanned(false);
 		}
+	}
+	
+	public static Player getOnlinePlayer(String name) {
+		return plugin.getServer().getPlayer(name);
 	}
 }
