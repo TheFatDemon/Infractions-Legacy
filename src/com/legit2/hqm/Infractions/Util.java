@@ -11,18 +11,21 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class Util {
 
 	private static Infractions plugin; // obviously needed
 	static Logger log = Logger.getLogger("Minecraft");
-	public static int SCORECAP = Settings.getSettingInt("ban_at_score"); // max score
+	public static int SCORECAP = Settings.getSettingInt("ban_at_score"); // max
+																			// score
 	static Calendar ca1 = Calendar.getInstance();
-    static int iDay = ca1.get(Calendar.DATE);
-    static int iMonth = ca1.get(Calendar.MONTH) + 1;
-    static int iYear = ca1.get(Calendar.YEAR);
-    static String date = iYear + "," + iMonth + "," + iDay + "," + ca1.get(Calendar.HOUR_OF_DAY) + ":" + ca1.get(Calendar.MINUTE);
+	static int iDay = ca1.get(Calendar.DATE);
+	static int iMonth = ca1.get(Calendar.MONTH) + 1;
+	static int iYear = ca1.get(Calendar.YEAR);
+	static String date = iYear + "," + iMonth + "," + iDay + ","
+			+ ca1.get(Calendar.HOUR_OF_DAY) + ":" + ca1.get(Calendar.MINUTE);
 
 	/**
 	 * Add a single infraction
@@ -33,13 +36,39 @@ public class Util {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean addInfraction(String target,int level, int id, String infraction, String proof) {
+	public static boolean addInfraction(String target, int level, int id,
+			String infraction, String proof) {
 		if (!Save.hasData(target, "INFRACTIONS")) {
 			setInfractions(target, new HashMap<String, String>());
 		}
 		String readableID = Integer.toString(id);
-		((HashMap<String, String>)Save.getData(target, "INFRACTIONS")).put(readableID, level + ":" + infraction + " - " + proof + " - " + date);
+		((HashMap<String, String>) Save.getData(target, "INFRACTIONS")).put(
+				readableID, level + ":" + infraction + " - " + proof + " - "
+						+ date);
 		return true;
+	}
+
+	/**
+	 * Check a player's score to see if they should be banned.
+	 * 
+	 * @param p
+	 */
+	
+	public static void checkScore(Player p) {
+		if (SCORECAP <= getScore(p)) {
+			p.kickPlayer("You have been banned.");
+			try {
+				p.setBanned(true);
+			} catch (NullPointerException e) {
+				log.info("[Infractions] Unable to set " + p.toString() + " to banned.");
+			}
+		} else {
+			try {
+				p.setBanned(false);
+			} catch (NullPointerException e) {
+				log.info("[Infractions] Unable to set " + p.toString() + " to unbanned.");
+			}
+		}
 	}
 
 	/**
@@ -51,12 +80,13 @@ public class Util {
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, String> getInfractions(String target) {
 		if (Save.hasData(target, "INFRACTIONS")) {
-			HashMap<String, String> original = ((HashMap<String, String>)Save.getData(target, "INFRACTIONS"));
+			HashMap<String, String> original = ((HashMap<String, String>) Save
+					.getData(target, "INFRACTIONS"));
 			HashMap<String, String> toreturn = new HashMap<String, String>();
 			for (String s : original.keySet()) {
-					toreturn.put(s, original.get(s));
+				toreturn.put(s, original.get(s));
 			}
-			setInfractions(target, toreturn); //clean original
+			setInfractions(target, toreturn); // clean original
 			return toreturn;
 		}
 		return null;
@@ -98,8 +128,39 @@ public class Util {
 		return found;
 	}
 
+	public static Player getOnlinePlayer(String name) {
+		return plugin.getServer().getPlayer(name);
+	}
+	
+	public static OfflinePlayer getOfflinePlayer(String name) {
+        OfflinePlayer target = plugin.getServer().getOfflinePlayer(name);
+		return target;
+	}
+
 	public static Infractions getPlugin() {
 		return plugin;
+	}
+
+	/**
+	 * Get a player's score.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public static int getScore(Player p) {
+		return getScore(p.getName());
+	}
+
+	/**
+	 * Get a player's score.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public static int getScore(String p) {
+		if (Save.hasData(p, "SCORE"))
+			return (Integer) Save.getData(p, "SCORE");
+		return 0;
 	}
 
 	/**
@@ -109,9 +170,11 @@ public class Util {
 	 * @param pe
 	 * @return
 	 */
-	public static boolean hasPermission(Player p, String pe) {// convenience
+	public static boolean hasPermission(Player p, String pe) { // convenience
 																// method for
 																// permissions
+		if (p == null)
+			return true;
 		if (p.isOp())
 			return true;
 		return p.hasPermission(pe);
@@ -124,10 +187,12 @@ public class Util {
 	 * @param pe
 	 * @return
 	 */
-	public static boolean hasPermissionOrOP(Player p, String pe) {// convenience
+	public static boolean hasPermissionOrOP(Player p, String pe) { // convenience
 																	// method
 																	// for
 																	// permissions
+		if (p == null)
+			return true;
 		if (p.isOp())
 			return true;
 		return p.hasPermission(pe);
@@ -158,6 +223,15 @@ public class Util {
 			return false;
 		} catch (URISyntaxException e) {
 			return false;
+		}
+	}
+
+	public static void messageSend(Player p, String str) {
+		if (p == null) {
+			str = "[Infractions] " + str;
+			log.info(str);
+		} else {
+			p.sendMessage(str);
 		}
 	}
 
@@ -212,39 +286,5 @@ public class Util {
 
 	public Util(Infractions i) {
 		plugin = i;
-	}
-	/**
-	 * Get a player's score.
-	 * @param p
-	 * @return
-	 */
-	public static int getScore(Player p) {
-		return getScore(p.getName());
-	}
-	/**
-	 * Get a player's score.
-	 * @param p
-	 * @return
-	 */
-	public static int getScore(String p) {
-		if (Save.hasData(p, "SCORE"))
-			return (Integer)Save.getData(p, "SCORE");
-		return 0;
-	}
-	/**
-	 * Check a player's score to see if they should be banned.
-	 * @param p
-	 */
-	public static void checkScore(String p) {
-		if (SCORECAP <= getScore(p)) {
-			getOnlinePlayer(p).kickPlayer("You have been banned.");
-			Bukkit.getPlayer(p).setBanned(true);
-		} else {
-			Bukkit.getPlayer(p).setBanned(false);
-		}
-	}
-	
-	public static Player getOnlinePlayer(String name) {
-		return plugin.getServer().getPlayer(name);
 	}
 }

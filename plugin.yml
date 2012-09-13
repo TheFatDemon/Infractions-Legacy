@@ -16,3 +16,7 @@ commands:
     history:
         description: Check a player's infraction history.
         usage: /history <player>
+permissions:
+    infractions.mod:
+        description: Gives access to all Inferno commands
+        default: op

@@ -21,9 +21,10 @@ public class Manager implements Listener {
 			Logger.getLogger("Minecraft")
 					.info("[Infractions] "
 							+ p.getName()
-							+ " joined and no save was detected. Creating new file.");
+							+ " joined for the first time.");
 			Save.addPlayer(p);
 		}
 		Save.saveData(p, "LASTLOGINTIME", System.currentTimeMillis());
+		Util.checkScore(p);
 	}
 }

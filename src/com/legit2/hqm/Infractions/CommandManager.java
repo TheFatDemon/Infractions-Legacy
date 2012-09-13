@@ -33,260 +33,385 @@ public class CommandManager implements CommandExecutor, Listener {
 		Player p = null;
 		if (sender instanceof Player)
 			p = (Player) sender;
-		if (p == null) {
-			if (c.getName().equalsIgnoreCase("infractions")) {
-				log.info("[Infractions] You cannot do anything from the console yet..."); // TODO
-			} else if (c.getName().equalsIgnoreCase("cite")) { // TODO
-				log.info("[Infractions] You must log in to use this command."); // TODO
-			} else if (c.getName().equalsIgnoreCase("uncite")) {
-				log.info("[Infractions] You must log in to use this command."); // TODO
-			} else if (c.getName().equalsIgnoreCase("history")) {
-				log.info("[Infractions] You must log in to use this command."); // TODO
+		if (p == null) { // TODO
+			log.info("[Infractions] Console commands not yet complete...");
+			log.info("[Infractions] For now, just use in-game commands.");
+			return true;
+		}
+		if (c.getName().equalsIgnoreCase("infractions")) {
+			Util.messageSend(p, "---------------");
+			Util.messageSend(p, "INFRACTIONS HELP");
+			Util.messageSend(p, "---------------");
+			if (Util.hasPermissionOrOP(p, "infractions.mod")) {
+				Util.messageSend(p, ChatColor.GRAY
+						+ "/cite <player> <infraction> [proof-url]");
+				Util.messageSend(p, ChatColor.GRAY + "/uncite <player> <key>"
+						+ ChatColor.WHITE + " - Find the key with "
+						+ ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
 			}
-			
-		} else {
-			if (c.getName().equalsIgnoreCase("infractions")) {
-				p.sendMessage("INFRACTIONS HELP");
-				p.sendMessage("----------------");
-				if (Util.hasPermissionOrOP(p, "infractions.mod")) {
-					p.sendMessage(ChatColor.GRAY + "/cite <player> <infraction> [proof-url]");
-					p.sendMessage(ChatColor.GRAY + "/uncite <player> <key>" + ChatColor.WHITE + " - Find the key with " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
-				}
-				p.sendMessage(ChatColor.GRAY + "/history <player>");
-				p.sendMessage(ChatColor.AQUA + "Using the GNU " + ChatColor.DARK_AQUA + "Affero" + ChatColor.AQUA + " General Public License.");
-				p.sendMessage(ChatColor.AQUA + "Read the AGPL at " + ChatColor.YELLOW + "http://bit.ly/TLY1xB");
-				p.sendMessage(ChatColor.AQUA + "Source: " + ChatColor.YELLOW + "https://github.com/HmmmQuestionMark/Infractions");
+			Util.messageSend(p, ChatColor.GRAY + "/history <player>");
+			Util.messageSend(p, ChatColor.AQUA + "Using the GNU "
+					+ ChatColor.DARK_AQUA + "Affero" + ChatColor.AQUA
+					+ " General Public License.");
+			Util.messageSend(p, ChatColor.AQUA + "Read the AGPL at "
+					+ ChatColor.YELLOW + "http://bit.ly/TLY1xB");
+			Util.messageSend(p, ChatColor.AQUA + "Source: " + ChatColor.YELLOW
+					+ "https://github.com/HmmmQuestionMark/Infractions");
+			return true;
+		} else if (c.getName().equalsIgnoreCase("cite")) {
+			if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
+				Util.messageSend(p, "You do not have enough permissions.");
 				return true;
-			} else if (c.getName().equalsIgnoreCase("cite")) {
-				if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
-					p.sendMessage("You do not have enough permissions.");
-					return true;
-				}
-				if (Settings.getSettingBoolean("require_proof")) {
-					if ((args.length != 3)) {
-						p.sendMessage("You must provide a valid URL as proof.");
-						return false;
-					}
-					if (!Util.isValidURL(args[2])) {
-						p.sendMessage("You must provide a valid URL as proof.");
-						return false;
-					}
-				}
-				if (args.length == 0 || args.length == 1) {
-					p.sendMessage("Not enough arguments.");
+			}
+			if (Settings.getSettingBoolean("require_proof")) {
+				if ((args.length != 3)) {
+					Util.messageSend(p,
+							"You must provide a valid URL as proof.");
 					return false;
 				}
-				Random generator = new Random();
-				int id = generator.nextInt();
-				// Level 1
-				if (Levels.getLevel1().contains(args[1])) {
-					if (args.length == 3) {
-						if (!Util.isValidURL(args[2])) {
-							p.sendMessage("You must provide a valid URL as proof.");
-							return false;
-						}
-						p.sendMessage("Proof URL: " + ChatColor.GOLD
-								+ URLShortenUtil.convertURL(args[2]));
-						p.sendMessage(ChatColor.GOLD + "Success! "
-								+ ChatColor.WHITE
-								+ "The level 1 infraction has been recieved.");
-						Util.setScore(Util.getInfractionsPlayer(args[0]), 1+Util.getScore(Util.getInfractionsPlayer(args[0])));
-						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 1, id, args[1], URLShortenUtil.convertURL(args[2]));
-						Util.checkScore(Util.getInfractionsPlayer(args[0]));
-						Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
-						return true;
+				if (!Util.isValidURL(args[2])) {
+					Util.messageSend(p,
+							"You must provide a valid URL as proof.");
+					return false;
+				}
+			}
+			if (args.length == 0 || args.length == 1) {
+				Util.messageSend(p, "Not enough arguments.");
+				return false;
+			}
+			Random generator = new Random();
+			int id = generator.nextInt();
+			// Level 1
+			if (Levels.getLevel1().contains(args[1])) {
+				if (args.length == 3) {
+					if (!Util.isValidURL(args[2])) {
+						Util.messageSend(p,
+								"You must provide a valid URL as proof.");
+						return false;
 					}
-					p.sendMessage(ChatColor.GOLD + "Success! "
+					Util.messageSend(p, "Proof URL: " + ChatColor.GOLD
+							+ URLShortenUtil.convertURL(args[2]));
+					Util.messageSend(p, ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 1 infraction has been recieved.");
-					Util.setScore(Util.getInfractionsPlayer(args[0]), 1+Util.getScore(Util.getInfractionsPlayer(args[0])));
-					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 1, id, args[1], "No proof.");
-					Util.checkScore(Util.getInfractionsPlayer(args[0]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 1 + Util
+							.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 1,
+							id, args[1], URLShortenUtil.convertURL(args[2]));
+					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+							.kickPlayer(
+									"You've been cited for " + args[1] + ".");
 					return true;
-				} else if (Levels.getLevel2().contains(args[1])) {
-					if (args.length == 3) {
-						if (!Util.isValidURL(args[2])) {
-							p.sendMessage("You must provide a valid URL as proof.");
-							return false;
-						}
-						p.sendMessage("Proof URL: " + ChatColor.GOLD
-								+ URLShortenUtil.convertURL(args[2]));
-						p.sendMessage(ChatColor.GOLD + "Success! "
-								+ ChatColor.WHITE
-								+ "The level 2 infraction has been recieved.");
-						Util.setScore(Util.getInfractionsPlayer(args[0]), 2+Util.getScore(Util.getInfractionsPlayer(args[0])));
-						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 2, id, args[1], URLShortenUtil.convertURL(args[2]));
-						Util.checkScore(Util.getInfractionsPlayer(args[0]));
-						Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
-						return true;
+				}
+				Util.messageSend(p, ChatColor.GOLD + "Success! "
+						+ ChatColor.WHITE
+						+ "The level 1 infraction has been recieved.");
+				Util.setScore(Util.getInfractionsPlayer(args[0]),
+						1 + Util.getScore(Util.getInfractionsPlayer(args[0])));
+				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 1, id,
+						args[1], "No proof.");
+				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+						.kickPlayer("You've been cited for " + args[1] + ".");
+				return true;
+			} else if (Levels.getLevel2().contains(args[1])) {
+				if (args.length == 3) {
+					if (!Util.isValidURL(args[2])) {
+						Util.messageSend(p,
+								"You must provide a valid URL as proof.");
+						return false;
 					}
-					p.sendMessage(ChatColor.GOLD + "Success! "
+					Util.messageSend(p, "Proof URL: " + ChatColor.GOLD
+							+ URLShortenUtil.convertURL(args[2]));
+					Util.messageSend(p, ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 2 infraction has been recieved.");
-					Util.setScore(Util.getInfractionsPlayer(args[0]), 2+Util.getScore(Util.getInfractionsPlayer(args[0])));
-					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 2, id, args[1], "No proof.");
-					Util.checkScore(Util.getInfractionsPlayer(args[0]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 2 + Util
+							.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 2,
+							id, args[1], URLShortenUtil.convertURL(args[2]));
+					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+							.kickPlayer(
+									"You've been cited for " + args[1] + ".");
 					return true;
-				} else if (Levels.getLevel3().contains(args[1])) {
-					if (args.length == 3) {
-						if (!Util.isValidURL(args[2])) {
-							p.sendMessage("You must provide a valid URL as proof.");
-							return false;
-						}
-						p.sendMessage("Proof URL: " + ChatColor.GOLD
-								+ URLShortenUtil.convertURL(args[2]));
-						p.sendMessage(ChatColor.GOLD + "Success! "
-								+ ChatColor.WHITE
-								+ "The level 3 infraction has been recieved.");
-						Util.setScore(Util.getInfractionsPlayer(args[0]), 3+Util.getScore(Util.getInfractionsPlayer(args[0])));
-						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 3, id, args[1], URLShortenUtil.convertURL(args[2]));
-						Util.checkScore(Util.getInfractionsPlayer(args[0]));
-						Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
-						return true;
+				}
+				Util.messageSend(p, ChatColor.GOLD + "Success! "
+						+ ChatColor.WHITE
+						+ "The level 2 infraction has been recieved.");
+				Util.setScore(Util.getInfractionsPlayer(args[0]),
+						2 + Util.getScore(Util.getInfractionsPlayer(args[0])));
+				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 2, id,
+						args[1], "No proof.");
+				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+						.kickPlayer("You've been cited for " + args[1] + ".");
+				return true;
+			} else if (Levels.getLevel3().contains(args[1])) {
+				if (args.length == 3) {
+					if (!Util.isValidURL(args[2])) {
+						Util.messageSend(p,
+								"You must provide a valid URL as proof.");
+						return false;
 					}
-					p.sendMessage(ChatColor.GOLD + "Success! "
+					Util.messageSend(p, "Proof URL: " + ChatColor.GOLD
+							+ URLShortenUtil.convertURL(args[2]));
+					Util.messageSend(p, ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 3 infraction has been recieved.");
-					Util.setScore(Util.getInfractionsPlayer(args[0]), 3+Util.getScore(Util.getInfractionsPlayer(args[0])));
-					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 3, id, args[1], "No proof.");
-					Util.checkScore(Util.getInfractionsPlayer(args[0]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 3 + Util
+							.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 3,
+							id, args[1], URLShortenUtil.convertURL(args[2]));
+					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+							.kickPlayer(
+									"You've been cited for " + args[1] + ".");
 					return true;
-				} else if (Levels.getLevel4().contains(args[1])) {
-					if (args.length == 3) {
-						if (!Util.isValidURL(args[2])) {
-							p.sendMessage("You must provide a valid URL as proof.");
-							return false;
-						}
-						p.sendMessage("Proof URL: " + ChatColor.GOLD
-								+ URLShortenUtil.convertURL(args[2]));
-						p.sendMessage(ChatColor.GOLD + "Success! "
-								+ ChatColor.WHITE
-								+ "The level 4 infraction has been recieved.");
-						Util.setScore(Util.getInfractionsPlayer(args[0]), 4+Util.getScore(Util.getInfractionsPlayer(args[0])));
-						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 4, id, args[1], URLShortenUtil.convertURL(args[2]));
-						Util.checkScore(Util.getInfractionsPlayer(args[0]));
-						Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
-						return true;
+				}
+				Util.messageSend(p, ChatColor.GOLD + "Success! "
+						+ ChatColor.WHITE
+						+ "The level 3 infraction has been recieved.");
+				Util.setScore(Util.getInfractionsPlayer(args[0]),
+						3 + Util.getScore(Util.getInfractionsPlayer(args[0])));
+				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 3, id,
+						args[1], "No proof.");
+				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+						.kickPlayer("You've been cited for " + args[1] + ".");
+				return true;
+			} else if (Levels.getLevel4().contains(args[1])) {
+				if (args.length == 3) {
+					if (!Util.isValidURL(args[2])) {
+						Util.messageSend(p,
+								"You must provide a valid URL as proof.");
+						return false;
 					}
-					p.sendMessage(ChatColor.GOLD + "Success! "
+					Util.messageSend(p, "Proof URL: " + ChatColor.GOLD
+							+ URLShortenUtil.convertURL(args[2]));
+					Util.messageSend(p, ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 4 infraction has been recieved.");
-					Util.setScore(Util.getInfractionsPlayer(args[0]), 4+Util.getScore(Util.getInfractionsPlayer(args[0])));
-					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 4, id, args[1], "No proof.");
-					Util.checkScore(Util.getInfractionsPlayer(args[0]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 4 + Util
+							.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 4,
+							id, args[1], URLShortenUtil.convertURL(args[2]));
+					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+							.kickPlayer(
+									"You've been cited for " + args[1] + ".");
 					return true;
-				} else if (Levels.getLevel5().contains(args[1])) {
-					if (args.length == 3) {
-						if (!Util.isValidURL(args[2])) {
-							p.sendMessage("You must provide a valid URL as proof.");
-							return false;
-						}
-						p.sendMessage("Proof URL: " + ChatColor.GOLD
-								+ URLShortenUtil.convertURL(args[2]));
-						p.sendMessage(ChatColor.GOLD + "Success! "
-								+ ChatColor.WHITE
-								+ "The level 5 infraction has been recieved.");
-						Util.setScore(Util.getInfractionsPlayer(args[0]), 5+Util.getScore(Util.getInfractionsPlayer(args[0])));
-						Util.addInfraction(Util.getInfractionsPlayer(args[0]), 5, id, args[1], URLShortenUtil.convertURL(args[2]));
-						Util.checkScore(Util.getInfractionsPlayer(args[0]));
-						Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
-						return true;
+				}
+				Util.messageSend(p, ChatColor.GOLD + "Success! "
+						+ ChatColor.WHITE
+						+ "The level 4 infraction has been recieved.");
+				Util.setScore(Util.getInfractionsPlayer(args[0]),
+						4 + Util.getScore(Util.getInfractionsPlayer(args[0])));
+				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 4, id,
+						args[1], "No proof.");
+				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+						.kickPlayer("You've been cited for " + args[1] + ".");
+				return true;
+			} else if (Levels.getLevel5().contains(args[1])) {
+				if (args.length == 3) {
+					if (!Util.isValidURL(args[2])) {
+						Util.messageSend(p,
+								"You must provide a valid URL as proof.");
+						return false;
 					}
-					p.sendMessage(ChatColor.GOLD + "Success! "
+					Util.messageSend(p, "Proof URL: " + ChatColor.GOLD
+							+ URLShortenUtil.convertURL(args[2]));
+					Util.messageSend(p, ChatColor.GOLD + "Success! "
 							+ ChatColor.WHITE
 							+ "The level 5 infraction has been recieved.");
-					Util.setScore(Util.getInfractionsPlayer(args[0]), 5+Util.getScore(Util.getInfractionsPlayer(args[0])));
-					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 5, id, args[1], "No proof.");
-					Util.checkScore(Util.getInfractionsPlayer(args[0]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).kickPlayer("You've been cited for " + args[1] + ".");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), 5 + Util
+							.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 5,
+							id, args[1], URLShortenUtil.convertURL(args[2]));
+					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+							.kickPlayer(
+									"You've been cited for " + args[1] + ".");
 					return true;
-				} else {
-					p.sendMessage(ChatColor.YELLOW + "Not a valid infraction type.");
 				}
+				Util.messageSend(p, ChatColor.GOLD + "Success! "
+						+ ChatColor.WHITE
+						+ "The level 5 infraction has been recieved.");
+				Util.setScore(Util.getInfractionsPlayer(args[0]),
+						5 + Util.getScore(Util.getInfractionsPlayer(args[0])));
+				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 5, id,
+						args[1], "No proof.");
+				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+						.kickPlayer("You've been cited for " + args[1] + ".");
 				return true;
-			} else if (c.getName().equalsIgnoreCase("uncite")) {
-				if (!(args.length == 2)) {
-					p.sendMessage("Not enough arguments.");
-					return false;
-				}
-				if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
-					p.sendMessage("You do not have enough permissions.");
-					return true;
-				}
-				try {
-					HashMap<String, String> infractions = Util.getInfractions(Util.getInfractionsPlayer(args[0]));
-			        Set<String> set = infractions.keySet();
-			        Collection<String> coll = infractions.values();
-			        Iterator<String> iterKey = set.iterator();
-			        Iterator<String> iterValue = coll.iterator();
-			        while (iterKey.hasNext())
-			        {
-			            Object oK = iterKey.next();
-			            Object oV = iterValue.next();
-			            String key = oK.toString();
-			            String value = oV.toString();
-			            if (key.contains(args[1])) {
-			            	if (value.startsWith("1")) {
-			            		Util.setScore(Util.getInfractionsPlayer(args[0]), Util.getScore(Util.getInfractionsPlayer(args[0]))-1);
-			            		Util.checkScore(Util.getInfractionsPlayer(args[0]));
-			            	} else if (value.startsWith("2")) {
-			            		Util.setScore(Util.getInfractionsPlayer(args[0]), Util.getScore(Util.getInfractionsPlayer(args[0]))-2);
-			            		Util.checkScore(Util.getInfractionsPlayer(args[0]));
-			            	} else if (value.startsWith("3")) {
-			            		Util.setScore(Util.getInfractionsPlayer(args[0]), Util.getScore(Util.getInfractionsPlayer(args[0]))-3);
-			            		Util.checkScore(Util.getInfractionsPlayer(args[0]));
-			            	} else if (value.startsWith("4")) {
-			            		Util.setScore(Util.getInfractionsPlayer(args[0]), Util.getScore(Util.getInfractionsPlayer(args[0]))-4);
-			            		Util.checkScore(Util.getInfractionsPlayer(args[0]));
-			            	} else if (value.startsWith("5")) {
-			            		Util.setScore(Util.getInfractionsPlayer(args[0]), Util.getScore(Util.getInfractionsPlayer(args[0]))-5);
-			            		Util.checkScore(Util.getInfractionsPlayer(args[0]));
-			            	}
-			            }
-			        }
-			        Util.removeInfraction(Util.getInfractionsPlayer(args[0]), args[1]);
-			        p.sendMessage("Infraction removed.");
-			        return true;
-				} catch (NullPointerException e) {
-					p.sendMessage("No such infraction exists.");
-					return true;
-				}
-			} else if (c.getName().equalsIgnoreCase("history")) {
-				if (!(args.length == 1)) {
-					p.sendMessage("Not enough arguments.");
-					return false;
-				}
-				if (Util.hasPermissionOrOP(p, "infractions.mod") || Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])).equals(p)) {
-					/**
-					 *  DISPLAY ALL CURRENT INFRACTIONS
-					 */
-					p.sendMessage(ChatColor.WHITE+ "--- " + ChatColor.YELLOW + Util.getInfractionsPlayer(args[0]) + ChatColor.WHITE + " - " + Util.getScore(Util.getInfractionsPlayer(args[0])) + " ---");
-					try {
-						HashMap<String, String> infractions = Util.getInfractions(Util.getInfractionsPlayer(args[0]));
-				        Set<String> set = infractions.keySet();
-				        Collection<String> coll = infractions.values();
-				        Iterator<String> iterKey = set.iterator();
-				        Iterator<String> iterValue = coll.iterator();
-				        while (iterKey.hasNext())
-				        {
-				            Object oK = iterKey.next();
-				            Object oV = iterValue.next();
-				            String key = oK.toString();
-				            int lineKey = (40 - key.length());
-				            p.sendMessage(oV.toString().substring(2));
-				            if (Util.hasPermissionOrOP(p, "infractions.mod")) {
-					            key += " " + ChatColor.WHITE + Strings.repeat("-", lineKey);
-					            p.sendMessage("Key: " + ChatColor.GOLD + key);
-				            }
-				        }
-				        return true;
-					} catch (NullPointerException e) {
+			} else {
+				Util.messageSend(p, ChatColor.YELLOW
+						+ "Not a valid infraction type.");
+			}
+			return true;
+		} else if (c.getName().equalsIgnoreCase("uncite")) {
+			if (!(args.length == 2)) {
+				Util.messageSend(p, "Not enough arguments.");
+				return false;
+			}
+			if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
+				Util.messageSend(p, "You do not have enough permissions.");
+				return true;
+			}
+			HashMap<String, String> infractions = Util.getInfractions(Util
+					.getInfractionsPlayer(args[0]));
+			Set<String> set = infractions.keySet();
+			Collection<String> coll = infractions.values();
+			Iterator<String> iterKey = set.iterator();
+			Iterator<String> iterValue = coll.iterator();
+			while (iterKey.hasNext()) {
+				Object oK = iterKey.next();
+				Object oV = iterValue.next();
+				String key = oK.toString();
+				String value = oV.toString();
+				if (key.contains(args[1])) {
+					if (value.startsWith("1")) {
+						Util.setScore(Util.getInfractionsPlayer(args[0]),
+								Util.getScore(Util
+										.getInfractionsPlayer(args[0])) - 1);
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0]))
+									.kickPlayer(
+											"Removed an infraction, please rejoin!");
+						} catch (NullPointerException e) {
+							// Do Nothing
+						}
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						} catch (NullPointerException e) {
+							Util.getOfflinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						}
+					} else if (value.startsWith("2")) {
+						Util.setScore(Util.getInfractionsPlayer(args[0]),
+								Util.getScore(Util
+										.getInfractionsPlayer(args[0])) - 2);
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0]))
+									.kickPlayer(
+											"Removed an infraction, please rejoin!");
+						} catch (NullPointerException e) {
+							// Do Nothing
+						}
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						} catch (NullPointerException e) {
+							Util.getOfflinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						}
+					} else if (value.startsWith("3")) {
+						Util.setScore(Util.getInfractionsPlayer(args[0]),
+								Util.getScore(Util
+										.getInfractionsPlayer(args[0])) - 3);
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0]))
+									.kickPlayer(
+											"Removed an infraction, please rejoin!");
+						} catch (NullPointerException e) {
+							// Do Nothing
+						}
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						} catch (NullPointerException e) {
+							Util.getOfflinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						}
+					} else if (value.startsWith("4")) {
+						Util.setScore(Util.getInfractionsPlayer(args[0]),
+								Util.getScore(Util
+										.getInfractionsPlayer(args[0])) - 4);
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0]))
+									.kickPlayer(
+											"Removed an infraction, please rejoin!");
+						} catch (NullPointerException e) {
+							// Do Nothing
+						}
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						} catch (NullPointerException e) {
+							Util.getOfflinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						}
+					} else if (value.startsWith("5")) {
+						Util.setScore(Util.getInfractionsPlayer(args[0]),
+								Util.getScore(Util
+										.getInfractionsPlayer(args[0])) - 5);
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0]))
+									.kickPlayer(
+											"Removed an infraction, please rejoin!");
+						} catch (NullPointerException e) {
+							// Do Nothing
+						}
+						try {
+							Util.getOnlinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						} catch (NullPointerException e) {
+							Util.getOfflinePlayer(
+									Util.getInfractionsPlayer(args[0])).setBanned(false);
+						}
+					} else {
+						Util.messageSend(p, "No such infraction exists.");
 						return true;
 					}
+				}
+			}
+			Util.removeInfraction(Util.getInfractionsPlayer(args[0]),
+					args[1]);
+			Util.messageSend(p, "Infraction removed.");
+			return true;
+		} else if (c.getName().equalsIgnoreCase("history")) {
+			if (!(args.length == 1)) {
+				Util.messageSend(p, "Not enough arguments.");
+				return false;
+			}
+			if (Util.hasPermissionOrOP(p, "infractions.mod")
+					|| Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
+							.equals(p)) {
+				/**
+				 * DISPLAY ALL CURRENT INFRACTIONS
+				 */
+				Util.messageSend(
+						p,
+						ChatColor.WHITE
+								+ "--- "
+								+ ChatColor.YELLOW
+								+ Util.getInfractionsPlayer(args[0])
+								+ ChatColor.WHITE
+								+ " - "
+								+ Util.getScore(Util
+										.getInfractionsPlayer(args[0]))
+								+ " ---");
+				try {
+					HashMap<String, String> infractions = Util
+							.getInfractions(Util.getInfractionsPlayer(args[0]));
+					Set<String> set = infractions.keySet();
+					Collection<String> coll = infractions.values();
+					Iterator<String> iterKey = set.iterator();
+					Iterator<String> iterValue = coll.iterator();
+					while (iterKey.hasNext()) {
+						Object oK = iterKey.next();
+						Object oV = iterValue.next();
+						String key = oK.toString();
+						int lineKey = (40 - key.length());
+						Util.messageSend(p, oV.toString().substring(2));
+						if (Util.hasPermissionOrOP(p, "infractions.mod")) {
+							key += " " + ChatColor.WHITE
+									+ Strings.repeat("-", lineKey);
+							Util.messageSend(p, "Key: " + ChatColor.GOLD + key);
+						}
+					}
+					return true;
+				} catch (NullPointerException e) {
+					return true;
 				}
 			}
 		}

@@ -187,7 +187,7 @@ public class Save {
 		for (File element : list) {
 			String load = element.getName();
 			if (load.endsWith(".player")) {
-				load = load.substring(0, load.length() - 4);
+				load = load.substring(0, load.length() - 7);
 				try {
 					ObjectInputStream ois = new ObjectInputStream(
 							new FileInputStream(element));
