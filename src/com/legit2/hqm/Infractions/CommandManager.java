@@ -79,6 +79,11 @@ public class CommandManager implements CommandExecutor, Listener {
 				Util.messageSend(p, "Not enough arguments.");
 				return false;
 			}
+			
+			if (Util.getInfractionsPlayer(args[0]) == null) {
+				Util.messageSend(p, "This player hasn't joined yet.");
+				return true;
+			}
 			Random generator = new Random();
 			int id = generator.nextInt();
 			// Level 1
