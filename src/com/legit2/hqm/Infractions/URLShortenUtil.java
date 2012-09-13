@@ -14,7 +14,7 @@ public class URLShortenUtil {
 	 * @return
 	 */
 	public static String convertURL(String input) {
-		if (!input.startsWith("http://") || !input.startsWith("https://")) {
+		if (!input.startsWith("http://") && !input.startsWith("https://")) {
 			input = ("http://" + input);
 		}
 		if (!input.endsWith("/")) {

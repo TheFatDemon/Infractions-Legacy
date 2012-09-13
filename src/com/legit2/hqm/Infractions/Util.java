@@ -205,11 +205,8 @@ public class Util {
 	 * @return
 	 */
 	public static boolean isValidURL(String input) {
-		if (!input.startsWith("http://") || !input.startsWith("https://")) {
+		if (!input.startsWith("http://") && !input.startsWith("https://")) {
 			input = ("http://" + input);
-		}
-		if (!input.endsWith("/")) {
-			input = (input + "/");
 		}
 		try {
 			URI uri = new URI(input);
