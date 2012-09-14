@@ -81,9 +81,6 @@ public class Util {
 		} else if (p.hasPermission("infractions.maxscore.20")) {
 			maxScore = 20;
 		}
-		log.info("[Infractions] " + p.getName() + " has a max score of " + maxScore + "."); // TEMP
-		log.info("[Infractions] " + p.hasPermission("infractions.maxscore.1")); // TEMP
-		log.info("[Infractions] " + p.hasPermission("infractions.maxscore.2")); // TEMP
 		return maxScore;
 	}
 	
