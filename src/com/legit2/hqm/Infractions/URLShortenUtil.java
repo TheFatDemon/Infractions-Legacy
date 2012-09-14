@@ -17,9 +17,6 @@ public class URLShortenUtil {
 		if (!input.startsWith("http://") && !input.startsWith("https://")) {
 			input = ("http://" + input);
 		}
-		if (!input.endsWith("/")) {
-			input = (input + "/");
-		}
 		Provider bitly = as("justicehqm", "R_8e7103357a5a07b25206fe657fe59d07"); // my
 																					// bit.ly
 																					// settings
