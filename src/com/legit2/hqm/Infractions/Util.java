@@ -18,8 +18,6 @@ public class Util {
 
 	private static Infractions plugin; // obviously needed
 	static Logger log = Logger.getLogger("Minecraft");
-	public static int SCORECAP = Settings.getSettingInt("ban_at_score"); // max
-																			// score
 	static Calendar ca1 = Calendar.getInstance();
 	static int iDay = ca1.get(Calendar.DATE);
 	static int iMonth = ca1.get(Calendar.MONTH) + 1;
@@ -35,6 +33,60 @@ public class Util {
 	 * @param proof
 	 * @return
 	 */
+	
+	public static int getMaxScore(Player p) {
+		int maxScore = Settings.getSettingInt("ban_at_score");
+		if (maxScore < 1)
+			maxScore = 1;
+		else if (maxScore > 20)
+			maxScore = 20;
+		if (p.hasPermission("infractions.maxscore.1")) {
+			maxScore = 1;
+		} else if (p.hasPermission("infractions.maxscore.2")) {
+			maxScore = 2;
+		} else if (p.hasPermission("infractions.maxscore.3")) {
+			maxScore = 3;
+		} else if (p.hasPermission("infractions.maxscore.4")) {
+			maxScore = 4;
+		} else if (p.hasPermission("infractions.maxscore.5")) {
+			maxScore = 5;
+		} else if (p.hasPermission("infractions.maxscore.6")) {
+			maxScore = 6;
+		} else if (p.hasPermission("infractions.maxscore.7")) {
+			maxScore = 7;
+		} else if (p.hasPermission("infractions.maxscore.8")) {
+			maxScore = 8;
+		} else if (p.hasPermission("infractions.maxscore.9")) {
+			maxScore = 9;
+		} else if (p.hasPermission("infractions.maxscore.10")) {
+			maxScore = 10;
+		} else if (p.hasPermission("infractions.maxscore.11")) {
+			maxScore = 11;
+		} else if (p.hasPermission("infractions.maxscore.12")) {
+			maxScore = 12;
+		} else if (p.hasPermission("infractions.maxscore.13")) {
+			maxScore = 13;
+		} else if (p.hasPermission("infractions.maxscore.14")) {
+			maxScore = 14;
+		} else if (p.hasPermission("infractions.maxscore.15")) {
+			maxScore = 15;
+		} else if (p.hasPermission("infractions.maxscore.16")) {
+			maxScore = 16;
+		} else if (p.hasPermission("infractions.maxscore.17")) {
+			maxScore = 17;
+		} else if (p.hasPermission("infractions.maxscore.18")) {
+			maxScore = 18;
+		} else if (p.hasPermission("infractions.maxscore.19")) {
+			maxScore = 19;
+		} else if (p.hasPermission("infractions.maxscore.20")) {
+			maxScore = 20;
+		}
+		log.info("[Infractions] " + p.getName() + " has a max score of " + maxScore + "."); // TEMP
+		log.info("[Infractions] " + p.hasPermission("infractions.maxscore.1")); // TEMP
+		log.info("[Infractions] " + p.hasPermission("infractions.maxscore.2")); // TEMP
+		return maxScore;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static boolean addInfraction(String target, int level, int id,
 			String infraction, String proof) {
@@ -55,7 +107,7 @@ public class Util {
 	 */
 	
 	public static void checkScore(Player p) {
-		if (SCORECAP <= getScore(p)) {
+		if (getMaxScore(p) <= getScore(p)) {
 			p.kickPlayer("You have been banned.");
 			try {
 				p.setBanned(true);
@@ -173,10 +225,6 @@ public class Util {
 	public static boolean hasPermission(Player p, String pe) { // convenience
 																// method for
 																// permissions
-		if (p == null)
-			return true;
-		if (p.isOp())
-			return true;
 		return p.hasPermission(pe);
 	}
 
@@ -276,8 +324,6 @@ public class Util {
 	 * @param amt
 	 */
 	public static void setScore(String p, int amt) {
-		if (amt > SCORECAP)
-			amt = SCORECAP;
 		Save.saveData(p, "SCORE", new Integer(amt));
 	}
 

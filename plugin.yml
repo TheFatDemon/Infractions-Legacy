@@ -20,3 +20,43 @@ permissions:
     infractions.mod:
         description: Gives access to all Inferno commands
         default: op
+    infractions.maxscore.1:
+        default: false
+    infractions.maxscore.2:
+        default: false
+    infractions.maxscore.3:
+        default: false
+    infractions.maxscore.4:
+        default: false
+    infractions.maxscore.5:
+        default: false
+    infractions.maxscore.6:
+        default: false
+    infractions.maxscore.7:
+        default: false
+    infractions.maxscore.8:
+        default: false
+    infractions.maxscore.9:
+        default: false
+    infractions.maxscore.10:
+        default: false
+    infractions.maxscore.11:
+        default: false
+    infractions.maxscore.12:
+        default: false
+    infractions.maxscore.13:
+        default: false
+    infractions.maxscore.14:
+        default: false
+    infractions.maxscore.15:
+        default: false
+    infractions.maxscore.16:
+        default: false
+    infractions.maxscore.17:
+        default: false
+    infractions.maxscore.18:
+        default: false
+    infractions.maxscore.19:
+        default: false
+    infractions.maxscore.20:
+        default: false
