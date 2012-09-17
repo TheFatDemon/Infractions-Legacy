@@ -39,25 +39,56 @@ public class CommandManager implements CommandExecutor, Listener {
 			return true;
 		}
 		if (c.getName().equalsIgnoreCase("infractions")) {
-			Util.messageSend(p, "---------------");
-			Util.messageSend(p, "INFRACTIONS HELP");
-			Util.messageSend(p, "---------------");
-			if (Util.hasPermissionOrOP(p, "infractions.mod")) {
-				Util.messageSend(p, ChatColor.GRAY
-						+ "/cite <player> <infraction> [proof-url]");
-				Util.messageSend(p, ChatColor.GRAY + "/uncite <player> <key>"
-						+ ChatColor.WHITE + " - Find the key with "
-						+ ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
+			if (args.length == 0) {
+				Util.messageSend(p, "---------------");
+				Util.messageSend(p, "INFRACTIONS HELP");
+				Util.messageSend(p, "---------------");
+				if (Util.hasPermissionOrOP(p, "infractions.mod")) {
+					Util.messageSend(p, ChatColor.GRAY
+							+ "/cite <player> <infraction> [proof-url]");
+					Util.messageSend(p, ChatColor.GRAY + "/uncite <player> <key>"
+							+ ChatColor.WHITE + " - Find the key with "
+							+ ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
+				}
+				Util.messageSend(p, ChatColor.GRAY + "/history [player]");
+				Util.messageSend(p, ChatColor.GRAY + "/infractions types " + ChatColor.WHITE + "- Shows all valid infraction types.");
+				Util.messageSend(p, ChatColor.AQUA + "Using the GNU "
+						+ ChatColor.DARK_AQUA + "Affero" + ChatColor.AQUA
+						+ " General Public License.");
+				Util.messageSend(p, ChatColor.AQUA + "Read the AGPL at "
+						+ ChatColor.YELLOW + "http://bit.ly/TLY1xB");
+				Util.messageSend(p, ChatColor.AQUA + "Source: " + ChatColor.YELLOW
+						+ "https://github.com/HmmmQuestionMark/Infractions");
+				return true;
+			} else if (args[0].equalsIgnoreCase("types")) {
+				Util.messageSend(p, "----------------");
+				Util.messageSend(p, "INFRACTIONS TYPES");
+				Util.messageSend(p, "----------------");
+				Util.messageSend(p, ChatColor.GREEN + "Level 1:");
+				for(int i=0; i< Levels.getLevel1().size(); i++){
+					Util.messageSend(p, Levels.getLevel1().get(i));
+				}
+				Util.messageSend(p, ChatColor.YELLOW + "Level 2:");
+				for(int i=0; i< Levels.getLevel2().size(); i++){
+					Util.messageSend(p, Levels.getLevel2().get(i));
+		        }
+				Util.messageSend(p, ChatColor.GOLD + "Level 3:");
+				for(int i=0; i< Levels.getLevel3().size(); i++){
+					Util.messageSend(p, Levels.getLevel3().get(i));
+		        }
+				Util.messageSend(p, ChatColor.RED + "Level 4:");
+				for(int i=0; i< Levels.getLevel4().size(); i++){
+					Util.messageSend(p, Levels.getLevel4().get(i));
+		        }
+				Util.messageSend(p, ChatColor.DARK_RED + "Level 5:");
+				for(int i=0; i< Levels.getLevel5().size(); i++){
+					Util.messageSend(p, Levels.getLevel5().get(i));
+		        }
+				return true;
+			} else {
+				Util.messageSend(p, "Too many arguments.");
+				return false;
 			}
-			Util.messageSend(p, ChatColor.GRAY + "/history <player>");
-			Util.messageSend(p, ChatColor.AQUA + "Using the GNU "
-					+ ChatColor.DARK_AQUA + "Affero" + ChatColor.AQUA
-					+ " General Public License.");
-			Util.messageSend(p, ChatColor.AQUA + "Read the AGPL at "
-					+ ChatColor.YELLOW + "http://bit.ly/TLY1xB");
-			Util.messageSend(p, ChatColor.AQUA + "Source: " + ChatColor.YELLOW
-					+ "https://github.com/HmmmQuestionMark/Infractions");
-			return true;
 		} else if (c.getName().equalsIgnoreCase("cite")) {
 			if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
 				Util.messageSend(p, "You do not have enough permissions.");
@@ -103,9 +134,7 @@ public class CommandManager implements CommandExecutor, Listener {
 							.getScore(Util.getInfractionsPlayer(args[0])));
 					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 1,
 							id, args[1], URLShortenUtil.convertURL(args[2]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-							.kickPlayer(
-									"You've been cited for " + args[1] + ".");
+					Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 					return true;
 				}
 				Util.messageSend(p, ChatColor.GOLD + "Success! "
@@ -115,8 +144,7 @@ public class CommandManager implements CommandExecutor, Listener {
 						1 + Util.getScore(Util.getInfractionsPlayer(args[0])));
 				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 1, id,
 						args[1], "No proof.");
-				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-						.kickPlayer("You've been cited for " + args[1] + ".");
+				Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 				return true;
 			} else if (Levels.getLevel2().contains(args[1])) {
 				if (args.length == 3) {
@@ -134,9 +162,7 @@ public class CommandManager implements CommandExecutor, Listener {
 							.getScore(Util.getInfractionsPlayer(args[0])));
 					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 2,
 							id, args[1], URLShortenUtil.convertURL(args[2]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-							.kickPlayer(
-									"You've been cited for " + args[1] + ".");
+					Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 					return true;
 				}
 				Util.messageSend(p, ChatColor.GOLD + "Success! "
@@ -146,8 +172,7 @@ public class CommandManager implements CommandExecutor, Listener {
 						2 + Util.getScore(Util.getInfractionsPlayer(args[0])));
 				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 2, id,
 						args[1], "No proof.");
-				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-						.kickPlayer("You've been cited for " + args[1] + ".");
+				Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 				return true;
 			} else if (Levels.getLevel3().contains(args[1])) {
 				if (args.length == 3) {
@@ -165,9 +190,7 @@ public class CommandManager implements CommandExecutor, Listener {
 							.getScore(Util.getInfractionsPlayer(args[0])));
 					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 3,
 							id, args[1], URLShortenUtil.convertURL(args[2]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-							.kickPlayer(
-									"You've been cited for " + args[1] + ".");
+					Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 					return true;
 				}
 				Util.messageSend(p, ChatColor.GOLD + "Success! "
@@ -177,8 +200,7 @@ public class CommandManager implements CommandExecutor, Listener {
 						3 + Util.getScore(Util.getInfractionsPlayer(args[0])));
 				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 3, id,
 						args[1], "No proof.");
-				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-						.kickPlayer("You've been cited for " + args[1] + ".");
+				Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 				return true;
 			} else if (Levels.getLevel4().contains(args[1])) {
 				if (args.length == 3) {
@@ -196,9 +218,7 @@ public class CommandManager implements CommandExecutor, Listener {
 							.getScore(Util.getInfractionsPlayer(args[0])));
 					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 4,
 							id, args[1], URLShortenUtil.convertURL(args[2]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-							.kickPlayer(
-									"You've been cited for " + args[1] + ".");
+					Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 					return true;
 				}
 				Util.messageSend(p, ChatColor.GOLD + "Success! "
@@ -208,8 +228,7 @@ public class CommandManager implements CommandExecutor, Listener {
 						4 + Util.getScore(Util.getInfractionsPlayer(args[0])));
 				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 4, id,
 						args[1], "No proof.");
-				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-						.kickPlayer("You've been cited for " + args[1] + ".");
+				Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 				return true;
 			} else if (Levels.getLevel5().contains(args[1])) {
 				if (args.length == 3) {
@@ -227,9 +246,7 @@ public class CommandManager implements CommandExecutor, Listener {
 							.getScore(Util.getInfractionsPlayer(args[0])));
 					Util.addInfraction(Util.getInfractionsPlayer(args[0]), 5,
 							id, args[1], URLShortenUtil.convertURL(args[2]));
-					Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-							.kickPlayer(
-									"You've been cited for " + args[1] + ".");
+					Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 					return true;
 				}
 				Util.messageSend(p, ChatColor.GOLD + "Success! "
@@ -239,8 +256,7 @@ public class CommandManager implements CommandExecutor, Listener {
 						5 + Util.getScore(Util.getInfractionsPlayer(args[0])));
 				Util.addInfraction(Util.getInfractionsPlayer(args[0]), 5, id,
 						args[1], "No proof.");
-				Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-						.kickPlayer("You've been cited for " + args[1] + ".");
+				Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 				return true;
 			} else {
 				Util.messageSend(p, ChatColor.YELLOW
@@ -275,8 +291,8 @@ public class CommandManager implements CommandExecutor, Listener {
 						try {
 							Util.getOnlinePlayer(
 									Util.getInfractionsPlayer(args[0]))
-									.kickPlayer(
-											"Removed an infraction, please rejoin!");
+									.sendMessage(
+											"Removed an infraction!");
 						} catch (NullPointerException e) {
 							// Do Nothing
 						}
@@ -294,8 +310,8 @@ public class CommandManager implements CommandExecutor, Listener {
 						try {
 							Util.getOnlinePlayer(
 									Util.getInfractionsPlayer(args[0]))
-									.kickPlayer(
-											"Removed an infraction, please rejoin!");
+									.sendMessage(
+											"Removed an infraction!");
 						} catch (NullPointerException e) {
 							// Do Nothing
 						}
@@ -313,8 +329,8 @@ public class CommandManager implements CommandExecutor, Listener {
 						try {
 							Util.getOnlinePlayer(
 									Util.getInfractionsPlayer(args[0]))
-									.kickPlayer(
-											"Removed an infraction, please rejoin!");
+									.sendMessage(
+											"Removed an infraction!");
 						} catch (NullPointerException e) {
 							// Do Nothing
 						}
@@ -332,8 +348,8 @@ public class CommandManager implements CommandExecutor, Listener {
 						try {
 							Util.getOnlinePlayer(
 									Util.getInfractionsPlayer(args[0]))
-									.kickPlayer(
-											"Removed an infraction, please rejoin!");
+									.sendMessage(
+											"Removed an infraction!");
 						} catch (NullPointerException e) {
 							// Do Nothing
 						}
@@ -351,8 +367,8 @@ public class CommandManager implements CommandExecutor, Listener {
 						try {
 							Util.getOnlinePlayer(
 									Util.getInfractionsPlayer(args[0]))
-									.kickPlayer(
-											"Removed an infraction, please rejoin!");
+									.sendMessage(
+											"Removed an infraction!");
 						} catch (NullPointerException e) {
 							// Do Nothing
 						}
@@ -375,15 +391,48 @@ public class CommandManager implements CommandExecutor, Listener {
 			return true;
 		} else if (c.getName().equalsIgnoreCase("history")) {
 			if (!(args.length == 1)) {
-				Util.messageSend(p, "Not enough arguments.");
-				return false;
+				Util.messageSend(
+						p,
+						ChatColor.WHITE
+								+ "--- "
+								+ ChatColor.YELLOW
+								+ Util.getInfractionsPlayer(p.getName())
+								+ ChatColor.WHITE
+								+ " - "
+								+ Util.getScore(Util
+										.getInfractionsPlayer(p.getName()))
+								+ "/"
+								+ Util.getMaxScore(p)
+								+ " ---");
+				try {
+					HashMap<String, String> infractions = Util
+							.getInfractions(Util.getInfractionsPlayer(p.getName()));
+					Set<String> set = infractions.keySet();
+					Collection<String> coll = infractions.values();
+					Iterator<String> iterKey = set.iterator();
+					Iterator<String> iterValue = coll.iterator();
+					while (iterKey.hasNext()) {
+						Object oK = iterKey.next();
+						Object oV = iterValue.next();
+						String key = oK.toString();
+						int lineKey = (40 - key.length());
+						Util.messageSend(p, oV.toString().substring(2));
+						if (Util.hasPermissionOrOP(p, "infractions.mod")) {
+							key += " " + ChatColor.WHITE
+									+ Strings.repeat("-", lineKey);
+							Util.messageSend(p, "Key: " + ChatColor.GOLD + key);
+						}
+					}
+					return true;
+				} catch (NullPointerException e) {
+					return true;
+				}
 			}
-			if (Util.hasPermissionOrOP(p, "infractions.mod")
-					|| Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0]))
-							.equals(p)) {
+			if (Util.hasPermissionOrOP(p, "infractions.mod")) {					
 				/**
 				 * DISPLAY ALL CURRENT INFRACTIONS
 				 */
+				try {
 				Util.messageSend(
 						p,
 						ChatColor.WHITE
@@ -394,7 +443,22 @@ public class CommandManager implements CommandExecutor, Listener {
 								+ " - "
 								+ Util.getScore(Util
 										.getInfractionsPlayer(args[0]))
+								+ "/"
+									+ Util.getMaxScore(Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])))
 								+ " ---");
+				} catch (NullPointerException e) {
+					Util.messageSend(
+							p,
+							ChatColor.WHITE
+									+ "--- "
+									+ ChatColor.YELLOW
+									+ Util.getInfractionsPlayer(args[0])
+									+ ChatColor.WHITE
+									+ " - "
+									+ Util.getScore(Util
+											.getInfractionsPlayer(args[0]))
+									+ " ---");
+				}
 				try {
 					HashMap<String, String> infractions = Util
 							.getInfractions(Util.getInfractionsPlayer(args[0]));

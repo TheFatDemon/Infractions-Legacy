@@ -1,6 +1,6 @@
 name: Infractions
 main: com.legit2.hqm.Infractions.Infractions
-version: 0.2
+version: 0.3
 description: Police your server with specific rules; give players a second or third chance before they are banned.
 author: HmmmQuestionMark
 commands:
@@ -15,7 +15,7 @@ commands:
         usage: /uncite <player> <key>
     history:
         description: Check a player's infraction history.
-        usage: /history <player>
+        usage: /history [player]
 permissions:
     infractions.mod:
         description: Gives access to all Inferno commands
@@ -59,4 +59,6 @@ permissions:
     infractions.maxscore.19:
         default: false
     infractions.maxscore.20:
+        default: false
+    infractions.*:
         default: false

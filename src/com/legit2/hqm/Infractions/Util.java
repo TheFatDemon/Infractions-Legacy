@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -25,22 +26,15 @@ public class Util {
 	static String date = iYear + "," + iMonth + "," + iDay + ","
 			+ ca1.get(Calendar.HOUR_OF_DAY) + ":" + ca1.get(Calendar.MINUTE);
 
-	/**
-	 * Add a single infraction
-	 * 
-	 * @param target
-	 * @param infraction
-	 * @param proof
-	 * @return
-	 */
-	
 	public static int getMaxScore(Player p) {
 		int maxScore = Settings.getSettingInt("ban_at_score");
 		if (maxScore < 1)
 			maxScore = 1;
 		else if (maxScore > 20)
 			maxScore = 20;
-		if (p.hasPermission("infractions.maxscore.1")) {
+		if (p.hasPermission("infractions.*")) { // '*' Permission check.
+			maxScore = Settings.getSettingInt("ban_at_score");
+		} else if (p.hasPermission("infractions.maxscore.1")) {
 			maxScore = 1;
 		} else if (p.hasPermission("infractions.maxscore.2")) {
 			maxScore = 2;
@@ -96,12 +90,6 @@ public class Util {
 						+ date);
 		return true;
 	}
-
-	/**
-	 * Check a player's score to see if they should be banned.
-	 * 
-	 * @param p
-	 */
 	
 	public static void checkScore(Player p) {
 		if (getMaxScore(p) <= getScore(p)) {
@@ -119,13 +107,23 @@ public class Util {
 			}
 		}
 	}
+	
+	public static void kickNotify(String p, String reason) {
+		try {
+			getOnlinePlayer(p); // Check if player is online.
+			if (getMaxScore(Util.getOnlinePlayer(p)) <= getScore(Util.getOnlinePlayer(p))) { // Players that should be banned are banned.
+				checkScore(Util.getOnlinePlayer(p));
+			} else if (Settings.getSettingBoolean("kick_on_cite")) {
+				Util.getOnlinePlayer(p).kickPlayer("You've been cited for " + reason + "."); // Kick a player if option is set to true.
+			} else {
+				Util.getOnlinePlayer(p).sendMessage(ChatColor.RED + "You've been cited for " + reason + ".");
+				Util.getOnlinePlayer(p).sendMessage("Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");  // Send player a message about their infraction.
+			}
+		} catch (NullPointerException e) {
+			Save.saveData(p, "NEWINFRACTION", true);
+		}
+	}
 
-	/**
-	 * Returns the effects on a player that are still active
-	 * 
-	 * @param p
-	 * @return
-	 */
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, String> getInfractions(String target) {
 		if (Save.hasData(target, "INFRACTIONS")) {
@@ -141,12 +139,6 @@ public class Util {
 		return null;
 	}
 
-	/**
-	 * Returns the infractions a player has
-	 * 
-	 * @param p
-	 * @return
-	 */
 	public static ArrayList<String> getInfractionsList(String target) {
 		if (Save.hasData(target, "INFRACTIONS")) {
 			HashMap<String, String> original = getInfractions(target);
@@ -190,48 +182,22 @@ public class Util {
 		return plugin;
 	}
 
-	/**
-	 * Get a player's score.
-	 * 
-	 * @param p
-	 * @return
-	 */
 	public static int getScore(Player p) {
 		return getScore(p.getName());
 	}
-
-	/**
-	 * Get a player's score.
-	 * 
-	 * @param p
-	 * @return
-	 */
+	
 	public static int getScore(String p) {
 		if (Save.hasData(p, "SCORE"))
 			return (Integer) Save.getData(p, "SCORE");
 		return 0;
 	}
 
-	/**
-	 * Checks is a player has the given permission.
-	 * 
-	 * @param p
-	 * @param pe
-	 * @return
-	 */
 	public static boolean hasPermission(Player p, String pe) { // convenience
 																// method for
 																// permissions
 		return p.hasPermission(pe);
 	}
 
-	/**
-	 * Checks if a player has the given permission or is OP.
-	 * 
-	 * @param p
-	 * @param pe
-	 * @return
-	 */
 	public static boolean hasPermissionOrOP(Player p, String pe) { // convenience
 																	// method
 																	// for
@@ -243,12 +209,6 @@ public class Util {
 		return p.hasPermission(pe);
 	}
 
-	/**
-	 * Checks if a URL is valid and can be accessed.
-	 * 
-	 * @param url
-	 * @return
-	 */
 	public static boolean isValidURL(String input) {
 		if (!input.startsWith("http://") && !input.startsWith("https://")) {
 			input = ("http://" + input);
@@ -277,21 +237,11 @@ public class Util {
 		}
 	}
 
-	/**
-	 * Reloads Infractions.
-	 */
-	public static void reloadDemigods() {
+	public static void reloadPlugin() {
 		Bukkit.getServer().getPluginManager().disablePlugin(plugin);
 		Bukkit.getServer().getPluginManager().enablePlugin(plugin);
 	}
 
-	/**
-	 * Remove a single infraction
-	 * 
-	 * @param p
-	 * @param id
-	 * @return
-	 */
 	public static boolean removeInfraction(String target, String givenID) {
 		for (String readableID : Util.getInfractionsList(target)) {
 			if (readableID.equals(givenID))
@@ -304,22 +254,10 @@ public class Util {
 		Save.saveData(p, "INFRACTIONS", data);
 	}
 
-	/**
-	 * Set a player's score.
-	 * 
-	 * @param p
-	 * @param amt
-	 */
 	public static void setScore(Player p, int amt) {
 		setScore(p.getName(), amt);
 	}
 
-	/**
-	 * Set a player's score.
-	 * 
-	 * @param p
-	 * @param amt
-	 */
 	public static void setScore(String p, int amt) {
 		Save.saveData(p, "SCORE", new Integer(amt));
 	}

@@ -16,6 +16,12 @@ public class Infractions extends JavaPlugin implements Listener {
 	static String mainDirectory = "plugins/Infractions/";
 	Util initialize;
 	Save SAVE;
+	public boolean MySQL = false;
+	public String dbHost = null;
+	public String dbPort = null;
+	public String dbUser = null;
+	public String dbPass = null;
+	public String dbDatabase = null;
 
 	public Infractions() {
 		super();
@@ -92,9 +98,10 @@ public class Infractions extends JavaPlugin implements Listener {
 		log.info("[Infractions] Updating configuration.");
 		initialize = new Util(this); // #2 (needed for everything else to work)
 		SAVE = new Save(mainDirectory); // #3 (needed to start save system)
-		loadListeners(); // #4
-		loadCommands(); // #5 (needed)
-		initializeThreads(); // #6 (regen and etc)
+		// checkMySQL(); // #4
+		loadListeners(); // #5
+		loadCommands(); // #6 (needed)
+		initializeThreads(); // #7 (regen and etc)
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
@@ -112,4 +119,53 @@ public class Infractions extends JavaPlugin implements Listener {
 			log.severe("[Infractions] Save write error. Screenshot the stack trace and send to marinating.");
 		}
 	}
+	
+	/**
+	public void checkMySQL() {
+		Boolean MySQL = Settings.getSettingBoolean("MySQL");
+		String dbHost = Settings.getSettingString("host");
+		String dbPort = Settings.getSettingString("port");
+		String dbUser = Settings.getSettingString("username");
+		String dbPass = Settings.getSettingString("password");
+		String dbDatabase = Settings.getSettingString("database");
+		
+		if (dbHost.equals(null)) {
+			MySQL = false;
+			log.severe("[Infractions] MySQL is on, but host is not defined, disabling.");
+		}
+		if (dbUser.equals(null)) {
+			MySQL = false;
+			log.severe("[Infractions] MySQL is on, but username is not defined, disabling.");
+		}
+		if (dbPass.equals(null)) {
+			MySQL = false;
+			log.severe("[Infractions] MySQL is on, but password is not defined, disabling.");
+		}
+		if (dbDatabase.equals(null)) {
+			MySQL = false;
+			log.severe("[Infractions] MySQL is on, but database is not defined, disabling.");
+		} 
+		if (MySQL) {
+			mysql = new MySQL(log, "[Infractions] ", dbHost, dbPort, dbDatabase, dbUser, dbPass);
+			
+			log.info("[Infractions] MySQL Initializing");
+			try {
+				mysql.open();
+			} catch (Exception e) {
+				out.println(e.getMessage());
+			}
+			if (mysql.checkConnection()) { // Check if the Connection was successful
+				log.info("[Infractions] MySQL connection successful");
+				if (!mysql.checkTable("infractions")) { // Check if the table exists in the database if not create it
+					log.info("[Infractions] Creating table infractions");
+					String query = "CREATE TABLE infractions (key INT, infractions VARCHAR(255), x INT, y INT, z INT);";
+					mysql.createTable(query);
+				}
+			} else {
+				log.severe("[Infractions] MySQL connection failed");
+				MySQL = false;
+			}
+		}
+	}
+	**/
 }

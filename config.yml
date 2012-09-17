@@ -3,6 +3,7 @@
 #Global Settings
 motd: true
 save_interval_seconds: 30
+kick_on_cite: false
 ban_at_score: 5
 require_proof: false
 #Define Infraction Levels

@@ -2,6 +2,7 @@ package com.legit2.hqm.Infractions;
 
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,6 +17,12 @@ public class Manager implements Listener {
 		final Player p = e.getPlayer();
 		if (Settings.getSettingBoolean("motd")) {
 			p.sendMessage("This server is policed with infractions.");
+		}
+		if (Save.hasData(p, "NEWINFRACTION")) {
+			if ((Boolean)Save.getData(p, "NEWINFRACTION")) {
+				p.sendMessage(ChatColor.RED + "You have a new infraction!" + ChatColor.WHITE + "Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
+				Save.saveData(p, "NEWINFRACTION", false);
+			}
 		}
 		if (!Save.hasPlayer(p)) {
 			Logger.getLogger("Minecraft")
