@@ -20,7 +20,7 @@ public class Manager implements Listener {
 		}
 		if (Save.hasData(p, "NEWINFRACTION")) {
 			if ((Boolean)Save.getData(p, "NEWINFRACTION")) {
-				p.sendMessage(ChatColor.RED + "You have a new infraction!" + ChatColor.WHITE + "Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
+				p.sendMessage(ChatColor.RED + "You have a new infraction!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
 				Save.saveData(p, "NEWINFRACTION", false);
 			}
 		}
