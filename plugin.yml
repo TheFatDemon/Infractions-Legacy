@@ -1,6 +1,6 @@
 name: Infractions
 main: com.legit2.hqm.Infractions.Infractions
-version: 0.3
+version: 0.3a
 description: Police your server with specific rules; give players a second or third chance before they are banned.
 author: HmmmQuestionMark
 commands:

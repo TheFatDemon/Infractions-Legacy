@@ -78,6 +78,12 @@ public class Util {
 		return maxScore;
 	}
 	
+	public static ChatColor chatColor (Player p, ChatColor color) {
+		if (p == null)
+			return ChatColor.RESET;
+		return (color);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static boolean addInfraction(String target, int level, int id,
 			String infraction, String proof) {
