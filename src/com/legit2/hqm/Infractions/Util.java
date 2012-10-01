@@ -5,6 +5,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -19,12 +21,9 @@ public class Util {
 
 	private static Infractions plugin; // obviously needed
 	static Logger log = Logger.getLogger("Minecraft");
-	static Calendar ca1 = Calendar.getInstance();
-	static int iDay = ca1.get(Calendar.DATE);
-	static int iMonth = ca1.get(Calendar.MONTH) + 1;
-	static int iYear = ca1.get(Calendar.YEAR);
-	static String date = iYear + "," + iMonth + "," + iDay + ","
-			+ ca1.get(Calendar.HOUR_OF_DAY) + ":" + ca1.get(Calendar.MINUTE);
+	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	static Calendar cal = Calendar.getInstance();
+	static String date = dateFormat.format(cal.getTime());
 
 	public static int getMaxScore(Player p) {
 		int maxScore = Settings.getSettingInt("ban_at_score");
