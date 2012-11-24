@@ -67,6 +67,15 @@ public class Infractions extends JavaPlugin implements Listener {
 	public void loadListeners() {
 		getServer().getPluginManager().registerEvents(new Manager(), this);
 	}
+	
+	public void loadMetrics() {
+		try {
+		    MetricsLite metrics = new MetricsLite(this);
+		    metrics.start();
+		} catch (IOException e) {
+		    // Failed to submit the stats :-(
+		}
+	}
 
 	@Override
 	public void onDisable() {
@@ -101,7 +110,8 @@ public class Infractions extends JavaPlugin implements Listener {
 		// checkMySQL(); // #4
 		loadListeners(); // #5
 		loadCommands(); // #6 (needed)
-		initializeThreads(); // #7 (regen and etc)
+		loadMetrics(); // #7
+		initializeThreads(); // #8 (regen and etc)
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
