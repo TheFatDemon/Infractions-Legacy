@@ -28,8 +28,8 @@ level_5:
   - lg-griefing
 #SQL Settings
 MySQL: true
-SQLport: 3306
-SQLusername: root
-SQLhostname: localhost
-SQLpassword: ''
-SQLdatabase: minecraft
+sqlPort: 3306
+sqlUsername: root
+sqlHostname: localhost
+sqlPassword: ''
+sqlDatabase: minecraft
