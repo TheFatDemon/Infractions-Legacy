@@ -107,12 +107,11 @@ public class Infractions extends JavaPlugin implements Listener {
 		log.info("[Infractions] Updating configuration.");
 		initialize = new Util(this); // #2 (needed for everything else to work)
 		SAVE = new Save(mainDirectory); // #3 (needed to start save system)
-		// checkMySQL(); // #4
+		Database.testDBConnection(); // #4
 		loadListeners(); // #5
 		loadCommands(); // #6 (needed)
-		loadMetrics(); // #7
+		// loadMetrics(); // #7
 		initializeThreads(); // #8 (regen and etc)
-		Database.testDBConnection();
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
