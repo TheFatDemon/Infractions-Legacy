@@ -112,7 +112,7 @@ public class Infractions extends JavaPlugin implements Listener {
 		loadCommands(); // #6 (needed)
 		loadMetrics(); // #7
 		initializeThreads(); // #8 (regen and etc)
-		//Database.testDBConnection();
+		Database.testDBConnection();
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
