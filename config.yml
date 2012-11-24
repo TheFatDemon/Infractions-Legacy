@@ -26,3 +26,9 @@ level_4:
 level_5:
   - lg-hacking
   - lg-griefing
+#SQL Settings
+MySQL: true
+sqlURL: http://localhost:3306/
+dbUser: root
+dbPass: password
+dbDatabase: Infractions
