@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,12 +15,6 @@ public class Infractions extends JavaPlugin implements Listener {
 	static String mainDirectory = "plugins/Infractions/";
 	Util initialize;
 	Save SAVE;
-	public boolean MySQL = false;
-	public String dbHost = null;
-	public String dbPort = null;
-	public String dbUser = null;
-	public String dbPass = null;
-	public String dbDatabase = null;
 
 	public Infractions() {
 		super();
@@ -67,13 +60,13 @@ public class Infractions extends JavaPlugin implements Listener {
 	public void loadListeners() {
 		getServer().getPluginManager().registerEvents(new Manager(), this);
 	}
-	
+
 	public void loadMetrics() {
 		try {
-		    MetricsLite metrics = new MetricsLite(this);
-		    metrics.start();
+			MetricsLite metrics = new MetricsLite(this);
+			metrics.start();
 		} catch (IOException e) {
-		    // Failed to submit the stats :-(
+			// Failed to submit the stats :-(
 		}
 	}
 
@@ -117,7 +110,6 @@ public class Infractions extends JavaPlugin implements Listener {
 				+ " seconds.");
 	}
 
-	@EventHandler
 	public void saveOnExit(PlayerQuitEvent e) {
 		try {
 			Save.save(mainDirectory);

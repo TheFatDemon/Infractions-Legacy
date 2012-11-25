@@ -20,7 +20,7 @@ public class URLShortenUtil {
 		Provider bitly = as("justicehqm", "R_8e7103357a5a07b25206fe657fe59d07"); // my
 																					// bit.ly
 																					// settings
-		Url shortUrl = bitly.call(shorten(input));
+		Url shortUrl = (Url) bitly.call(shorten(input));
 		return shortUrl.getShortUrl();
 	}
 }

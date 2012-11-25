@@ -19,15 +19,17 @@ public class Manager implements Listener {
 			p.sendMessage("This server is policed with infractions.");
 		}
 		if (Save.hasData(p, "NEWINFRACTION")) {
-			if ((Boolean)Save.getData(p, "NEWINFRACTION")) {
-				p.sendMessage(ChatColor.RED + "You have a new infraction!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
+			if ((Boolean) Save.getData(p, "NEWINFRACTION")) {
+				p.sendMessage(ChatColor.RED + "You have a new infraction!"
+						+ ChatColor.WHITE + " Use " + ChatColor.YELLOW
+						+ "/history" + ChatColor.WHITE
+						+ " for more information.");
 				Save.saveData(p, "NEWINFRACTION", false);
 			}
 		}
 		if (!Save.hasPlayer(p)) {
-			Logger.getLogger("Minecraft")
-					.info("[Infractions] "
-							+ p.getName()
+			Logger.getLogger("Minecraft").info(
+					"[Infractions] " + p.getName()
 							+ " joined for the first time.");
 			Save.addPlayer(p);
 		}

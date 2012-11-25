@@ -76,13 +76,13 @@ public class Util {
 		}
 		return maxScore;
 	}
-	
-	public static ChatColor chatColor (Player p, ChatColor color) {
+
+	public static ChatColor chatColor(Player p, ChatColor color) {
 		if (p == null)
 			return ChatColor.RESET;
 		return (color);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static boolean addInfraction(String target, int level, int id,
 			String infraction, String proof) {
@@ -95,34 +95,54 @@ public class Util {
 						+ date);
 		return true;
 	}
-	
+
 	public static void checkScore(Player p) {
 		if (getMaxScore(p) <= getScore(p)) {
 			p.kickPlayer("You have been banned.");
 			try {
 				p.setBanned(true);
 			} catch (NullPointerException e) {
-				log.info("[Infractions] Unable to set " + p.toString() + " to banned.");
+				log.info("[Infractions] Unable to set " + p.toString()
+						+ " to banned.");
 			}
 		} else {
 			try {
 				p.setBanned(false);
 			} catch (NullPointerException e) {
-				log.info("[Infractions] Unable to set " + p.toString() + " to unbanned.");
+				log.info("[Infractions] Unable to set " + p.toString()
+						+ " to unbanned.");
 			}
 		}
 	}
-	
+
 	public static void kickNotify(String p, String reason) {
 		try {
 			getOnlinePlayer(p); // Check if player is online.
-			if (getMaxScore(Util.getOnlinePlayer(p)) <= getScore(Util.getOnlinePlayer(p))) { // Players that should be banned are banned.
+			if (getMaxScore(Util.getOnlinePlayer(p)) <= getScore(Util
+					.getOnlinePlayer(p))) { // Players that should be banned are
+											// banned.
 				checkScore(Util.getOnlinePlayer(p));
 			} else if (Settings.getSettingBoolean("kick_on_cite")) {
-				Util.getOnlinePlayer(p).kickPlayer("You've been cited for " + reason + "."); // Kick a player if option is set to true.
+				Util.getOnlinePlayer(p).kickPlayer(
+						"You've been cited for " + reason + "."); // Kick a
+																	// player if
+																	// option is
+																	// set to
+																	// true.
 			} else {
-				Util.getOnlinePlayer(p).sendMessage(ChatColor.RED + "You've been cited for " + reason + ".");
-				Util.getOnlinePlayer(p).sendMessage("Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");  // Send player a message about their infraction.
+				Util.getOnlinePlayer(p)
+						.sendMessage(
+								ChatColor.RED + "You've been cited for "
+										+ reason + ".");
+				Util.getOnlinePlayer(p).sendMessage(
+						"Use " + ChatColor.YELLOW + "/history"
+								+ ChatColor.WHITE + " for more information."); // Send
+																				// player
+																				// a
+																				// message
+																				// about
+																				// their
+																				// infraction.
 			}
 		} catch (NullPointerException e) {
 			Save.saveData(p, "NEWINFRACTION", true);
@@ -177,9 +197,9 @@ public class Util {
 	public static Player getOnlinePlayer(String name) {
 		return plugin.getServer().getPlayer(name);
 	}
-	
+
 	public static OfflinePlayer getOfflinePlayer(String name) {
-        OfflinePlayer target = plugin.getServer().getOfflinePlayer(name);
+		OfflinePlayer target = plugin.getServer().getOfflinePlayer(name);
 		return target;
 	}
 
@@ -190,7 +210,7 @@ public class Util {
 	public static int getScore(Player p) {
 		return getScore(p.getName());
 	}
-	
+
 	public static int getScore(String p) {
 		if (Save.hasData(p, "SCORE"))
 			return (Integer) Save.getData(p, "SCORE");

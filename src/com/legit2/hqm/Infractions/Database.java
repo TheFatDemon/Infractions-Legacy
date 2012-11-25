@@ -11,21 +11,24 @@ public class Database {
 	private Infractions plugin;
 
 	static Boolean MySQL = Settings.getSettingBoolean("MySQL");
-	static String dbURL = "jdbc:mysql://" + Settings.getSettingString("sqlHostname") + ":" + Settings.getSettingInt("sqlPort") + "/" + Settings.getSettingString("sqlDatabase");
+	static String dbURL = "jdbc:mysql://"
+			+ Settings.getSettingString("sqlHostname") + ":"
+			+ Settings.getSettingInt("sqlPort") + "/"
+			+ Settings.getSettingString("sqlDatabase");
 	static String dbUser = Settings.getSettingString("sqlUsername");
 	static String dbPass = Settings.getSettingString("sqlPassword");
-	
+
 	public Database(Infractions plugin) {
 		this.plugin = plugin;
 
 		if (testDBConnection()) {
-			//setupMysql();
+			// setupMysql();
 		} else {
 			log.info("Failed to connect to database, disabling plugin...");
 			plugin.getPluginLoader().disablePlugin(plugin);
 		}
 	}
-	
+
 	public static boolean testDBConnection() {
 		try {
 			Connection con = DriverManager.getConnection(dbURL, dbUser, dbPass);
@@ -34,7 +37,7 @@ public class Database {
 			return true;
 		} catch (SQLException e) {
 			log.info("[Infractions] MYSQL NO WORKY. :C");
-			//do nothing
+			// do nothing
 		}
 		return false;
 	}
