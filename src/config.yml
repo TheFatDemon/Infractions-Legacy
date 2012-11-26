@@ -1,6 +1,7 @@
 #default config.yml
 #Infractions Configuration File
 #Global Settings
+auto-update: true
 motd: true
 save_interval_seconds: 30
 kick_on_cite: false

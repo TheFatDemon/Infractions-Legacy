@@ -10,6 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
 
+import com.legit2.hqm.ClashniaUpdate.Update;
+
 public class Infractions extends JavaPlugin implements Listener {
 	public static Logger log = Logger.getLogger("Minecraft");
 	static String mainDirectory = "plugins/Infractions/";
@@ -108,6 +110,9 @@ public class Infractions extends JavaPlugin implements Listener {
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
+		if (Settings.getSettingBoolean("auto-update")) {
+			Update.infractionsUpdate();
+		}
 	}
 
 	public void saveOnExit(PlayerQuitEvent e) {
