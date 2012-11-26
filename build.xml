@@ -28,8 +28,8 @@
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
             <src path="src"/>
             <classpath refid="Infractions.classpath"/>
-        	<jar jarfile="build/Infractions.jar" basedir="bin"/>
         </javac>
+    	<jar jarfile="build/Infractions.jar" basedir="bin"/>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
 </project>
