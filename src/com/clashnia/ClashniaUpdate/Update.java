@@ -1,4 +1,4 @@
-package com.legit2.hqm.ClashniaUpdate;
+package com.clashnia.ClashniaUpdate;
 
 import java.io.BufferedReader;
 import java.io.File;

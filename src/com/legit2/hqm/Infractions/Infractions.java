@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
 
-import com.legit2.hqm.ClashniaUpdate.Update;
+import com.clashnia.ClashniaUpdate.Update;
 
 public class Infractions extends JavaPlugin implements Listener {
 	public static Logger log = Logger.getLogger("Minecraft");

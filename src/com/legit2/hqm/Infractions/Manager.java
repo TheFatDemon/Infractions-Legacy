@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import com.legit2.hqm.ClashniaUpdate.Update;
+import com.clashnia.ClashniaUpdate.Update;
 
 public class Manager implements Listener {
 	/*
