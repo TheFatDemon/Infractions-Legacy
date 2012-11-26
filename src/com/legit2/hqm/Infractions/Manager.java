@@ -19,6 +19,10 @@ public class Manager implements Listener {
 		final Player p = e.getPlayer();
 		if (Settings.getSettingBoolean("motd")) {
 			p.sendMessage("This server is policed with infractions.");
+			if (Settings.getSettingBoolean("auto-update") == false && (Settings.getSettingBoolean("update-notify")) && (Update.shouldUpdate()) && Util.hasPermissionOrOP(p, "infractions.mod")) {
+				p.sendMessage(ChatColor.RED + "There is a new, stable release for Infractions.");
+				p.sendMessage(ChatColor.RED + "Please update ASAP.");
+			}
 		}
 		if (Save.hasData(p, "NEWINFRACTION")) {
 			if ((Boolean) Save.getData(p, "NEWINFRACTION")) {
@@ -35,10 +39,7 @@ public class Manager implements Listener {
 							+ " joined for the first time.");
 			Save.addPlayer(p);
 		}
-		if (Settings.getSettingBoolean("auto-update") == false && (Update.shouldUpdate()) && Util.hasPermissionOrOP(p, "infractions.mod")) {
-			p.sendMessage(ChatColor.RED + "There is a new, stable release for Infractions.");
-			p.sendMessage(ChatColor.RED + "Please update ASAP.");
-		}
+		
 		Save.saveData(p, "LASTLOGINTIME", System.currentTimeMillis());
 		Util.checkScore(p);
 	}
