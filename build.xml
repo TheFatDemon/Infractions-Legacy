@@ -10,7 +10,7 @@
     </path>
     <target name="init">
         <mkdir dir="bin"/>
-    	<mkdir dir="build"/>
+    	<mkdir dir="stable"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
                 <exclude name="**/*.java"/>
@@ -19,6 +19,7 @@
     </target>
     <target name="clean">
         <delete dir="bin"/>
+    	<delete dir="stable"/>
     </target>
     <target depends="clean" name="cleanall"/>
     <target depends="build-subprojects,build-project" name="build"/>
@@ -29,7 +30,7 @@
             <src path="src"/>
             <classpath refid="Infractions.classpath"/>
         </javac>
-    	<jar jarfile="build/Infractions.jar" basedir="bin"/>
+    	<jar jarfile="stable/Infractions.jar" basedir="bin"/>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
 </project>
