@@ -26,6 +26,8 @@ public class Update {
 		String latestVersion = pdf.getVersion();
 		String onlineVersion;
 
+		if (latestVersion.contains("d")) return false; // development versions shouldn't downgrade
+		
 		try {
 			URL version = new URL("http://www.clashnia.com/plugins/infractions/version.txt");
 			URLConnection versionCon = version.openConnection();
