@@ -8,6 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import com.legit2.hqm.ClashniaUpdate.Update;
+
 public class Manager implements Listener {
 	/*
 	 * Distributes all events to deities
@@ -18,7 +20,7 @@ public class Manager implements Listener {
 		if (Settings.getSettingBoolean("motd")) {
 			p.sendMessage("This server is policed with infractions.");
 		}
-		if (!Settings.getSettingBoolean("auto-update") && Util.hasPermissionOrOP(p, "infractions.mod")) {
+		if (!Settings.getSettingBoolean("auto-update") && (Update.shouldUpdate()) && Util.hasPermissionOrOP(p, "infractions.mod")) {
 			p.sendMessage("There is a new, stable release for Infractions.");
 			p.sendMessage("Please update ASAP.");
 		}

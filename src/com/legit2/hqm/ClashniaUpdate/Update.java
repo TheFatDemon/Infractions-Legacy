@@ -13,41 +13,47 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginDescriptionFile;
 
-import com.legit2.hqm.Infractions.Infractions;
+import com.legit2.hqm.Infractions.Util;
 
 public class Update {
 	static Logger log = Logger.getLogger("Minecraft");
-	private static Infractions plugin; // obviously needed
-
-	public static void infractionsUpdate() {
-		boolean shouldUpdate = false;
-		String latestVersion = "";
+	
+	public static boolean shouldUpdate() {
+		PluginDescriptionFile pdf = Util.getPlugin().getDescription();
+		String latestVersion = pdf.getVersion();
 		String onlineVersion = "";
 		URL url = null;
-		plugin.getDescription().getVersion();
-		
+
 		try {
 			url = new URL(
 					"http://www.clashnia.com/plugins/infractions/version.txt");
 			BufferedReader in = null;
 			in = new BufferedReader(new InputStreamReader(url.openStream()));
 			onlineVersion = in.readLine();
-			if (latestVersion.equals(onlineVersion)) {
+			if (latestVersion == (onlineVersion)) {
 				log.info("[Infractions] Infractions is up to date. Version "
 						+ latestVersion);
+				in.close();
+				return false;
 			} else {
-				log.info("[Infractions] Attempting to update to latest version...");
-				shouldUpdate = true;
+				log.info("[Infractions] Infractions is not up to date...");
+				in.close();
+				return true;
 			}
-			in.close();
 		} catch (MalformedURLException ex) {
 			log.warning("[Infractions] Error accessing version URL.");
 		} catch (IOException ex) {
 			log.warning("[Infractions] Error checking for update.");
 		}
-		if ((shouldUpdate))
+		return false;
+	}
+
+	public static void infractionsUpdate() {
+		if ((shouldUpdate()))
 			try {
+				log.info("[Infractions] Attempting to update to latest version...");
 				URL config = new URL(
 						"http://www.clashnia.com/plugins/infractions/Infractions.jar");
 				ReadableByteChannel rbc = Channels.newChannel(config
@@ -55,8 +61,7 @@ public class Update {
 				FileOutputStream fos = new FileOutputStream("plugins"
 						+ File.separator + "Infractions.jar");
 				fos.getChannel().transferFrom(rbc, 0L, 16777216L);
-				log.info("[Infractions] Download complete! You are on version "
-						+ onlineVersion);
+				log.info("[Infractions] Download complete!");
 				Bukkit.getServer().reload();
 			} catch (MalformedURLException ex) {
 				log.warning("[Infractions] Error accessing URL: " + ex);
