@@ -22,41 +22,31 @@ public class Update {
 
 	public static void infractionsUpdate() {
 		boolean shouldUpdate = false;
-		boolean infractionsExists = true;
 		String latestVersion = "";
 		String onlineVersion = "";
 		URL url = null;
+		plugin.getDescription().getVersion();
+		
 		try {
-			latestVersion = plugin.getServer().getPluginManager()
-					.getPlugin("Infractions").getDescription().getVersion();
-		} catch (Exception nullpointer) {
-			infractionsExists = false;
-			log.info("[Infractions] No instance of Infractions detected.");
-			log.info("[Infractions] Beginning download...");
-		}
-
-		if (infractionsExists) {
-			try {
-				url = new URL(
-						"http://www.clashnia.com/plugins/infractions/version.txt");
-				BufferedReader in = null;
-				in = new BufferedReader(new InputStreamReader(url.openStream()));
-				onlineVersion = in.readLine();
-				if (latestVersion.equals(onlineVersion)) {
-					log.info("[Infractions] Infractions is up to date. Version "
-							+ latestVersion);
-				} else {
-					log.info("[Infractions] Attempting to update to latest version...");
-					shouldUpdate = true;
-				}
-				in.close();
-			} catch (MalformedURLException ex) {
-				log.warning("[Infractions] Error accessing version URL.");
-			} catch (IOException ex) {
-				log.warning("[Infractions] Error checking for update.");
+			url = new URL(
+					"http://www.clashnia.com/plugins/infractions/version.txt");
+			BufferedReader in = null;
+			in = new BufferedReader(new InputStreamReader(url.openStream()));
+			onlineVersion = in.readLine();
+			if (latestVersion.equals(onlineVersion)) {
+				log.info("[Infractions] Infractions is up to date. Version "
+						+ latestVersion);
+			} else {
+				log.info("[Infractions] Attempting to update to latest version...");
+				shouldUpdate = true;
 			}
+			in.close();
+		} catch (MalformedURLException ex) {
+			log.warning("[Infractions] Error accessing version URL.");
+		} catch (IOException ex) {
+			log.warning("[Infractions] Error checking for update.");
 		}
-		if ((shouldUpdate) || (!infractionsExists))
+		if ((shouldUpdate))
 			try {
 				URL config = new URL(
 						"http://www.clashnia.com/plugins/infractions/Infractions.jar");
