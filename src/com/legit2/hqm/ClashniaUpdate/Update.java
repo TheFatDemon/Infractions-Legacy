@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Logger;
@@ -23,22 +24,22 @@ public class Update {
 	public static boolean shouldUpdate() {
 		PluginDescriptionFile pdf = Util.getPlugin().getDescription();
 		String latestVersion = pdf.getVersion();
-		String onlineVersion = "";
-		URL url = null;
+		String onlineVersion;
 
 		try {
-			url = new URL(
-					"http://www.clashnia.com/plugins/infractions/version.txt");
-			BufferedReader in = null;
-			in = new BufferedReader(new InputStreamReader(url.openStream()));
+			URL version = new URL("http://www.clashnia.com/plugins/infractions/version.txt");
+			URLConnection versionCon = version.openConnection();
+			versionCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"); //FIXES 403 ERROR
+			BufferedReader in = new BufferedReader(new InputStreamReader(versionCon.getInputStream()));
 			onlineVersion = in.readLine();
-			if (latestVersion == (onlineVersion)) {
+			if (latestVersion.equals(onlineVersion)) {
 				log.info("[Infractions] Infractions is up to date. Version "
 						+ latestVersion);
 				in.close();
 				return false;
 			} else {
 				log.info("[Infractions] Infractions is not up to date...");
+				log.info("[Infractions] New version: " + onlineVersion);
 				in.close();
 				return true;
 			}
@@ -54,10 +55,11 @@ public class Update {
 		if ((shouldUpdate()))
 			try {
 				log.info("[Infractions] Attempting to update to latest version...");
-				URL config = new URL(
+				URL plugin = new URL(
 						"http://www.clashnia.com/plugins/infractions/Infractions.jar");
-				ReadableByteChannel rbc = Channels.newChannel(config
-						.openStream());
+				URLConnection pluginCon = plugin.openConnection();
+				pluginCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"); //FIXES 403 ERROR
+				ReadableByteChannel rbc = Channels.newChannel(pluginCon.getInputStream());
 				FileOutputStream fos = new FileOutputStream("plugins"
 						+ File.separator + "Infractions.jar");
 				fos.getChannel().transferFrom(rbc, 0L, 16777216L);
