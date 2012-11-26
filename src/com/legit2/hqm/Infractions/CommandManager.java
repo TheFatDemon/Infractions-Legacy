@@ -70,7 +70,7 @@ public class CommandManager implements CommandExecutor, Listener {
 								+ "http://bit.ly/TLY1xB");
 				Util.messageSend(p, Util.chatColor(p, ChatColor.AQUA)
 						+ "Source: " + Util.chatColor(p, ChatColor.YELLOW)
-						+ "https://github.com/HmmmQuestionMark/Infractions");
+						+ "https://github.com/Clashnia/Infractions");
 				return true;
 			} else if (args[0].equalsIgnoreCase("types")) {
 				Util.messageSend(p, "----------------");
