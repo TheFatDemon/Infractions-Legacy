@@ -17,6 +17,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import com.legit2.hqm.Virtues.Virtues;
+
 public class Util {
 
 	private static Infractions plugin; // obviously needed
@@ -116,36 +118,40 @@ public class Util {
 	}
 
 	public static void kickNotify(String p, String reason) {
-		try {
-			getOnlinePlayer(p); // Check if player is online.
-			if (getMaxScore(Util.getOnlinePlayer(p)) <= getScore(Util
-					.getOnlinePlayer(p))) { // Players that should be banned are
-											// banned.
-				checkScore(Util.getOnlinePlayer(p));
-			} else if (Settings.getSettingBoolean("kick_on_cite")) {
-				Util.getOnlinePlayer(p).kickPlayer(
-						"You've been cited for " + reason + "."); // Kick a
-																	// player if
-																	// option is
-																	// set to
-																	// true.
-			} else {
-				Util.getOnlinePlayer(p)
-						.sendMessage(
-								ChatColor.RED + "You've been cited for "
-										+ reason + ".");
-				Util.getOnlinePlayer(p).sendMessage(
-						"Use " + ChatColor.YELLOW + "/history"
-								+ ChatColor.WHITE + " for more information."); // Send
-																				// player
-																				// a
-																				// message
-																				// about
-																				// their
-																				// infraction.
+		if (!Virtues.getVirtues().contains(reason)) {
+			try {
+				getOnlinePlayer(p); // Check if player is online.
+				if (getMaxScore(Util.getOnlinePlayer(p)) <= getScore(Util
+						.getOnlinePlayer(p))) { // Players that should be banned are
+												// banned.
+					checkScore(Util.getOnlinePlayer(p));
+				} else if (Settings.getSettingBoolean("kick_on_cite")) {
+					Util.getOnlinePlayer(p).kickPlayer(
+							"You've been cited for " + reason + "."); // Kick a
+																		// player if
+																		// option is
+																		// set to
+																		// true.
+				} else {
+					Util.getOnlinePlayer(p)
+							.sendMessage(
+									ChatColor.RED + "You've been cited for "
+											+ reason + ".");
+					Util.getOnlinePlayer(p).sendMessage(
+							"Use " + ChatColor.YELLOW + "/history"
+									+ ChatColor.WHITE + " for more information."); // Send
+																					// player
+																					// a
+																					// message
+																					// about
+																					// their
+																					// infraction.
+				}
+			} catch (NullPointerException e) {
+				Save.saveData(p, "NEWINFRACTION", true);
 			}
-		} catch (NullPointerException e) {
-			Save.saveData(p, "NEWINFRACTION", true);
+		} else {
+			Virtues.rewardPlayer(p, reason);
 		}
 	}
 

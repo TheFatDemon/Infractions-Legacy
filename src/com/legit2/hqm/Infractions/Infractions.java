@@ -53,6 +53,7 @@ public class Infractions extends JavaPlugin implements Listener {
 		// info
 		getServer().getPluginManager().registerEvents(ce, this);
 		getCommand("infractions").setExecutor(ce);
+		getCommand("virtues").setExecutor(ce);
 		getCommand("history").setExecutor(ce);
 		// actions
 		getCommand("cite").setExecutor(ce);

@@ -33,6 +33,15 @@ public class Manager implements Listener {
 				Save.saveData(p, "NEWINFRACTION", false);
 			}
 		}
+		if (Save.hasData(p, "NEWVIRTUE")) {
+			if ((Boolean) Save.getData(p, "NEWVIRTUE")) {
+				p.sendMessage(ChatColor.RED + "You have a new virtue!"
+						+ ChatColor.WHITE + " Use " + ChatColor.YELLOW
+						+ "/history" + ChatColor.WHITE
+						+ " for more information.");
+				Save.saveData(p, "NEWVIRTUE", false);
+			}
+		}
 		if (!Save.hasPlayer(p)) {
 			Logger.getLogger("Minecraft").info(
 					"[Infractions] " + p.getName()

@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import com.google.common.base.Strings;
+import com.legit2.hqm.Virtues.Virtues;
 
 public class CommandManager implements CommandExecutor, Listener {
 
@@ -59,6 +60,12 @@ public class CommandManager implements CommandExecutor, Listener {
 								+ "/infractions types "
 								+ Util.chatColor(p, ChatColor.WHITE)
 								+ "- Shows all valid infraction types.");
+				Util.messageSend(
+						p,
+						Util.chatColor(p, ChatColor.GRAY)
+								+ "/virtues "
+								+ Util.chatColor(p, ChatColor.WHITE)
+								+ "- Shows all valid virtue types.");
 				Util.messageSend(p,
 						Util.chatColor(p, ChatColor.AQUA) + "Using the GNU "
 								+ Util.chatColor(p, ChatColor.DARK_AQUA)
@@ -106,6 +113,14 @@ public class CommandManager implements CommandExecutor, Listener {
 				Util.messageSend(p, "Too many arguments.");
 				return false;
 			}
+		} else if (c.getName().equalsIgnoreCase("virtues")) {
+			Util.messageSend(p, "----------------");
+			Util.messageSend(p, "VIRTUES TYPES");
+			Util.messageSend(p, "----------------");
+			for (int i = 0; i < Virtues.getVirtues().size(); i++) {
+				Util.messageSend(p, Virtues.getVirtues().get(i));
+			}
+			return true;
 		} else if (c.getName().equalsIgnoreCase("cite")) {
 			if (!Util.hasPermissionOrOP(p, "infractions.mod")) {
 				Util.messageSend(p, "You do not have enough permissions.");
@@ -280,6 +295,35 @@ public class CommandManager implements CommandExecutor, Listener {
 						args[1], "No proof.");
 				Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
 				return true;
+			} else if (Virtues.getVirtues().contains(args[1])) {
+				if (args.length == 3) {
+					if (!Util.isValidURL(args[2])) {
+						Util.messageSend(p,
+								"You must provide a valid URL as proof.");
+						return false;
+					}
+					Util.messageSend(p,
+							"Proof URL: " + Util.chatColor(p, ChatColor.GOLD)
+									+ URLShortenUtil.convertURL(args[2]));
+					Util.messageSend(p, Util.chatColor(p, ChatColor.GOLD)
+							+ "Success! " + Util.chatColor(p, ChatColor.WHITE)
+							+ "The virtue has been recieved.");
+					Util.setScore(Util.getInfractionsPlayer(args[0]), Settings.getSettingInt("virtue_value") + Util
+							.getScore(Util.getInfractionsPlayer(args[0])));
+					Util.addInfraction(Util.getInfractionsPlayer(args[0]), Settings.getSettingInt("virtue_value"),
+							id, args[1], URLShortenUtil.convertURL(args[2]));
+					Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
+					return true;
+				}
+				Util.messageSend(p, Util.chatColor(p, ChatColor.GOLD)
+						+ "Success! " + Util.chatColor(p, ChatColor.WHITE)
+						+ "The virtue has been recieved.");
+				Util.setScore(Util.getInfractionsPlayer(args[0]),
+						Settings.getSettingInt("virtue_value") + Util.getScore(Util.getInfractionsPlayer(args[0])));
+				Util.addInfraction(Util.getInfractionsPlayer(args[0]), Settings.getSettingInt("virtue_value"), id,
+						args[1], "No proof.");
+				Util.kickNotify(Util.getInfractionsPlayer(args[0]), args[1]);
+				return true;
 			} else {
 				Util.messageSend(p, Util.chatColor(p, ChatColor.YELLOW)
 						+ "Not a valid infraction type.");
@@ -304,116 +348,27 @@ public class CommandManager implements CommandExecutor, Listener {
 				Object oK = iterKey.next();
 				Object oV = iterValue.next();
 				String key = oK.toString();
-				String value = oV.toString();
+				String earlyValue = oV.toString();
 				if (key.contains(args[1])) {
-					if (value.startsWith("1")) {
-						Util.setScore(Util.getInfractionsPlayer(args[0]),
-								Util.getScore(Util
-										.getInfractionsPlayer(args[0])) - 1);
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.sendMessage("Removed an infraction!");
-						} catch (NullPointerException e) {
-							// Do Nothing
-						}
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						} catch (NullPointerException e) {
-							Util.getOfflinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						}
-					} else if (value.startsWith("2")) {
-						Util.setScore(Util.getInfractionsPlayer(args[0]),
-								Util.getScore(Util
-										.getInfractionsPlayer(args[0])) - 2);
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.sendMessage("Removed an infraction!");
-						} catch (NullPointerException e) {
-							// Do Nothing
-						}
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						} catch (NullPointerException e) {
-							Util.getOfflinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						}
-					} else if (value.startsWith("3")) {
-						Util.setScore(Util.getInfractionsPlayer(args[0]),
-								Util.getScore(Util
-										.getInfractionsPlayer(args[0])) - 3);
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.sendMessage("Removed an infraction!");
-						} catch (NullPointerException e) {
-							// Do Nothing
-						}
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						} catch (NullPointerException e) {
-							Util.getOfflinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						}
-					} else if (value.startsWith("4")) {
-						Util.setScore(Util.getInfractionsPlayer(args[0]),
-								Util.getScore(Util
-										.getInfractionsPlayer(args[0])) - 4);
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.sendMessage("Removed an infraction!");
-						} catch (NullPointerException e) {
-							// Do Nothing
-						}
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						} catch (NullPointerException e) {
-							Util.getOfflinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						}
-					} else if (value.startsWith("5")) {
-						Util.setScore(Util.getInfractionsPlayer(args[0]),
-								Util.getScore(Util
-										.getInfractionsPlayer(args[0])) - 5);
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.sendMessage("Removed an infraction!");
-						} catch (NullPointerException e) {
-							// Do Nothing
-						}
-						try {
-							Util.getOnlinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						} catch (NullPointerException e) {
-							Util.getOfflinePlayer(
-									Util.getInfractionsPlayer(args[0]))
-									.setBanned(false);
-						}
-					} else {
-						Util.messageSend(p, "No such infraction exists.");
-						return true;
+					
+					String[] preValue = earlyValue.split(":");
+					String value = preValue[0];
+					
+					Util.removeInfraction(Util.getInfractionsPlayer(args[0]), args[1]);
+					
+					Util.setScore(Util.getInfractionsPlayer(args[0]),
+							Util.getScore(Util
+									.getInfractionsPlayer(args[0])) - Integer.parseInt(value));
+					Util.messageSend(p, "Removed!");
+					try {
+						Util.checkScore(Util.getOnlinePlayer(Util.getInfractionsPlayer(args[0])));
+					} catch (NullPointerException e) {
+						// player is offline
 					}
+					return true;
 				}
 			}
-			Util.removeInfraction(Util.getInfractionsPlayer(args[0]), args[1]);
-			Util.messageSend(p, "Infraction removed.");
+			Util.messageSend(p, "No such infraction.");
 			return true;
 		} else if (c.getName().equalsIgnoreCase("history")) {
 			if (!(args.length == 1) && !(p == null)) {
@@ -441,7 +396,10 @@ public class CommandManager implements CommandExecutor, Listener {
 						Object oV = iterValue.next();
 						String key = oK.toString();
 						int lineKey = (40 - key.length());
-						Util.messageSend(p, oV.toString().substring(2));
+						int trimFront;
+						if (oV.toString().startsWith("-")) trimFront = 1 + String.valueOf(Settings.getSettingInt("virtue_value")).length();
+						else trimFront = 2;
+						Util.messageSend(p, oV.toString().substring(trimFront));
 						if (Util.hasPermissionOrOP(p, "infractions.mod")) {
 							key += " " + Util.chatColor(p, ChatColor.WHITE)
 									+ Strings.repeat("-", lineKey);
@@ -503,7 +461,10 @@ public class CommandManager implements CommandExecutor, Listener {
 						Object oV = iterValue.next();
 						String key = oK.toString();
 						int lineKey = (40 - key.length());
-						Util.messageSend(p, oV.toString().substring(2));
+						int trimFront;
+						if (oV.toString().startsWith("-")) trimFront = 1 + String.valueOf(Settings.getSettingInt("virtue_value")).length();
+						else trimFront = 2;
+						Util.messageSend(p, oV.toString().substring(trimFront));
 						if (Util.hasPermissionOrOP(p, "infractions.mod")) {
 							key += " " + Util.chatColor(p, ChatColor.WHITE)
 									+ Strings.repeat("-", lineKey);

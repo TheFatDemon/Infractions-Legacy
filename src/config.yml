@@ -8,6 +8,7 @@ save_interval_seconds: 30
 kick_on_cite: false
 ban_at_score: 5
 require_proof: false
+virtue_value: -1
 #Define Infraction Levels
 level_1:
   - flying
@@ -28,6 +29,10 @@ level_4:
 level_5:
   - lg-hacking
   - lg-griefing
+virtues:
+  - helping-admin
+  - fixing-grief
+  - reporting-hacks
 #SQL Settings
 MySQL: true
 sqlHostname: localhost
