@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import com.clashnia.ClashniaUpdate.Update;
+import com.clashnia.ClashniaUpdate.InfractionsUpdate;
 
 public class Manager implements Listener {
 	/*
@@ -19,7 +19,7 @@ public class Manager implements Listener {
 		final Player p = e.getPlayer();
 		if (Settings.getSettingBoolean("motd")) {
 			p.sendMessage("This server is policed with infractions.");
-			if (Settings.getSettingBoolean("auto-update") == false && (Settings.getSettingBoolean("update-notify")) && (Update.shouldUpdate()) && Util.hasPermissionOrOP(p, "infractions.mod")) {
+			if (Settings.getSettingBoolean("auto-update") == false && (Settings.getSettingBoolean("update-notify")) && (InfractionsUpdate.shouldUpdate()) && Util.hasPermissionOrOP(p, "infractions.mod")) {
 				p.sendMessage(ChatColor.RED + "There is a new, stable release for Infractions.");
 				p.sendMessage(ChatColor.RED + "Please update ASAP.");
 			}

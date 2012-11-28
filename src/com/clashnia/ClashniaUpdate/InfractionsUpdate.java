@@ -18,7 +18,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 
 import com.legit2.hqm.Infractions.Util;
 
-public class Update {
+public class InfractionsUpdate {
 	static Logger log = Logger.getLogger("Minecraft");
 	
 	public static boolean shouldUpdate() {
@@ -54,7 +54,7 @@ public class Update {
 	}
 
 	public static void infractionsUpdate() {
-		if ((shouldUpdate()))
+		if ((shouldUpdate())) {
 			try {
 				log.info("[Infractions] Attempting to update to latest version...");
 				URL plugin = new URL(
@@ -74,5 +74,8 @@ public class Update {
 			} catch (IOException ex) {
 				log.warning("[Infractions] Error downloading file: " + ex);
 			}
+		} else {
+			// do nothing
+		}
 	}
 }

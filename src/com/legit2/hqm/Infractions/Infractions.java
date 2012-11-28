@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
 
-import com.clashnia.ClashniaUpdate.Update;
+import com.clashnia.ClashniaUpdate.InfractionsUpdate;
 
 public class Infractions extends JavaPlugin implements Listener {
 	public static Logger log = Logger.getLogger("Minecraft");
@@ -108,11 +108,13 @@ public class Infractions extends JavaPlugin implements Listener {
 		loadCommands(); // #6 (needed)
 		loadMetrics(); // #7
 		initializeThreads(); // #8 (regen and etc)
+		@SuppressWarnings("unused")
+		Boolean shouldUpdate = InfractionsUpdate.shouldUpdate();
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
-		if (Settings.getSettingBoolean("auto-update") && (Update.shouldUpdate())) {
-			Update.infractionsUpdate();
+		if (Settings.getSettingBoolean("auto-update") && (shouldUpdate = true)) {
+			InfractionsUpdate.infractionsUpdate();
 		}
 	}
 
