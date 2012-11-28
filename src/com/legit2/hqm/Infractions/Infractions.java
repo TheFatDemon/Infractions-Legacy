@@ -111,7 +111,7 @@ public class Infractions extends JavaPlugin implements Listener {
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
-		if (Settings.getSettingBoolean("auto-update")) {
+		if (Settings.getSettingBoolean("auto-update") && (Update.shouldUpdate())) {
 			Update.infractionsUpdate();
 		}
 	}
