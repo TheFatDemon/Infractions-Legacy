@@ -1,7 +1,6 @@
 #default config.yml
 #Infractions Configuration File
 #Global Settings
-auto-update: true
 update-notify: true
 motd: true
 save_interval_seconds: 30

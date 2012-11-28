@@ -108,14 +108,10 @@ public class Infractions extends JavaPlugin implements Listener {
 		loadCommands(); // #6 (needed)
 		loadMetrics(); // #7
 		initializeThreads(); // #8 (regen and etc)
-		@SuppressWarnings("unused")
-		Boolean shouldUpdate = InfractionsUpdate.shouldUpdate();
+		InfractionsUpdate.shouldUpdate();
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
-		if (Settings.getSettingBoolean("auto-update") && (shouldUpdate = true)) {
-			InfractionsUpdate.infractionsUpdate();
-		}
 	}
 
 	public void saveOnExit(PlayerQuitEvent e) {

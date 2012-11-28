@@ -1,19 +1,19 @@
 package com.clashnia.ClashniaUpdate;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+//import java.io.File;
+//import java.io.FileNotFoundException;
+//import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
+//import java.nio.channels.Channels;
+//import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
+//import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import com.legit2.hqm.Infractions.Util;
@@ -52,7 +52,7 @@ public class InfractionsUpdate {
 		}
 		return false;
 	}
-
+/**
 	public static void infractionsUpdate() {
 		if ((shouldUpdate())) {
 			try {
@@ -78,4 +78,5 @@ public class InfractionsUpdate {
 			// do nothing
 		}
 	}
+*/
 }
