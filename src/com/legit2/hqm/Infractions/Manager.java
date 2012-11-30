@@ -19,7 +19,7 @@ public class Manager implements Listener {
 		final Player p = e.getPlayer();
 		if (Settings.getSettingBoolean("motd")) {
 			p.sendMessage("This server is policed with infractions.");
-			if (Settings.getSettingBoolean("update-notify") && (InfractionsUpdate.shouldUpdate()) && Util.hasPermissionOrOP(p, "infractions.mod")) {
+			if (!Settings.getSettingBoolean("update") && (InfractionsUpdate.shouldUpdate()) && Util.hasPermissionOrOP(p, "infractions.mod")) {
 				p.sendMessage(ChatColor.RED + "There is a new, stable release for Infractions.");
 				p.sendMessage(ChatColor.RED + "Please update ASAP.");
 				p.sendMessage(ChatColor.GREEN + "Latest: http://clashnia.com/plugins/infractions/Infractions.jar");

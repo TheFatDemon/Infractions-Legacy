@@ -108,7 +108,11 @@ public class Infractions extends JavaPlugin implements Listener {
 		loadCommands(); // #6 (needed)
 		loadMetrics(); // #7
 		initializeThreads(); // #8 (regen and etc)
-		InfractionsUpdate.shouldUpdate();
+		Boolean shouldUpdate = InfractionsUpdate.shouldUpdate();
+		if(shouldUpdate && Settings.getSettingBoolean("update"))
+		{
+			InfractionsUpdate.infractionsUpdate();
+		}
 		log.info("[Infractions] Preparation completed in "
 				+ ((double) (System.currentTimeMillis() - firstTime) / 1000)
 				+ " seconds.");
