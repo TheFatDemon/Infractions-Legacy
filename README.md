@@ -6,10 +6,11 @@ The idea was originally implemented on my server with a php application hooking 
 
 ## Statistics: ##
 
-Find more statistics [here](http://mcstats.org/plugin/Infractions).
 ![Plugin Metrics](http://mcstats.org/signature/infractions.png)
 
 Versions 0.3c and up will provide the option to contribute to these statistics.
+
+Find more statistics [here](http://mcstats.org/plugin/Infractions).
 
 # Features #
 
