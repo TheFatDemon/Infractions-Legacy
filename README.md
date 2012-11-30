@@ -1,4 +1,4 @@
-![Infractions](http://i.imgur.com/kHrlR.png)
+![Infractions](http://i.imgur.com/Bo4OW.png)
 
 **Infractions** is a policing plugin for Bukkit based on a number of small warnings given to a player before they are automatically banned.
 
@@ -12,7 +12,7 @@ Versions 0.3c and up will provide the option to contribute to these statistics.
 
 Find more statistics [here](http://mcstats.org/plugin/Infractions).
 
-# Features #
+## Features ##
 
 **Levels**: Infractions currently has 5 'levels' for warnings.  Different types of infractions are sorted into these levels, 5 being the worst, 1 being hardly a problem at all.  When an infraction of any level is given, it's level number is added to a players total score.
 
@@ -39,7 +39,7 @@ This node sets a player's max score. Replace # with a max score of 1 to 20.  If 
 
 If you have the '*' permission, as given from PermissionsEx, you will be given the default max score provided in the config file.
 
-# In Development #
+## Development ##
 
 Infractions is still in active development.  New ideas are welcome to the plugin. Do you have a clever idea? Let me know!
 
