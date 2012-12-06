@@ -57,4 +57,4 @@ Ideas already in development:
 * Option to have a certain score set a player to a certain rank.
 * MySQL option for saves.
 
-You can always find the latest stable build here: http://www.clashnia.com/plugins/infractions/Infractions.jar
+You can always find the latest stable build here: http://dev.bukkit.org/server-mods/infractions/files/
