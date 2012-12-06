@@ -11,9 +11,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import com.clashnia.ClashniaUpdate.InfractionsUpdate;
 
 public class Manager implements Listener {
-	/*
-	 * Distributes all events to deities
-	 */
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) { // sync to master file
 		final Player p = e.getPlayer();
