@@ -26,6 +26,16 @@ public class Util {
 	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	static Calendar cal = Calendar.getInstance();
 	static String date = dateFormat.format(cal.getTime());
+	
+	public static void consoleMSG(String level, String msg)
+	{
+		// Define variables
+		Logger log = Logger.getLogger("Minecraft");
+		
+		if(level.equalsIgnoreCase("info")) log.info("[Demigods] " + msg);
+		if(level.equalsIgnoreCase("warning")) log.warning("[Demigods] " + msg);
+		if(level.equalsIgnoreCase("severe")) log.severe("[Demigods] " + msg);
+	}
 
 	public static int getMaxScore(Player p) {
 		int maxScore = Settings.getSettingInt("ban_at_score");

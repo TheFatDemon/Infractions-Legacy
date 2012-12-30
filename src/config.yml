@@ -33,9 +33,9 @@ virtues:
   - fixing-grief
   - reporting-hacks
 #SQL Settings
-MySQL: true
-sqlHostname: localhost
-sqlPort: 3306
-sqlUsername: root
-sqlPassword: ''
-sqlDatabase: minecraft
+#MySQL: true
+#sqlHostname: localhost
+#sqlPort: 3306
+#sqlUsername: root
+#sqlPassword: ''
+#sqlDatabase: minecraft

@@ -1,60 +1,40 @@
 package com.clashnia.ClashniaUpdate;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginDescriptionFile;
 
+import com.legit2.hqm.Infractions.Infractions;
 import com.legit2.hqm.Infractions.Util;
 
-public class InfractionsUpdate {
-static Logger log = Logger.getLogger("Minecraft");
+public class InfractionsUpdate
+{
+	static Infractions plugin;
 	
 	/*
 	 *  (String)OLD_DOWNLOAD_LINK : The download link for what should be this exact jar, or the last stable jar if this is a development build.
 	 */
-	static String OLD_DOWNLOAD_LINK = "http://dev.bukkit.org/media/files/649/676/Infractions.jar";
+
+	public static UpdateChecker checker = new UpdateChecker("http://dev.bukkit.org/server-mods/infractions/files.rss");
 	
+	public InfractionsUpdate(Infractions infractions)
+	{
+		plugin = infractions;
+	}
+
 	public static boolean shouldUpdate()
 	{
-		PluginDescriptionFile pdf = Util.getPlugin().getDescription();
-		String currentVersion = pdf.getVersion();
-		
-		if (currentVersion.startsWith("d")) return false; // development versions shouldn't downgrade
-
-		try
-		{
-			String downloadLink = getDownloadLink();
-			
-			if (downloadLink.equals(OLD_DOWNLOAD_LINK))
-			{
-				log.info("[Infractions] Infractions is up to date.");
-				return false;
-			}
-			else
-			{
-				log.info("[Infractions] Infractions is not up to date...");
-				return true;
-			}
-		}
-	catch (MalformedURLException ex)
-	{
-			log.severe("[Infractions] Error accessing version URL.");
-		}
-		catch (IOException ex)
-		{
-			log.severe("[Infractions] Error checking for update.");
+		if (checker.updateNeeded()){
+			Util.consoleMSG("info","A new version is available: " + checker.getVersion());
+			return true;
 		}
 		return false;
 	}
@@ -72,7 +52,7 @@ static Logger log = Logger.getLogger("Minecraft");
 			int bytesTransferred = 0;
 			String downloadLink = getDownloadLink();
 
-			log.info("[Infractions] Attempting to update to latest version...");
+			Util.consoleMSG("info","Attempting to update to latest version...");
 			
 			// Set latest build URL
 			URL plugin = new URL(downloadLink);
@@ -84,7 +64,7 @@ static Logger log = Logger.getLogger("Minecraft");
 
             // Create new .jar file and add it to plugins directory
             File pluginUpdate = new File("plugins" + File.separator + "Infractions.jar");
-			log.info("[Infractions] File has been written to: " + pluginUpdate.getCanonicalPath());
+            Util.consoleMSG("info","File has been written to: " + pluginUpdate.getCanonicalPath());
 			
 			InputStream is = pluginCon.getInputStream();
 			OutputStream os = new FileOutputStream(pluginUpdate);
@@ -101,7 +81,7 @@ static Logger log = Logger.getLogger("Minecraft");
 					
 					if(percentTransferred != 100)
 					{
-						log.info("[Infractions] " + percentTransferred + "%");
+						Util.consoleMSG("info", percentTransferred + "%");
 					}
 				}
 			}
@@ -111,33 +91,26 @@ static Logger log = Logger.getLogger("Minecraft");
 			os.close();
 			
 			// Update complete! Reload the server now
-			log.info("[Infractions] Download complete! Reloading server...");
+			Util.consoleMSG("info","Download complete! Reloading server...");
 			Bukkit.getServer().reload();
 		}
 		catch (MalformedURLException ex)
 		{
-			log.warning("[Infractions] Error accessing URL: " + ex);
+			Util.consoleMSG("warning", "Error accessing URL: " + ex);
 		}
 		catch (FileNotFoundException ex)
 		{
-			log.warning("[Infractions] Error accessing URL: " + ex);
+			Util.consoleMSG("warning", "Error accessing URL: " + ex);
 		}
 		catch (IOException ex)
 		{
-			log.warning("[Infractions] Error downloading file: " + ex);
+			Util.consoleMSG("warning", "Error downloading file: " + ex);
 		}
 	}
 	
 	private static String getDownloadLink() throws IOException
 	{
-		String downloadLink;
-		
-		URL version = new URL("http://www.clashnia.com/plugins/infractions/dl.txt");
-		URLConnection downloadCon = version.openConnection();
-		downloadCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"); //FIXES 403 ERROR
-		BufferedReader in = new BufferedReader(new InputStreamReader(downloadCon.getInputStream()));
-		downloadLink = in.readLine();
-		in.close();
+		String downloadLink = checker.getJarLink();
 		
 		return downloadLink;
 	}
