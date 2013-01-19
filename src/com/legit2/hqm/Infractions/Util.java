@@ -32,6 +32,9 @@ public class Util {
 		// Define variables
 		Logger log = Logger.getLogger("Minecraft");
 		
+		// Strip color from console messages
+		msg = ChatColor.stripColor(msg);
+		
 		if(level.equalsIgnoreCase("info")) log.info("[Demigods] " + msg);
 		if(level.equalsIgnoreCase("warning")) log.warning("[Demigods] " + msg);
 		if(level.equalsIgnoreCase("severe")) log.severe("[Demigods] " + msg);
