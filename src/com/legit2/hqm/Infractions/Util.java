@@ -109,7 +109,7 @@ public class Util {
 	}
 
 	public static void checkScore(Player p) {
-		if (getMaxScore(p) <= getScore(p)) {
+		if (getMaxScore(p) <= getScore(p) && (!p.hasPermission("infractions.banexempt"))) {
 			p.kickPlayer("You have been banned.");
 			try {
 				p.setBanned(true);
