@@ -22,8 +22,8 @@ Find more statistics [here](http://mcstats.org/plugin/Infractions).
 
 ## Commands ##
 Use the following commands in-game, or in the console.
-* **/cite <player> <infraction> [proof]** - Gives an infraction.
-* **/uncite <player> <key>** - Removes an infraction, key is found with /history <player>.
+* **/cite [player] [infraction] [proof]** - Gives an infraction.
+* **/uncite [player] [key]** - Removes an infraction, key is found with /history [player].
 * **/infractions** - Help page.
 * **/infractions types** - Shows every valid type of infraction.
 * **/history [player]** - View a players infraction history.
@@ -36,6 +36,10 @@ This node gives permission to use /cite and /uncite, as well as being able to us
 This node sets a player's max score. Replace # with a max score of 1 to 20.  If no permission like this is found, it defaults to the max score you set in your config (ban_at_score).
 
     - infractions.maxscore.#
+    
+This node excempts a player from being banned by this plugin:
+
+    - infractions.banexempt
 
 If you have the '*' permission, as given from PermissionsEx, you will be given the default max score provided in the config file.
 
