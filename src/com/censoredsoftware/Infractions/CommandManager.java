@@ -1,4 +1,4 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
 import com.google.common.base.Strings;
 import org.bukkit.ChatColor;

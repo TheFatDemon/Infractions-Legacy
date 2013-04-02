@@ -1,6 +1,5 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
-import com.legit2.hqm.Infractions.Util;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

@@ -7,7 +7,7 @@ public final class Dom
 {
 	public static String getTextContent(Node n)
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		NodeList nl = n.getChildNodes();
 		for(int i = 0; i < nl.getLength(); i++)
 		{

@@ -1,4 +1,4 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
 import org.bukkit.Bukkit;
 
@@ -41,7 +41,7 @@ public class InfractionsUpdate
 
 			// Define variables
 			byte[] buffer = new byte[1024];
-			int read = 0;
+			int read;
 			int bytesTransferred = 0;
 			String downloadLink = getDownloadLink();
 

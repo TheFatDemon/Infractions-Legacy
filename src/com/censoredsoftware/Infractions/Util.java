@@ -1,4 +1,4 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -312,9 +312,8 @@ public class Util
 	  // for
 	  // permissions
 		if(p == null) return true;
-		if(p.isOp()) return true;
-		return p.hasPermission(pe);
-	}
+        return p.isOp() || p.hasPermission(pe);
+    }
 
 	public static boolean isValidURL(String input)
 	{
@@ -384,7 +383,7 @@ public class Util
 
 	public static void setScore(String p, int amt)
 	{
-		Save.saveData(p, "SCORE", new Integer(amt));
+		Save.saveData(p, "SCORE", amt);
 	}
 
 	public Util(Infractions i)

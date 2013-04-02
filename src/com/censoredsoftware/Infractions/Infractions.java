@@ -1,4 +1,4 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -117,7 +117,6 @@ public class Infractions extends JavaPlugin implements Listener
 		log.info("[Infractions] Updating configuration.");
 		initialize = new Util(this); // #2 (needed for everything else to work)
 		SAVE = new Save(mainDirectory); // #3 (needed to start save system)
-		// Database.testDBConnection(); // #4
 		loadListeners(); // #5
 		loadCommands(); // #6 (needed)
 		loadMetrics(); // #7

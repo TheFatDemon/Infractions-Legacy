@@ -44,11 +44,11 @@ class SimpleProvider implements Bitly.Provider
 
 	protected String getUrlForCall(BitlyMethod<?> m)
 	{
-		StringBuilder sb = new StringBuilder(this.endPoint).append(m.getName() + "?").append("&login=").append(this.user).append("&apiKey=").append(this.apiKey).append("&format=xml");
+		StringBuilder sb = new StringBuilder(this.endPoint).append(m.getName()).append("?").append("&login=").append(this.user).append("&apiKey=").append(this.apiKey).append("&format=xml");
 		try
 		{
 			for(Pair<?, ?> p : m.getParameters())
-				sb.append("&" + (String) p.getOne() + "=" + URLEncoder.encode((String) p.getTwo(), "UTF-8"));
+				sb.append("&").append((String) p.getOne()).append("=").append(URLEncoder.encode((String) p.getTwo(), "UTF-8"));
 		}
 		catch(UnsupportedEncodingException e)
 		{

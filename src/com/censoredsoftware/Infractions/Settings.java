@@ -1,4 +1,4 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -32,8 +32,7 @@ public class Settings
 
 	public static boolean getSettingBoolean(String id)
 	{
-		if(plugin.getConfig().isBoolean(id)) return plugin.getConfig().getBoolean(id);
-		else return true;
+        return !plugin.getConfig().isBoolean(id) || plugin.getConfig().getBoolean(id);
 	}
 
 	public static double getSettingDouble(String id)

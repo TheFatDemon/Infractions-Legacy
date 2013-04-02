@@ -1,4 +1,4 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

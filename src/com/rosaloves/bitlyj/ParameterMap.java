@@ -9,7 +9,7 @@ class ParameterMap extends AbstractCollection<Map.Entry<String, List<String>>>
 
 	public void add(String name, String value)
 	{
-		List<String> values = (List<String>) this.parameters.get(name);
+		List<String> values = this.parameters.get(name);
 		if(values == null) values = new ArrayList<String>();
 		values.add(value);
 		this.parameters.put(name, values);
@@ -17,7 +17,7 @@ class ParameterMap extends AbstractCollection<Map.Entry<String, List<String>>>
 
 	public List<String> get(String name)
 	{
-		return (List<String>) this.parameters.get(name);
+		return this.parameters.get(name);
 	}
 
 	public Iterator<Map.Entry<String, List<String>>> iterator()

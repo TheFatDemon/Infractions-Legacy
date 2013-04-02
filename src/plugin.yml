@@ -1,8 +1,8 @@
 name: Infractions
-main: com.legit2.hqm.Infractions.Infractions
-version: 0.4.1
+main: com.censoredsoftware.Infractions.Infractions
+version: 0.4.2
 description: Police your server with specific rules; give players a second or third chance before they are banned.
-author: HmmmQuestionMark, Clashnia
+author: HmmmQuestionMark
 commands:
     infractions:
         description: Important information.

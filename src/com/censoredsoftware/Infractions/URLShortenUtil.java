@@ -1,4 +1,4 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
 import com.rosaloves.bitlyj.Bitly.Provider;
 import com.rosaloves.bitlyj.Url;
@@ -10,9 +10,8 @@ public class URLShortenUtil
 {
 	/**
 	 * Converts a URL into a bit.ly shortened URL.
-	 * 
-	 * @param url
-	 * @return
+	 *
+	 * @return String
 	 */
 	public static String convertURL(String input)
 	{

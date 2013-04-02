@@ -1,16 +1,11 @@
-package com.legit2.hqm.Infractions;
+package com.censoredsoftware.Infractions;
 
-import com.legit2.hqm.Infractions.Infractions;
-import com.legit2.hqm.Infractions.Save;
-import com.legit2.hqm.Infractions.Settings;
-import com.legit2.hqm.Infractions.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,7 +23,7 @@ public class Virtues
 			log.warning("[Infractions] Unable to load the config for Virtues.");
 			return null;
 		}
-		List<String> virtues = new ArrayList<String>();
+		List<String> virtues;
 		virtues = Settings.fetchListString(config, "virtues");
 		return virtues;
 	}
