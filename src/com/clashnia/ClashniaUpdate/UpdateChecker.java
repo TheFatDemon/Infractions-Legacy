@@ -1,19 +1,17 @@
 package com.clashnia.ClashniaUpdate;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import com.legit2.hqm.Infractions.Util;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.legit2.hqm.Infractions.Util;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class UpdateChecker
 {
@@ -22,14 +20,14 @@ public class UpdateChecker
 	private String version;
 	private String link;
 	private String jarLink;
-	
+
 	public UpdateChecker(String url)
 	{
 		try
 		{
 			this.filesFeed = new URL(url);
 		}
-		catch (MalformedURLException e)
+		catch(MalformedURLException e)
 		{
 			e.printStackTrace();
 		}
@@ -48,31 +46,31 @@ public class UpdateChecker
 			this.version = children.item(1).getTextContent().replaceAll("[a-zA-Z ]", "");
 			try
 			{
-			this.link = children.item(3).getTextContent();
+				this.link = children.item(3).getTextContent();
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
-				Util.consoleMSG("warning","Failed to find download page.");
+				Util.consoleMSG("warning", "Failed to find download page.");
 				e.printStackTrace();
 			}
 			input.close();
 
 			try
 			{
-			input = (new URL(this.link)).openConnection().getInputStream();
+				input = (new URL(this.link)).openConnection().getInputStream();
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
-				Util.consoleMSG("warning","Failed to open connection with download page.");
+				Util.consoleMSG("warning", "Failed to open connection with download page.");
 				e.printStackTrace();
 			}
 
 			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 			String line;
 
-			while ((line = reader.readLine()) != null)
+			while((line = reader.readLine()) != null)
 			{
-				if (line.trim().startsWith("<li class=\"user-action user-action-download\">"))
+				if(line.trim().startsWith("<li class=\"user-action user-action-download\">"))
 				{
 					this.jarLink = line.substring(line.indexOf("href=\"") + 6, line.lastIndexOf("\""));
 					break;
@@ -82,17 +80,16 @@ public class UpdateChecker
 			reader.close();
 			input.close();
 
-			
-			PluginDescriptionFile pdf = Util.getPlugin().getDescription();	  	
+			PluginDescriptionFile pdf = Util.getPlugin().getDescription();
 			String currentVersion = pdf.getVersion();
-			if (!currentVersion.equals(this.version))
+			if(!currentVersion.equals(this.version))
 			{
 				return true;
 			}
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			Util.consoleMSG("warning","Failed to read download page.");
+			Util.consoleMSG("warning", "Failed to read download page.");
 			e.printStackTrace();
 		}
 
@@ -113,5 +110,5 @@ public class UpdateChecker
 	{
 		return this.jarLink;
 	}
-	
+
 }

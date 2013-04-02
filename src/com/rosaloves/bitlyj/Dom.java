@@ -3,14 +3,16 @@ package com.rosaloves.bitlyj;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public final class Dom {
-	public static String getTextContent(Node n) {
+public final class Dom
+{
+	public static String getTextContent(Node n)
+	{
 		StringBuffer sb = new StringBuffer();
 		NodeList nl = n.getChildNodes();
-		for (int i = 0; i < nl.getLength(); i++) {
+		for(int i = 0; i < nl.getLength(); i++)
+		{
 			Node child = nl.item(i);
-			if (child.getNodeType() == 3)
-				sb.append(child.getNodeValue());
+			if(child.getNodeType() == 3) sb.append(child.getNodeValue());
 		}
 		return sb.toString();
 	}

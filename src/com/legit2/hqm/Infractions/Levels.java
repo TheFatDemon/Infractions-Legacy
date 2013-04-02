@@ -1,23 +1,25 @@
 package com.legit2.hqm.Infractions;
 
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
-public class Levels {
+public class Levels
+{
 
 	static Infractions plugin;
 	static Logger log = Logger.getLogger("Minecraft");
-	static File f = new File("plugins" + File.separator + "Infractions"
-			+ File.separator + "config.yml");
+	static File f = new File("plugins" + File.separator + "Infractions" + File.separator + "config.yml");
 	static FileConfiguration config = YamlConfiguration.loadConfiguration(f);
 
-	public static List<String> getLevel1() {
-		if (config == null) {
+	public static List<String> getLevel1()
+	{
+		if(config == null)
+		{
 			log.warning("[Infractions] Unable to load the config for Level 1.");
 			return null;
 		}
@@ -26,8 +28,10 @@ public class Levels {
 		return level1;
 	}
 
-	public static List<String> getLevel2() {
-		if (config == null) {
+	public static List<String> getLevel2()
+	{
+		if(config == null)
+		{
 			log.warning("[Infractions] Unable to load the config for Level 2.");
 			return null;
 		}
@@ -36,8 +40,10 @@ public class Levels {
 		return level2;
 	}
 
-	public static List<String> getLevel3() {
-		if (config == null) {
+	public static List<String> getLevel3()
+	{
+		if(config == null)
+		{
 			log.warning("[Infractions] Unable to load the config for Level 3.");
 			return null;
 		}
@@ -46,8 +52,10 @@ public class Levels {
 		return level3;
 	}
 
-	public static List<String> getLevel4() {
-		if (config == null) {
+	public static List<String> getLevel4()
+	{
+		if(config == null)
+		{
 			log.warning("[Infractions] Unable to load the config for Level 4.");
 			return null;
 		}
@@ -56,8 +64,10 @@ public class Levels {
 		return level4;
 	}
 
-	public static List<String> getLevel5() {
-		if (config == null) {
+	public static List<String> getLevel5()
+	{
+		if(config == null)
+		{
 			log.warning("[Infractions] Unable to load the config for Level 5.");
 			return null;
 		}
@@ -66,7 +76,8 @@ public class Levels {
 		return level5;
 	}
 
-	public Levels(Infractions instance) {
+	public Levels(Infractions instance)
+	{
 		plugin = instance;
 		plugin.getConfig().options().copyDefaults(true);
 		plugin.saveConfig();
