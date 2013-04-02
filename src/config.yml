@@ -2,6 +2,7 @@
 #Infractions Configuration File
 #Global Settings
 update: true
+update_notify: true
 motd: true
 save_interval_seconds: 30
 kick_on_cite: false

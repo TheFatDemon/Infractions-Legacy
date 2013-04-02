@@ -1,13 +1,17 @@
-package com.censoredsoftware.Infractions;
-
-import org.bukkit.Bukkit;
+package com.censoredsoftware.Infractions.Handlers;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class InfractionsUpdate
+import org.bukkit.Bukkit;
+
+import com.censoredsoftware.Infractions.Infractions;
+import com.censoredsoftware.Infractions.Libraries.UpdateChecker;
+import com.censoredsoftware.Infractions.Utilities.MiscUtil;
+
+public class UpdateHandler
 {
 	static Infractions plugin;
 
@@ -17,7 +21,7 @@ public class InfractionsUpdate
 
 	public static UpdateChecker checker = new UpdateChecker("http://dev.bukkit.org/server-mods/infractions/files.rss");
 
-	public InfractionsUpdate(Infractions infractions)
+	public UpdateHandler(Infractions infractions)
 	{
 		plugin = infractions;
 	}
@@ -26,7 +30,7 @@ public class InfractionsUpdate
 	{
 		if(checker.updateNeeded())
 		{
-			Util.consoleMSG("info", "A new version is available: " + checker.getVersion());
+			MiscUtil.consoleMSG("info", "A new version is available: " + checker.getVersion());
 			return true;
 		}
 		return false;
@@ -45,7 +49,7 @@ public class InfractionsUpdate
 			int bytesTransferred = 0;
 			String downloadLink = getDownloadLink();
 
-			Util.consoleMSG("info", "Attempting to update to latest version...");
+			MiscUtil.consoleMSG("info", "Attempting to update to latest version...");
 
 			// Set latest build URL
 			URL plugin = new URL(downloadLink);
@@ -57,7 +61,7 @@ public class InfractionsUpdate
 
 			// Create new .jar file and add it to plugins directory
 			File pluginUpdate = new File("plugins" + File.separator + "Infractions.jar");
-			Util.consoleMSG("info", "File has been written to: " + pluginUpdate.getCanonicalPath());
+			MiscUtil.consoleMSG("info", "File has been written to: " + pluginUpdate.getCanonicalPath());
 
 			InputStream is = pluginCon.getInputStream();
 			OutputStream os = new FileOutputStream(pluginUpdate);
@@ -74,7 +78,7 @@ public class InfractionsUpdate
 
 					if(percentTransferred != 100)
 					{
-						Util.consoleMSG("info", percentTransferred + "%");
+						MiscUtil.consoleMSG("info", percentTransferred + "%");
 					}
 				}
 			}
@@ -84,20 +88,20 @@ public class InfractionsUpdate
 			os.close();
 
 			// Update complete! Reload the server now
-			Util.consoleMSG("info", "Download complete! Reloading server...");
+			MiscUtil.consoleMSG("info", "Download complete! Reloading server...");
 			Bukkit.getServer().reload();
 		}
 		catch(MalformedURLException ex)
 		{
-			Util.consoleMSG("warning", "Error accessing URL: " + ex);
+			MiscUtil.consoleMSG("warning", "Error accessing URL: " + ex);
 		}
 		catch(FileNotFoundException ex)
 		{
-			Util.consoleMSG("warning", "Error accessing URL: " + ex);
+			MiscUtil.consoleMSG("warning", "Error accessing URL: " + ex);
 		}
 		catch(IOException ex)
 		{
-			Util.consoleMSG("warning", "Error downloading file: " + ex);
+			MiscUtil.consoleMSG("warning", "Error downloading file: " + ex);
 		}
 	}
 

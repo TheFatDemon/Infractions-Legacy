@@ -1,16 +1,16 @@
-package com.censoredsoftware.Infractions;
-
-import com.rosaloves.bitlyj.Bitly.Provider;
-import com.rosaloves.bitlyj.Url;
+package com.censoredsoftware.Infractions.Utilities;
 
 import static com.rosaloves.bitlyj.Bitly.as;
 import static com.rosaloves.bitlyj.Bitly.shorten;
+
+import com.rosaloves.bitlyj.Bitly.Provider;
+import com.rosaloves.bitlyj.Url;
 
 public class URLShortenUtil
 {
 	/**
 	 * Converts a URL into a bit.ly shortened URL.
-	 *
+	 * 
 	 * @return String
 	 */
 	public static String convertURL(String input)

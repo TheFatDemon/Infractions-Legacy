@@ -1,12 +1,14 @@
-package com.censoredsoftware.Infractions;
-
-import org.bukkit.configuration.file.FileConfiguration;
+package com.censoredsoftware.Infractions.Utilities;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class Settings
+import org.bukkit.configuration.file.FileConfiguration;
+
+import com.censoredsoftware.Infractions.Infractions;
+
+public class SettingUtil
 {
 
 	static Infractions plugin;
@@ -32,7 +34,7 @@ public class Settings
 
 	public static boolean getSettingBoolean(String id)
 	{
-        return !plugin.getConfig().isBoolean(id) || plugin.getConfig().getBoolean(id);
+		return !plugin.getConfig().isBoolean(id) || plugin.getConfig().getBoolean(id);
 	}
 
 	public static double getSettingDouble(String id)
@@ -53,7 +55,7 @@ public class Settings
 		else return null;
 	}
 
-	public Settings(Infractions instance)
+	public SettingUtil(Infractions instance)
 	{
 		plugin = instance;
 		plugin.getConfig().options().copyDefaults(true);

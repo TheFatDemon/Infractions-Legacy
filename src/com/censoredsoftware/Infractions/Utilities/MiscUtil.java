@@ -1,9 +1,4 @@
-package com.censoredsoftware.Infractions;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
+package com.censoredsoftware.Infractions.Utilities;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -17,7 +12,14 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-public class Util
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+
+import com.censoredsoftware.Infractions.Infractions;
+
+public class MiscUtil
 {
 
 	private static Infractions plugin; // obviously needed
@@ -41,12 +43,12 @@ public class Util
 
 	public static int getMaxScore(Player p)
 	{
-		int maxScore = Settings.getSettingInt("ban_at_score");
+		int maxScore = SettingUtil.getSettingInt("ban_at_score");
 		if(maxScore < 1) maxScore = 1;
 		else if(maxScore > 20) maxScore = 20;
 		if(p.hasPermission("infractions.*"))
 		{ // '*' Permission check.
-			maxScore = Settings.getSettingInt("ban_at_score");
+			maxScore = SettingUtil.getSettingInt("ban_at_score");
 		}
 		else if(p.hasPermission("infractions.maxscore.1"))
 		{
@@ -140,12 +142,12 @@ public class Util
 	@SuppressWarnings("unchecked")
 	public static boolean addInfraction(String target, int level, int id, String infraction, String proof)
 	{
-		if(!Save.hasData(target, "INFRACTIONS"))
+		if(!SaveUtil.hasData(target, "INFRACTIONS"))
 		{
 			setInfractions(target, new HashMap<String, String>());
 		}
 		String readableID = Integer.toString(id);
-		((HashMap<String, String>) Save.getData(target, "INFRACTIONS")).put(readableID, level + ":" + infraction + " - " + proof + " - " + date);
+		((HashMap<String, String>) SaveUtil.getData(target, "INFRACTIONS")).put(readableID, level + ":" + infraction + " - " + proof + " - " + date);
 		return true;
 	}
 
@@ -178,53 +180,53 @@ public class Util
 
 	public static void kickNotify(String p, String reason)
 	{
-		if(!Virtues.getVirtues().contains(reason))
+		if(!VirtueUtil.getVirtues().contains(reason))
 		{
 			try
 			{
 				getOnlinePlayer(p); // Check if player is online.
-				if(getMaxScore(Util.getOnlinePlayer(p)) <= getScore(Util.getOnlinePlayer(p)))
+				if(getMaxScore(MiscUtil.getOnlinePlayer(p)) <= getScore(MiscUtil.getOnlinePlayer(p)))
 				{ // Players that should be banned are
 				  // banned.
-					checkScore(Util.getOnlinePlayer(p));
+					checkScore(MiscUtil.getOnlinePlayer(p));
 				}
-				else if(Settings.getSettingBoolean("kick_on_cite"))
+				else if(SettingUtil.getSettingBoolean("kick_on_cite"))
 				{
-					Util.getOnlinePlayer(p).kickPlayer("You've been cited for " + reason + "."); // Kick a
-					                                                                             // player if
-					                                                                             // option is
-					                                                                             // set to
-					                                                                             // true.
+					MiscUtil.getOnlinePlayer(p).kickPlayer("You've been cited for " + reason + "."); // Kick a
+					// player if
+					// option is
+					// set to
+					// true.
 				}
 				else
 				{
-					Util.getOnlinePlayer(p).sendMessage(ChatColor.RED + "You've been cited for " + reason + ".");
-					Util.getOnlinePlayer(p).sendMessage("Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information."); // Send
-					                                                                                                                          // player
-					                                                                                                                          // a
-					                                                                                                                          // message
-					                                                                                                                          // about
-					                                                                                                                          // their
-					                                                                                                                          // infraction.
+					MiscUtil.getOnlinePlayer(p).sendMessage(ChatColor.RED + "You've been cited for " + reason + ".");
+					MiscUtil.getOnlinePlayer(p).sendMessage("Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information."); // Send
+					// player
+					// a
+					// message
+					// about
+					// their
+					// infraction.
 				}
 			}
 			catch(NullPointerException e)
 			{
-				Save.saveData(p, "NEWINFRACTION", true);
+				SaveUtil.saveData(p, "NEWINFRACTION", true);
 			}
 		}
 		else
 		{
-			Virtues.rewardPlayer(p, reason);
+			VirtueUtil.rewardPlayer(p, reason);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, String> getInfractions(String target)
 	{
-		if(Save.hasData(target, "INFRACTIONS"))
+		if(SaveUtil.hasData(target, "INFRACTIONS"))
 		{
-			HashMap<String, String> original = ((HashMap<String, String>) Save.getData(target, "INFRACTIONS"));
+			HashMap<String, String> original = ((HashMap<String, String>) SaveUtil.getData(target, "INFRACTIONS"));
 			HashMap<String, String> toreturn = new HashMap<String, String>();
 			for(String s : original.keySet())
 			{
@@ -238,7 +240,7 @@ public class Util
 
 	public static ArrayList<String> getInfractionsList(String target)
 	{
-		if(Save.hasData(target, "INFRACTIONS"))
+		if(SaveUtil.hasData(target, "INFRACTIONS"))
 		{
 			HashMap<String, String> original = getInfractions(target);
 			ArrayList<String> toreturn = new ArrayList<String>();
@@ -256,7 +258,7 @@ public class Util
 		String found = null;
 		String lowerName = name.toLowerCase();
 		int delta = Integer.MAX_VALUE;
-		for(String playername : Save.getCompleteData().keySet())
+		for(String playername : SaveUtil.getCompleteData().keySet())
 		{
 			if(playername.toLowerCase().startsWith(lowerName))
 			{
@@ -295,7 +297,7 @@ public class Util
 
 	public static int getScore(String p)
 	{
-		if(Save.hasData(p, "SCORE")) return (Integer) Save.getData(p, "SCORE");
+		if(SaveUtil.hasData(p, "SCORE")) return (Integer) SaveUtil.getData(p, "SCORE");
 		return 0;
 	}
 
@@ -312,8 +314,8 @@ public class Util
 	  // for
 	  // permissions
 		if(p == null) return true;
-        return p.isOp() || p.hasPermission(pe);
-    }
+		return p.isOp() || p.hasPermission(pe);
+	}
 
 	public static boolean isValidURL(String input)
 	{
@@ -364,16 +366,16 @@ public class Util
 
 	public static boolean removeInfraction(String target, String givenID)
 	{
-		for(String readableID : Util.getInfractionsList(target))
+		for(String readableID : MiscUtil.getInfractionsList(target))
 		{
-			if(readableID.equals(givenID)) return(Util.getInfractions(target).remove(readableID) == null);
+			if(readableID.equals(givenID)) return(MiscUtil.getInfractions(target).remove(readableID) == null);
 		}
 		return false;
 	}
 
 	public static void setInfractions(String p, HashMap<String, String> data)
 	{
-		Save.saveData(p, "INFRACTIONS", data);
+		SaveUtil.saveData(p, "INFRACTIONS", data);
 	}
 
 	public static void setScore(Player p, int amt)
@@ -383,10 +385,10 @@ public class Util
 
 	public static void setScore(String p, int amt)
 	{
-		Save.saveData(p, "SCORE", amt);
+		SaveUtil.saveData(p, "SCORE", amt);
 	}
 
-	public Util(Infractions i)
+	public MiscUtil(Infractions i)
 	{
 		plugin = i;
 	}

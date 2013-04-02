@@ -1,15 +1,17 @@
-package com.censoredsoftware.Infractions;
+package com.censoredsoftware.Infractions.Utilities;
+
+import java.io.File;
+import java.util.List;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
-import java.util.List;
-import java.util.logging.Logger;
+import com.censoredsoftware.Infractions.Infractions;
 
-public class Virtues
+public class VirtueUtil
 {
 	static Infractions plugin;
 	static Logger log = Logger.getLogger("Minecraft");
@@ -20,11 +22,11 @@ public class Virtues
 		FileConfiguration config = YamlConfiguration.loadConfiguration(f);
 		if(config == null)
 		{
-			log.warning("[Infractions] Unable to load the config for Virtues.");
+			log.warning("[Infractions] Unable to load the config for VirtueUtil.");
 			return null;
 		}
 		List<String> virtues;
-		virtues = Settings.fetchListString(config, "virtues");
+		virtues = SettingUtil.fetchListString(config, "virtues");
 		return virtues;
 	}
 
@@ -34,11 +36,11 @@ public class Virtues
 		Bukkit.broadcastMessage(ChatColor.GREEN + "Everyone should congratulate " + p + ".");
 		try
 		{
-			Util.getOnlinePlayer(p); // Check if player is online.
+			MiscUtil.getOnlinePlayer(p); // Check if player is online.
 		}
 		catch(NullPointerException e)
 		{
-			Save.saveData(p, "NEWVIRTUE", true);
+			SaveUtil.saveData(p, "NEWVIRTUE", true);
 		}
 	}
 }

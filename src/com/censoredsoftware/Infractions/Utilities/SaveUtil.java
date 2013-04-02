@@ -1,17 +1,17 @@
-package com.censoredsoftware.Infractions;
-
-import org.bukkit.entity.Player;
+package com.censoredsoftware.Infractions.Utilities;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.logging.Logger;
+
+import org.bukkit.entity.Player;
 
 /*
  * HASHMAP OF PLAYER'S NAMES
  * CONTAINS EACH PLAYER'S SAVED INFORMATION (IDENTIFIED BY STRINGS)
  * BE VERY CAREFUL NOT TO SAVE THINGS THAT CAN'T BE WRITTEN
  */
-public class Save
+public class SaveUtil
 {
 	Logger log = Logger.getLogger("Minecraft");
 	private static String PATH;
@@ -157,7 +157,7 @@ public class Save
 	}
 
 	/*
-	 * Save data under a certain id.
+	 * SaveUtil data under a certain id.
 	 */
 	public static boolean saveData(Player p, String id, Object save)
 	{
@@ -193,7 +193,7 @@ public class Save
 		}
 	}
 
-	public Save(String path)
+	public SaveUtil(String path)
 	{
 		PATH = path;
 		SAVEDDATA = new HashMap<String, HashMap<String, Object>>();

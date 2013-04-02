@@ -1,16 +1,19 @@
-package com.censoredsoftware.Infractions;
+package com.censoredsoftware.Infractions.Libraries;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.censoredsoftware.Infractions.Utilities.MiscUtil;
 
 public class UpdateChecker
 {
@@ -49,7 +52,7 @@ public class UpdateChecker
 			}
 			catch(Exception e)
 			{
-				Util.consoleMSG("warning", "Failed to find download page.");
+				MiscUtil.consoleMSG("warning", "Failed to find download page.");
 				e.printStackTrace();
 			}
 			input.close();
@@ -60,7 +63,7 @@ public class UpdateChecker
 			}
 			catch(Exception e)
 			{
-				Util.consoleMSG("warning", "Failed to open connection with download page.");
+				MiscUtil.consoleMSG("warning", "Failed to open connection with download page.");
 				e.printStackTrace();
 			}
 
@@ -79,7 +82,7 @@ public class UpdateChecker
 			reader.close();
 			input.close();
 
-			PluginDescriptionFile pdf = Util.getPlugin().getDescription();
+			PluginDescriptionFile pdf = MiscUtil.getPlugin().getDescription();
 			String currentVersion = pdf.getVersion();
 			if(!currentVersion.equals(this.version))
 			{
@@ -88,7 +91,7 @@ public class UpdateChecker
 		}
 		catch(Exception e)
 		{
-			Util.consoleMSG("warning", "Failed to read download page.");
+			MiscUtil.consoleMSG("warning", "Failed to read download page.");
 			e.printStackTrace();
 		}
 

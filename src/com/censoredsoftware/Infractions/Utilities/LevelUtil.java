@@ -1,13 +1,15 @@
-package com.censoredsoftware.Infractions;
-
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+package com.censoredsoftware.Infractions.Utilities;
 
 import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class Levels
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import com.censoredsoftware.Infractions.Infractions;
+
+public class LevelUtil
 {
 
 	static Infractions plugin;
@@ -23,7 +25,7 @@ public class Levels
 			return null;
 		}
 		List<String> level1;
-		level1 = Settings.fetchListString(config, "level_1");
+		level1 = SettingUtil.fetchListString(config, "level_1");
 		return level1;
 	}
 
@@ -35,7 +37,7 @@ public class Levels
 			return null;
 		}
 		List<String> level2;
-		level2 = Settings.fetchListString(config, "level_2");
+		level2 = SettingUtil.fetchListString(config, "level_2");
 		return level2;
 	}
 
@@ -47,7 +49,7 @@ public class Levels
 			return null;
 		}
 		List<String> level3;
-		level3 = Settings.fetchListString(config, "level_3");
+		level3 = SettingUtil.fetchListString(config, "level_3");
 		return level3;
 	}
 
@@ -59,7 +61,7 @@ public class Levels
 			return null;
 		}
 		List<String> level4;
-		level4 = Settings.fetchListString(config, "level_4");
+		level4 = SettingUtil.fetchListString(config, "level_4");
 		return level4;
 	}
 
@@ -71,11 +73,11 @@ public class Levels
 			return null;
 		}
 		List<String> level5;
-		level5 = Settings.fetchListString(config, "level_5");
+		level5 = SettingUtil.fetchListString(config, "level_5");
 		return level5;
 	}
 
-	public Levels(Infractions instance)
+	public LevelUtil(Infractions instance)
 	{
 		plugin = instance;
 		plugin.getConfig().options().copyDefaults(true);
