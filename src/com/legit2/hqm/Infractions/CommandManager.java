@@ -1,7 +1,6 @@
 package com.legit2.hqm.Infractions;
 
 import com.google.common.base.Strings;
-import com.legit2.hqm.Virtues.Virtues;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

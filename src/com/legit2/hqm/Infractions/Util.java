@@ -1,6 +1,5 @@
 package com.legit2.hqm.Infractions;
 
-import com.legit2.hqm.Virtues.Virtues;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;

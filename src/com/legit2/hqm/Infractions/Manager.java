@@ -1,6 +1,5 @@
 package com.legit2.hqm.Infractions;
 
-import com.clashnia.ClashniaUpdate.InfractionsUpdate;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
