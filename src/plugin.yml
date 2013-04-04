@@ -1,6 +1,6 @@
 name: Infractions
 main: com.censoredsoftware.Infractions.Infractions
-version: 0.4.2
+version: 0.4.3
 description: Police your server with specific rules; give players a second or third chance before they are banned.
 author: HmmmQuestionMark
 commands:
