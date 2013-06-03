@@ -15,6 +15,7 @@ public class URLShortenUtil
 	 */
 	public static String convertURL(String input)
 	{
+		if(!SettingUtil.getSettingBoolean("use_bitly")) return input;
 		if(!input.startsWith("http://") && !input.startsWith("https://"))
 		{
 			input = ("http://" + input);

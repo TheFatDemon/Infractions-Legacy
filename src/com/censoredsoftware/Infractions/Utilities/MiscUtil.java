@@ -255,7 +255,7 @@ public class MiscUtil
 
 	public static String getInfractionsPlayer(String name)
 	{
-		String found = null;
+		String found = name;
 		String lowerName = name.toLowerCase();
 		int delta = Integer.MAX_VALUE;
 		for(String playername : SaveUtil.getCompleteData().keySet())
@@ -313,8 +313,7 @@ public class MiscUtil
 	  // method
 	  // for
 	  // permissions
-		if(p == null) return true;
-		return p.isOp() || p.hasPermission(pe);
+		return p == null || p.isOp() || p.hasPermission(pe);
 	}
 
 	public static boolean isValidURL(String input)
