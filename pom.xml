@@ -6,7 +6,7 @@
 
     <groupId>com.censoredsoftware</groupId>
     <artifactId>Infractions</artifactId>
-    <version>0.4.4</version>
+    <version>0.4.5</version>
     <packaging>jar</packaging>
 
     <name>Infractions</name>
@@ -66,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>org.mcstats.bukkit</groupId>
-            <artifactId>metrics</artifactId>
+            <artifactId>metrics-lite</artifactId>
             <version>${mcstats.version}</version>
             <exclusions>
                 <exclusion>
@@ -108,7 +108,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>org.mcstats.bukkit:metrics</include>
+                                    <include>org.mcstats.bukkit:metrics-lite</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

@@ -1,7 +1,6 @@
 package com.censoredsoftware.Infractions;
 
 import com.censoredsoftware.Infractions.Handlers.CommandHandler;
-import com.censoredsoftware.Infractions.Libraries.MetricsLite;
 import com.censoredsoftware.Infractions.Listeners.PlayerListener;
 import com.censoredsoftware.Infractions.Utilities.MiscUtil;
 import com.censoredsoftware.Infractions.Utilities.SaveUtil;
@@ -15,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
+import org.mcstats.MetricsLite;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -81,13 +81,10 @@ public class Infractions extends JavaPlugin implements Listener
 	{
 		try
 		{
-			MetricsLite metrics = new MetricsLite(this);
-			metrics.start();
+			(new MetricsLite(this)).start();
 		}
-		catch(IOException e)
-		{
-			// Failed to submit the stats :-(
-		}
+		catch(Exception ignored)
+		{}
 	}
 
 	@Override
