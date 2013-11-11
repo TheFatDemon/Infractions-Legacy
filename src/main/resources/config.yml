@@ -9,7 +9,10 @@ ban: true
 ban_at_score: 5
 require_proof: false
 virtue_value: -1
-use_bitly: true
+bitly:
+    use: false
+    user: '' #Sign-up for bit.ly
+    key: ''
 #Define Infraction Levels
 level_1:
   - flying

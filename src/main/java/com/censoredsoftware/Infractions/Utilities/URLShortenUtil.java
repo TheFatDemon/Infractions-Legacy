@@ -15,12 +15,9 @@ public class URLShortenUtil
 	 */
 	public static String convertURL(String input)
 	{
-		if(!SettingUtil.getSettingBoolean("use_bitly")) return input;
-		if(!input.startsWith("http://") && !input.startsWith("https://"))
-		{
-			input = ("http://" + input);
-		}
-		Provider bitly = as("justicehqm", "R_8e7103357a5a07b25206fe657fe59d07");
+		if(!SettingUtil.getSettingBoolean("bitly.use")) return input;
+		if(!input.startsWith("http://") && !input.startsWith("https://")) input = ("http://" + input);
+		Provider bitly = as(SettingUtil.getSettingString("bitly.user"), SettingUtil.getSettingString("bitly.key"));
 		Url shortUrl = (Url) bitly.call(shorten(input));
 		return shortUrl.getShortUrl();
 	}
