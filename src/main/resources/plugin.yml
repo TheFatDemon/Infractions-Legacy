@@ -18,6 +18,10 @@ commands:
     history:
         description: Check a player's infraction history.
         usage: /history [player]
+    clearhistory:
+        description: Clear a player's infraction history.
+        usage: /clearhistory <player>
+        permission: infractions.clearhistory
 permissions:
     infractions.mod:
         description: Gives access to all Inferno commands
@@ -64,3 +68,5 @@ permissions:
         default: false
     infractions.*:
         default: false
+    infractions.clearhistory:
+        default: op

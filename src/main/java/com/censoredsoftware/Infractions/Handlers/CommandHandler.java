@@ -3,6 +3,7 @@ package com.censoredsoftware.Infractions.Handlers;
 import com.censoredsoftware.Infractions.Infractions;
 import com.censoredsoftware.Infractions.Utilities.*;
 import com.google.common.base.Strings;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -399,6 +400,21 @@ public class CommandHandler implements CommandExecutor
 				{
 					return true;
 				}
+			}
+		}
+		else if(c.getName().equalsIgnoreCase("clearhistory") && p != null && p.hasPermission("infractions.clearhistory") && args.length > 0)
+		{
+			try
+			{
+				Player remove = Bukkit.getServer().matchPlayer(args[0]).get(0);
+				SaveUtil.removePlayer(remove);
+				remove.kickPlayer(ChatColor.GREEN + "Your Infractions history has been reset--please join again.");
+				return true;
+			}
+			catch(Exception error)
+			{
+				sender.sendMessage(ChatColor.RED + "Could not find that player...");
+				return false;
 			}
 		}
 		MiscUtil.messageSend(p, "Something went wrong, please try again.");
