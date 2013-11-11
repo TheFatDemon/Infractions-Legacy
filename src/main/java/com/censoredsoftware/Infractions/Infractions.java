@@ -70,6 +70,7 @@ public class Infractions extends JavaPlugin implements Listener
 		// actions
 		getCommand("cite").setExecutor(ce);
 		getCommand("uncite").setExecutor(ce);
+		getCommand("clearhistory").setExecutor(ce);
 	}
 
 	public void loadListeners()
