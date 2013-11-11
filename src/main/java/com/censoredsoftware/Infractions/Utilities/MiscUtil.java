@@ -152,6 +152,7 @@ public class MiscUtil
 
 	public static void checkScore(Player p)
 	{
+		if(!SettingUtil.getSettingBoolean("ban")) return;
 		if(getMaxScore(p) <= getScore(p) && (!p.hasPermission("infractions.banexempt")))
 		{
 			p.kickPlayer("You have been banned.");

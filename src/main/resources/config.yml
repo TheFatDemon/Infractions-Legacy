@@ -5,6 +5,7 @@ update: true
 motd: true
 save_interval_seconds: 30
 kick_on_cite: false
+ban: true
 ban_at_score: 5
 require_proof: false
 virtue_value: -1
