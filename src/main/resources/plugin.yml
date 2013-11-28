@@ -23,6 +23,10 @@ commands:
         usage: /clearhistory <player>
         permission: infractions.clearhistory
 permissions:
+    infractions.ignore:
+        default: false
+    infractions.banexempt:
+        default: false
     infractions.mod:
         description: Gives access to all Inferno commands
         default: op

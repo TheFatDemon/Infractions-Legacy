@@ -6,7 +6,7 @@
 
     <groupId>com.censoredsoftware</groupId>
     <artifactId>Infractions</artifactId>
-    <version>0.4.5</version>
+    <version>0.4.6</version>
     <packaging>jar</packaging>
 
     <name>Infractions</name>
@@ -25,7 +25,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spigot.version>1.6.4-R2.1-SNAPSHOT</spigot.version>
         <mcstats.version>R7</mcstats.version>
-        <worldguard.version>5.8-SNAPSHOT</worldguard.version>
     </properties>
 
     <developers>

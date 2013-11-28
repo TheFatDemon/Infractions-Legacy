@@ -43,3 +43,4 @@ chat_score_4: '&7[&6:(&7]' #Almost banned
 chat_score_3: '&7[&6:\&7]' #Eh...
 chat_score_2: '&7[&2:)&7]' #Alright
 chat_score_1: '&7[&2:D&7]' #Perfect
+chat_score_ignore: '&7[&3:3&7]' #Plugin ignores this player
