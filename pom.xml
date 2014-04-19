@@ -23,7 +23,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spigot.version>1.6.4-R2.1-SNAPSHOT</spigot.version>
+        <spigot.version>1.7.8-R0.1-SNAPSHOT</spigot.version>
         <mcstats.version>R7</mcstats.version>
     </properties>
 
