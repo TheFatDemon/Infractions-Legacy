@@ -1,5 +1,5 @@
 name: Infractions
-main: com.censoredsoftware.infractions.Infractions
+main: com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin
 version: ${project.version}
 description: Police your server with specific rules; give players a second or third chance before they are banned.
 author: HmmmQuestionMark
