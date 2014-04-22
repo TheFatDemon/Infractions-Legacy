@@ -1,4 +1,4 @@
-package com.censoredsoftware.infractions.util;
+package com.censoredsoftware.infractions.bukkit.legacy.util;
 
 /*
  * Updater for Bukkit.

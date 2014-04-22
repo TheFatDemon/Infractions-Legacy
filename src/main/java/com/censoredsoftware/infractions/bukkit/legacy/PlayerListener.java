@@ -1,8 +1,8 @@
-package com.censoredsoftware.infractions;
+package com.censoredsoftware.infractions.bukkit.legacy;
 
-import com.censoredsoftware.infractions.util.MiscUtil;
-import com.censoredsoftware.infractions.util.SaveUtil;
-import com.censoredsoftware.infractions.util.SettingUtil;
+import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
+import com.censoredsoftware.infractions.bukkit.legacy.util.SaveUtil;
+import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +15,8 @@ public class PlayerListener implements Listener
 {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e)
-	{ // sync to master file
+	{
+		// sync to master file
 		final Player p = e.getPlayer();
 		if(SettingUtil.getSettingBoolean("motd")) p.sendMessage("This server is policed with infractions.");
 		if(p.hasPermission("infractions.ignore"))

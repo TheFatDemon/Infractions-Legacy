@@ -1,14 +1,13 @@
-package com.censoredsoftware.infractions;
+package com.censoredsoftware.infractions.bukkit.legacy;
 
-import com.censoredsoftware.infractions.util.MiscUtil;
-import com.censoredsoftware.infractions.util.SaveUtil;
-import com.censoredsoftware.infractions.util.SettingUtil;
-import com.censoredsoftware.infractions.util.Updater;
+import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
+import com.censoredsoftware.infractions.bukkit.legacy.util.SaveUtil;
+import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
+import com.censoredsoftware.infractions.bukkit.legacy.util.Updater;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
@@ -17,16 +16,20 @@ import org.mcstats.MetricsLite;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Logger;
 
-public class Infractions extends JavaPlugin implements Listener
+public class InfractionsPlugin extends JavaPlugin
 {
-	public static Logger log = Logger.getLogger("Minecraft");
-	static String mainDirectory = "plugins/Infractions/";
 	MiscUtil initialize;
 	SaveUtil SAVE;
 
+	static InfractionsPlugin inst;
+
 	private static ImmutableMap<Integer, String> CHAT_SCORES;
+
+	public static InfractionsPlugin getInst()
+	{
+		return inst;
+	}
 
 	private void initializeThreads()
 	{
@@ -42,17 +45,17 @@ public class Infractions extends JavaPlugin implements Listener
 			{
 				try
 				{
-					SaveUtil.save(mainDirectory);
+					SaveUtil.save(getDataFolder().getPath());
 				}
 				catch(FileNotFoundException e)
 				{
 					e.printStackTrace();
-					log.severe("[Infractions] SaveUtil location error. Screenshot the stack trace and send to HmmmQuestionMark.");
+					getLogger().severe("[Infractions] SaveUtil location error. Screenshot the stack trace and send to HmmmQuestionMark.");
 				}
 				catch(IOException e)
 				{
 					e.printStackTrace();
-					log.severe("[Infractions] SaveUtil write error. Screenshot the stack trace and send to HmmmQuestionMark.");
+					getLogger().severe("[Infractions] SaveUtil write error. Screenshot the stack trace and send to HmmmQuestionMark.");
 				}
 			}
 		}, startdelay, savefrequency);
@@ -71,11 +74,6 @@ public class Infractions extends JavaPlugin implements Listener
 		getCommand("clearhistory").setExecutor(ce);
 	}
 
-	public void loadListeners()
-	{
-		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-	}
-
 	public void loadMetrics()
 	{
 		try
@@ -92,17 +90,17 @@ public class Infractions extends JavaPlugin implements Listener
 	{
 		try
 		{
-			SaveUtil.save(mainDirectory);
+			SaveUtil.save(getDataFolder().getPath());
 		}
 		catch(FileNotFoundException e)
 		{
 			e.printStackTrace();
-			log.severe("[Infractions] SaveUtil location error. Screenshot the stack trace and send to HmmmQuestionMark.");
+			getLogger().severe("[Infractions] SaveUtil location error. Screenshot the stack trace and send to HmmmQuestionMark.");
 		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
-			log.severe("[Infractions] SaveUtil write error. Screenshot the stack trace and send to HmmmQuestionMark.");
+			getLogger().severe("[Infractions] SaveUtil write error. Screenshot the stack trace and send to HmmmQuestionMark.");
 		}
 		int c = 0;
 		for(BukkitWorker bw : getServer().getScheduler().getActiveWorkers())
@@ -110,22 +108,23 @@ public class Infractions extends JavaPlugin implements Listener
 		for(BukkitTask bt : getServer().getScheduler().getPendingTasks())
 			if(bt.getOwner().equals(this)) c++;
 		this.getServer().getScheduler().cancelTasks(this);
-		log.info("[Infractions] SaveUtil completed and " + c + " tasks cancelled.");
+		getLogger().info("[Infractions] SaveUtil completed and " + c + " tasks cancelled.");
 	}
 
 	@Override
 	public void onEnable()
 	{
+		inst = this;
+
 		long firstTime = System.currentTimeMillis();
-		log.info("[Infractions] Initializing.");
+		getLogger().info("[Infractions] Initializing.");
 		new SettingUtil(this); // #1 (needed for MiscUtil to load)
-		log.info("[Infractions] Updating configuration.");
+		getLogger().info("[Infractions] Updating configuration.");
 		initialize = new MiscUtil(this); // #2 (needed for everything else to work)
-		SAVE = new SaveUtil(mainDirectory); // #3 (needed to start save system)
-		loadListeners(); // #5
-		loadCommands(); // #6 (needed)
-		loadMetrics(); // #7
-		initializeThreads(); // #8 (regen and etc)
+		SAVE = new SaveUtil(getDataFolder().getPath()); // #3 (needed to start save system)
+		loadCommands(); // #5 (needed)
+		loadMetrics(); // #6
+		initializeThreads(); // #7 (regen and etc)
 
 		Map<Integer, String> scores = Maps.newHashMap();
 		for(int i = 1; i < 6; i++)
@@ -135,7 +134,7 @@ public class Infractions extends JavaPlugin implements Listener
 		if(SettingUtil.getSettingBoolean("update"))
 			new Updater(this, 44721, getFile(), Updater.UpdateType.DEFAULT, true);
 
-		log.info("[Infractions] Preparation completed in " + ((double) (System.currentTimeMillis() - firstTime) / 1000) + " seconds.");
+		getLogger().info("[Infractions] Preparation completed in " + ((double) (System.currentTimeMillis() - firstTime) / 1000) + " seconds.");
 	}
 
 	/**

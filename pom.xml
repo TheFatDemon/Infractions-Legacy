@@ -6,7 +6,7 @@
 
     <groupId>com.censoredsoftware</groupId>
     <artifactId>Infractions</artifactId>
-    <version>0.4.6</version>
+    <version>0.5.0</version>
     <packaging>jar</packaging>
 
     <name>Infractions</name>
@@ -23,7 +23,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spigot.version>1.7.8-R0.1-SNAPSHOT</spigot.version>
+        <spigot.version>1.7.9-R0.1-SNAPSHOT</spigot.version>
         <mcstats.version>R7</mcstats.version>
     </properties>
 
@@ -45,7 +45,11 @@
 
     <repositories>
         <repository>
-            <id>md_5-releases</id>
+            <id>CenSoft</id>
+            <url>http://repo.censoredsoftware.com/</url>
+        </repository>
+        <repository>
+        <id>md_5-releases</id>
             <url>http://repo.md-5.net/content/repositories/snapshots</url>
         </repository>
         <repository>
@@ -64,7 +68,12 @@
             <optional>false</optional>
         </dependency>
         <dependency>
-            <groupId>org.mcstats.bukkit</groupId>
+            <groupId>com.censoredsoftware</groupId>
+            <artifactId>infractions-bukkit-api</artifactId>
+            <version>0.5.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+        <groupId>org.mcstats.bukkit</groupId>
             <artifactId>metrics-lite</artifactId>
             <version>${mcstats.version}</version>
             <exclusions>
@@ -75,6 +84,12 @@
             </exclusions>
             <scope>compile</scope>
             <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>AccountsClient</artifactId>
+            <version>latest</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -88,8 +103,7 @@
                 <filtering>true</filtering>
                 <directory>${basedir}/src/main/resources/</directory>
                 <includes>
-                    <include>plugin.yml</include>
-                    <include>config.yml</include>
+                    <include>*.yml</include>
                 </includes>
             </resource>
         </resources>
@@ -108,11 +122,20 @@
                             <artifactSet>
                                 <includes>
                                     <include>org.mcstats.bukkit:metrics-lite</include>
+                                    <include>com.mojang:AccountsClient</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.mojang</pattern>
+                            <shadedPattern>infractions.shaded.com.mojang</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -137,9 +160,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
-                <configuration>
-                    <finalName>Infractions</finalName>
-                </configuration>
             </plugin>
         </plugins>
     </build>

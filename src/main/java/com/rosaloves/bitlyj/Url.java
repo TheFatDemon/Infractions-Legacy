@@ -9,7 +9,8 @@ public class Url
 	private String longUrl;
 
 	Url()
-	{}
+	{
+	}
 
 	Url(String shortBase, String globalHash, String userHash, String shortUrl, String longUrl)
 	{

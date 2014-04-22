@@ -1,5 +1,5 @@
 name: Infractions
-main: com.censoredsoftware.Infractions.Infractions
+main: com.censoredsoftware.infractions.Infractions
 version: ${project.version}
 description: Police your server with specific rules; give players a second or third chance before they are banned.
 author: HmmmQuestionMark

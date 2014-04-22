@@ -1,11 +1,25 @@
-package com.censoredsoftware.infractions.util;
+package com.censoredsoftware.infractions.bukkit.legacy.util;
 
-import com.censoredsoftware.infractions.Infractions;
+import com.censoredsoftware.infractions.bukkit.Infraction;
+import com.censoredsoftware.infractions.bukkit.Infractions;
+import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
+import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
+import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
+import com.censoredsoftware.infractions.bukkit.evidence.EvidenceType;
+import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
+import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
+import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
+import com.censoredsoftware.library.helper.MojangIdProvider;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -13,15 +27,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class MiscUtil
 {
 
-	private static Infractions plugin; // obviously needed
+	private static InfractionsPlugin plugin; // obviously needed
 	static Logger log = Logger.getLogger("Minecraft");
 	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	static Calendar cal = Calendar.getInstance();
@@ -139,19 +152,64 @@ public class MiscUtil
 	}
 
 	@SuppressWarnings("unchecked")
-	public static boolean addInfraction(String target, int level, int id, String infraction, String proof)
+	public static boolean addInfraction(String target, CommandSender sender, int score, String reason, String proof)
 	{
-		if(!SaveUtil.hasData(target, "INFRACTIONS"))
+		try
 		{
-			setInfractions(target, new HashMap<String, String>());
+			UUID id = MojangIdProvider.getId(target);
+			Issuer issuer = getIssuer(sender);
+			Infractions.getCompleteDossier(target).cite(new Infraction(id, System.currentTimeMillis(), reason, score, issuer, createEvidence(issuer, proof)));
+			return true;
 		}
-		String readableID = Integer.toString(id);
-		((HashMap<String, String>) SaveUtil.getData(target, "INFRACTIONS")).put(readableID, level + ":" + infraction + " - " + proof + " - " + date);
-		return true;
+		catch(Exception ignored)
+		{
+		}
+		return false;
 	}
 
-	public static void checkScore(Player p)
+	public static String getInfractionsPlayer(final String guess)
 	{
+		Dossier dossier = Iterables.find(Infractions.allDossiers(), new Predicate<Dossier>()
+		{
+			@Override
+			public boolean apply(Dossier dossier)
+			{
+				return dossier instanceof CompleteDossier && ((CompleteDossier) dossier).getLastKnownName().toLowerCase().startsWith(guess.toLowerCase());
+			}
+		}, null);
+		if(dossier != null) return ((CompleteDossier) dossier).getLastKnownName();
+		return null;
+	}
+
+	public static Issuer getIssuer(CommandSender sender)
+	{
+		if(sender instanceof Player) return new Issuer(IssuerType.STAFF, ((Player) sender).getUniqueId().toString());
+		return new Issuer(IssuerType.UNKNOWN, sender.getName());
+	}
+
+	public static Evidence createEvidence(Issuer issuer, String proof)
+	{
+		boolean isImage = false;
+		try
+		{
+			Image image = ImageIO.read(new URL(proof));
+			isImage = image != null;
+		}
+		catch(Exception ignored)
+		{
+		}
+		return new Evidence(issuer, isImage ? EvidenceType.IMAGE_URL : EvidenceType.OTHER_URL, System.currentTimeMillis(), proof);
+	}
+
+	public static void checkScore(String playerName)
+	{
+		checkScore(Bukkit.getOfflinePlayer(playerName));
+	}
+
+	public static void checkScore(OfflinePlayer offlinePlayer)
+	{
+		if(offlinePlayer == null || !offlinePlayer.isOnline()) return;
+		Player p = offlinePlayer.getPlayer();
 		if(!SettingUtil.getSettingBoolean("ban") || p.hasPermission("infractions.ignore")) return;
 		if(getMaxScore(p) <= getScore(p) && (!p.hasPermission("infractions.banexempt")))
 		{
@@ -184,30 +242,19 @@ public class MiscUtil
 		{
 			try
 			{
-				getOnlinePlayer(p); // Check if player is online.
-				if(getMaxScore(MiscUtil.getOnlinePlayer(p)) <= getScore(MiscUtil.getOnlinePlayer(p)))
-				{ // Players that should be banned are
-					// banned.
-					checkScore(MiscUtil.getOnlinePlayer(p));
+				Player player = Bukkit.getPlayer(p);
+				if(getMaxScore(player) <= getScore(player))
+				{
+					checkScore(player);
 				}
 				else if(SettingUtil.getSettingBoolean("kick_on_cite"))
 				{
-					MiscUtil.getOnlinePlayer(p).kickPlayer("You've been cited for " + reason + "."); // Kick a
-					// player if
-					// option is
-					// set to
-					// true.
+					player.kickPlayer("You've been cited for " + reason + "."); // Kick a
 				}
 				else
 				{
-					MiscUtil.getOnlinePlayer(p).sendMessage(ChatColor.RED + "You've been cited for " + reason + ".");
-					MiscUtil.getOnlinePlayer(p).sendMessage("Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information."); // Send
-					// player
-					// a
-					// message
-					// about
-					// their
-					// infraction.
+					player.sendMessage(ChatColor.RED + "You've been cited for " + reason + ".");
+					player.sendMessage("Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information."); // Send
 				}
 			}
 			catch(NullPointerException e)
@@ -221,71 +268,7 @@ public class MiscUtil
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public static HashMap<String, String> getInfractions(String target)
-	{
-		if(SaveUtil.hasData(target, "INFRACTIONS"))
-		{
-			HashMap<String, String> original = ((HashMap<String, String>) SaveUtil.getData(target, "INFRACTIONS"));
-			HashMap<String, String> toreturn = new HashMap<String, String>();
-			for(String s : original.keySet())
-			{
-				toreturn.put(s, original.get(s));
-			}
-			setInfractions(target, toreturn); // clean original
-			return toreturn;
-		}
-		return null;
-	}
-
-	public static ArrayList<String> getInfractionsList(String target)
-	{
-		if(SaveUtil.hasData(target, "INFRACTIONS"))
-		{
-			HashMap<String, String> original = getInfractions(target);
-			ArrayList<String> toreturn = new ArrayList<String>();
-			for(String s : original.keySet())
-			{
-				toreturn.add(s);
-			}
-			return toreturn;
-		}
-		return null;
-	}
-
-	public static String getInfractionsPlayer(String name)
-	{
-		String found = name;
-		String lowerName = name.toLowerCase();
-		int delta = Integer.MAX_VALUE;
-		for(String playername : SaveUtil.getCompleteData().keySet())
-		{
-			if(playername.toLowerCase().startsWith(lowerName))
-			{
-				int curDelta = playername.length() - lowerName.length();
-				if(curDelta < delta)
-				{
-					found = playername;
-					delta = curDelta;
-				}
-				if(curDelta == 0) break;
-			}
-		}
-		return found;
-	}
-
-	public static Player getOnlinePlayer(String name)
-	{
-		return plugin.getServer().getPlayer(name);
-	}
-
-	public static OfflinePlayer getOfflinePlayer(String name)
-	{
-		OfflinePlayer target = plugin.getServer().getOfflinePlayer(name);
-		return target;
-	}
-
-	public static Infractions getPlugin()
+	public static InfractionsPlugin getPlugin()
 	{
 		return plugin;
 	}
@@ -297,15 +280,7 @@ public class MiscUtil
 
 	public static int getScore(String p)
 	{
-		if(SaveUtil.hasData(p, "SCORE")) return (Integer) SaveUtil.getData(p, "SCORE");
-		return 0;
-	}
-
-	public static boolean hasPermission(Player p, String pe)
-	{ // convenience
-		// method for
-		// permissions
-		return p.hasPermission(pe);
+		return Infractions.getCompleteDossier(p).getScore();
 	}
 
 	public static boolean hasPermissionOrOP(Player p, String pe)
@@ -357,37 +332,52 @@ public class MiscUtil
 		}
 	}
 
-	public static void reloadPlugin()
+	public static boolean removeInfraction(String target, final String givenID)
 	{
-		Bukkit.getServer().getPluginManager().disablePlugin(plugin);
-		Bukkit.getServer().getPluginManager().enablePlugin(plugin);
-	}
-
-	public static boolean removeInfraction(String target, String givenID)
-	{
-		for(String readableID : MiscUtil.getInfractionsList(target))
+		CompleteDossier dossier = Infractions.getCompleteDossier(target);
+		Infraction infraction = Iterables.find(dossier.getInfractions(), new Predicate<Infraction>()
 		{
-			if(readableID.equals(givenID)) return (MiscUtil.getInfractions(target).remove(readableID) == null);
+			@Override
+			public boolean apply(Infraction infraction)
+			{
+				return givenID.equals(getId(infraction));
+			}
+		}, null);
+		if(infraction != null)
+		{
+			dossier.acquit(infraction);
+			return true;
 		}
 		return false;
 	}
 
-	public static void setInfractions(String p, HashMap<String, String> data)
+	public static String getId(Infraction infraction)
 	{
-		SaveUtil.saveData(p, "INFRACTIONS", data);
+		String s = infraction.getTimeCreated().toString();
+		StringBuilder id = new StringBuilder();
+		for(int i = 0; i < s.length(); i++)
+		{
+			char c = s.charAt(i);
+			id.append(getLetterForId(c));
+		}
+		return id.toString();
 	}
 
-	public static void setScore(Player p, int amt)
+	private static String getLetterForId(char num)
 	{
-		setScore(p.getName(), amt);
+		if(num == '1') return "F";
+		if(num == '2') return "Z";
+		if(num == '3') return "c";
+		if(num == '4') return "A";
+		if(num == '5') return "Q";
+		if(num == '6') return "u";
+		if(num == '7') return "p";
+		if(num == '8') return "W";
+		if(num == '9') return "j";
+		return "b"; // 0
 	}
 
-	public static void setScore(String p, int amt)
-	{
-		SaveUtil.saveData(p, "SCORE", amt);
-	}
-
-	public MiscUtil(Infractions i)
+	public MiscUtil(InfractionsPlugin i)
 	{
 		plugin = i;
 	}
