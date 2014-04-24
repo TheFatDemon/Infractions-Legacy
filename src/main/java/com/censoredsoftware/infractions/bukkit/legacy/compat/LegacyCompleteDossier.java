@@ -32,7 +32,10 @@ import java.util.UUID;
 
 public class LegacyCompleteDossier extends LegacyDossier implements CompleteDossier
 {
-	private String lastKnownName;
+	LegacyCompleteDossier()
+	{
+		super();
+	}
 
 	public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Infraction... infractions)
 	{

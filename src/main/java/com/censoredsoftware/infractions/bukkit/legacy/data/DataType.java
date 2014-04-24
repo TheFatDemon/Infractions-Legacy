@@ -1,14 +1,6 @@
 package com.censoredsoftware.infractions.bukkit.legacy.data;
 
-import com.demigodsrpg.demigods.engine.battle.Battle;
-import com.demigodsrpg.demigods.engine.entity.DemigodsTameable;
-import com.demigodsrpg.demigods.engine.entity.player.DemigodsCharacter;
-import com.demigodsrpg.demigods.engine.entity.player.DemigodsPlayer;
-import com.demigodsrpg.demigods.engine.entity.player.attribute.*;
-import com.demigodsrpg.demigods.engine.inventory.DemigodsEnderInventory;
-import com.demigodsrpg.demigods.engine.inventory.DemigodsPlayerInventory;
-import com.demigodsrpg.demigods.engine.item.DemigodsItemStack;
-import com.demigodsrpg.demigods.engine.tribute.TributeData;
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
@@ -24,55 +16,7 @@ public enum DataType
 	/**
 	 * DemigodsPlayer.
 	 */
-	PLAYER(DemigodsPlayer.class, IdType.UUID, "pl"),
-	/**
-	 * DemigodsCharacter.
-	 */
-	CHARACTER(DemigodsCharacter.class, IdType.UUID, "ch"),
-	/**
-	 * DemigodsCharacterMeta.
-	 */
-	CHARACTER_META(DemigodsCharacterMeta.class, IdType.UUID, "chmt"),
-	/**
-	 * DemigodsPlayerInventory.
-	 */
-	PLAYER_INVENTORY(DemigodsPlayerInventory.class, IdType.UUID, "plin"),
-	/**
-	 * DemigodsEnderInventory.
-	 */
-	ENDER_INVENTORY(DemigodsEnderInventory.class, IdType.UUID, "enin"),
-	/**
-	 * DemigodsTameable.
-	 */
-	TAMABLE(DemigodsTameable.class, IdType.UUID, "tm"),
-	/**
-	 * Death.
-	 */
-	DEATH(Death.class, IdType.UUID, "d"),
-	/**
-	 * Skill.
-	 */
-	SKILL(Skill.class, IdType.UUID, "sk"),
-	/**
-	 * Notification.
-	 */
-	NOTIFICATION(Notification.class, IdType.UUID, "n"),
-	/**
-	 * DemigodsItemStack.
-	 */
-	ITEM_STACK(DemigodsItemStack.class, IdType.UUID, "it"),
-	/**
-	 * DemigodsPotionEffect.
-	 */
-	POTION_EFFECT(DemigodsPotionEffect.class, IdType.UUID, "po"),
-	/**
-	 * Battle.
-	 */
-	BATTLE(Battle.class, IdType.UUID, "b"),
-	/**
-	 * TributeData.class
-	 */
-	TRIBUTE(TributeData.class, IdType.UUID, "tr"),
+	DOSSIER(LegacyDossier.class, IdType.UUID, "do"),
 	/**
 	 * TimedServerData.
 	 */
@@ -84,7 +28,7 @@ public enum DataType
 	/**
 	 * Returned when no valid type can be found.
 	 */
-	INVALID(Invalid.class, IdType.VOID, "IF_YOU_SEE_THIS_PLEASE_TELL_US_ON_THE_SITE_YOU_DOWNLOADED_DEMIGODS_FROM");
+	INVALID(Invalid.class, IdType.VOID, "IF_YOU_SEE_THIS_PLEASE_TELL_US_ON_THE_SITE_YOU_DOWNLOADED_INFRACTIONS_FROM");
 
 	private Class clazz;
 	private IdType idType;

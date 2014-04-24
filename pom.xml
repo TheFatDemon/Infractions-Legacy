@@ -49,7 +49,7 @@
             <url>http://repo.censoredsoftware.com/</url>
         </repository>
         <repository>
-        <id>md_5-releases</id>
+            <id>md_5-releases</id>
             <url>http://repo.md-5.net/content/repositories/snapshots</url>
         </repository>
         <repository>
@@ -73,7 +73,7 @@
             <version>0.5.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-        <groupId>org.mcstats.bukkit</groupId>
+            <groupId>org.mcstats.bukkit</groupId>
             <artifactId>metrics-lite</artifactId>
             <version>${mcstats.version}</version>
             <exclusions>
@@ -121,6 +121,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
+                                    <include>org.censoredsoftware:infractions-bukkit-api</include>
                                     <include>org.mcstats.bukkit:metrics-lite</include>
                                     <include>com.mojang:AccountsClient</include>
                                 </includes>

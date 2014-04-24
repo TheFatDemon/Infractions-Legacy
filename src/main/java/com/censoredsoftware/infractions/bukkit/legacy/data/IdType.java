@@ -1,7 +1,6 @@
 package com.censoredsoftware.infractions.bukkit.legacy.data;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 
 import javax.annotation.Nullable;
 
@@ -26,8 +25,7 @@ public enum IdType
 		@Override
 		public java.util.UUID apply(@Nullable String s)
 		{
-			if(s.contains("-")) return java.util.UUID.fromString(s);
-			return toUUID(s);
+			return java.util.UUID.fromString(s);
 		}
 	}, java.util.UUID.class),
 	/**
@@ -77,24 +75,5 @@ public enum IdType
 	public Class getCastClass()
 	{
 		return cast;
-	}
-
-	public static java.util.UUID toUUID(String mojangId)
-	{
-		// Check that it is long enough.
-		if(mojangId.length() != 32) return null;
-
-		// Grab the components from the UUID.
-		String component1 = mojangId.substring(0, 8),
-				component2 = mojangId.substring(8, 12),
-				component3 = mojangId.substring(12, 16),
-				component4 = mojangId.substring(16, 20),
-				component5 = mojangId.substring(20);
-
-		// Create the new String.
-		String fullId = Joiner.on('-').join(component1, component2, component3, component4, component5);
-
-		// Transform to UUID
-		return java.util.UUID.fromString(fullId);
 	}
 }

@@ -23,17 +23,31 @@
 package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
 import com.censoredsoftware.infractions.bukkit.Infraction;
+import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
+import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
+import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
+import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.Set;
-import java.util.UUID;
+import javax.annotation.Nullable;
+import java.util.*;
 
-public class LegacyDossier implements Dossier
+public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Dossier
 {
 	private UUID mojangid;
 	private Set<Infraction> infractions;
+	protected String lastKnownName;
+
+	LegacyDossier()
+	{
+	}
 
 	public LegacyDossier(UUID mojangId, Infraction... infractions)
 	{
@@ -46,8 +60,15 @@ public class LegacyDossier implements Dossier
 		this.infractions = infractions;
 	}
 
+	@Register(idType = IdType.UUID)
+	public LegacyDossier(UUID id, ConfigurationSection conf)
+	{
+		this.mojangid = id;
+
+	}
+
 	@Override
-	public UUID getMojangId()
+	public UUID getId()
 	{
 		return mojangid;
 	}
@@ -82,12 +103,64 @@ public class LegacyDossier implements Dossier
 	@Override
 	public CompleteDossier complete(String playerName)
 	{
-		return new LegacyCompleteDossier(getMojangId(), playerName, getInfractions());
+		return new LegacyCompleteDossier(getId(), playerName, getInfractions());
 	}
 
 	@Override
 	public CompleteDossier complete() throws ClassCastException
 	{
 		return (CompleteDossier) this;
+	}
+
+	@Override
+	public Map<String, Object> serialize()
+	{
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(lastKnownName != null) map.put("lastKnownName", lastKnownName);
+
+		List<String> infractionList = Lists.newArrayList(Collections2.transform(infractions, new Function<Infraction, String>()
+		{
+			@Override
+			public String apply(Infraction infraction)
+			{
+				return MiscUtil.getId(infraction);
+			}
+		}));
+
+		if(!infractionList.isEmpty()) map.put("infractions", infractionList);
+
+		return map;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Dossier unserialize(UUID id, Map<String, Object> map)
+	{
+		LegacyDossier dossier;
+		if(map.isEmpty()) return Infractions.getDossier(id);
+		if(map.containsKey("lastKnownName"))
+		{
+			dossier = new LegacyCompleteDossier();
+			dossier.lastKnownName = map.get("lastKnownName").toString();
+		}
+		else dossier = new LegacyDossier();
+		if(map.containsKey("infractions"))
+		{
+			dossier.infractions = Sets.newHashSet(Collections2.transform((List<String>) map.get("infractions"), new Function<String, Infraction>()
+			{
+				@Override
+				public Infraction apply(@Nullable String s)
+				{
+					try
+					{
+						return ((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.get(s);
+					}
+					catch(Exception ignored)
+					{
+					}
+					return null;
+				}
+			}));
+		}
+		return dossier;
 	}
 }

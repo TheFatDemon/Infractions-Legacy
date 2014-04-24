@@ -17,7 +17,7 @@ public class TempDataManager
 		@Override
 		public ConcurrentHashMap<String, Object> get()
 		{
-			return new ConcurrentHashMap<>();
+			return new ConcurrentHashMap<String, Object>();
 		}
 	});
 
