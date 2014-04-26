@@ -1,11 +1,28 @@
+/*
+ * Copyright 2014 Alexander Chauncey
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.censoredsoftware.infractions.bukkit.legacy.data;
 
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyInfraction;
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyIssuer;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 /**
  * Meta data for each data type.
@@ -16,11 +33,15 @@ public enum DataType
 	/**
 	 * Dossier.
 	 */
-	DOSSIER(LegacyDossier.class, IdType.UUID, "do"),
+	DOSSIER(LegacyDossier.class, IdType.UUID, "dos"),
 	/**
 	 * Infraction.
 	 */
-	INFRACTION(LegacyDossier.class, IdType.UUID, "in"),
+	INFRACTION(LegacyInfraction.class, IdType.STRING, "inf"),
+	/**
+	 * Issuer.
+	 */
+	ISSUER(LegacyIssuer.class, IdType.STRING, "iss"),
 	/**
 	 * ServerData.
 	 */
@@ -69,30 +90,12 @@ public enum DataType
 		return abbr;
 	}
 
-	public <K extends Comparable, V extends DataAccess<K, V>> V cast(Object o)
-	{
-		return (V) clazz.cast(o);
-	}
-
-	public static String[] names()
-	{
-		String[] names = new String[values().length];
-		for(int i = 0; i < values().length; i++)
-			names[i] = values()[i].name();
-		return names;
-	}
-
 	public static <V extends DataAccess> Class<V>[] classes()
 	{
 		Class<V>[] classes = new Class[values().length];
 		for(int i = 0; i < values().length; i++)
 			classes[i] = values()[i].clazz;
 		return classes;
-	}
-
-	public static <V extends DataAccess> String nameFromClass(final Class<V> clazz)
-	{
-		return typeFromClass(clazz).name();
 	}
 
 	public static <V extends DataAccess> DataType typeFromClass(final Class<V> clazz)
@@ -105,24 +108,5 @@ public enum DataType
 				return clazz.equals(dataType.clazz);
 			}
 		}, INVALID);
-	}
-
-	public static <V extends DataAccess> Class<V> classFromName(final String name)
-	{
-		try
-		{
-			return Iterables.find(Arrays.asList(values()), new Predicate<DataType>()
-			{
-				@Override
-				public boolean apply(DataType dataType)
-				{
-					return dataType.clazz != null && dataType.name().equals(name);
-				}
-			}).clazz;
-		}
-		catch(NoSuchElementException noElement)
-		{
-			throw new UnsupportedOperationException("Plugin tried accessing non-existent data type.", noElement);
-		}
 	}
 }

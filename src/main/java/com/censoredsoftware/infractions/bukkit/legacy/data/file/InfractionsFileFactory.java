@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Alexander Chauncey
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.censoredsoftware.infractions.bukkit.legacy.data.file;
 
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
@@ -6,7 +22,8 @@ import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
 import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Factory for constructing DemigodsFiles in a safe and generic way.
@@ -47,8 +64,8 @@ public class InfractionsFileFactory
 		// Check for void type.
 		if(IdType.VOID.equals(idType)) return null;
 
-		// Construct a new Demigods File from the abbreviation, file extension, and file directory path.
-		return new InfractionsFile<K, V>(abbr, ".demi", filePath)
+		// Construct a new Infractions File from the abbreviation, file extension, and file directory path.
+		return new InfractionsFile<K, V>(abbr, ".know", filePath)
 		{
 			// Overridden method to create an new data object from the file data.
 			@Override
@@ -57,22 +74,22 @@ public class InfractionsFileFactory
 				try
 				{
 					// Look over all constructors in the data class.
-					for(Constructor<V> constructor : (Constructor<V>[]) dataClass.getConstructors())
+					for(Method method : dataClass.getMethods())
 					{
 						// Attempt to find a registered constructor.
-						Register dataConstructor = constructor.getAnnotation(Register.class);
+						Register methodConstructor = method.getAnnotation(Register.class);
 
 						// Is the constructor suitable for use?
-						if(dataConstructor == null || !idType.equals(dataConstructor.idType())) continue;
+						if(methodConstructor == null || !Modifier.isStatic(method.getModifiers()) || !idType.equals(methodConstructor.idType())) continue;
 
 						// So far so good, now we double check the params.
-						Class<?>[] params = constructor.getParameterTypes();
+						Class<?>[] params = method.getParameterTypes();
 						if(params.length < 2 || !params[0].equals(idType.getCastClass()) || !params[1].equals(ConfigurationSection.class))
 							// No good.
 							throw new RuntimeException("The defined constructor for a data file is invalid.");
 
 						// Everything looks perfect so far. Last thing to do is construct a new instance.
-						return constructor.newInstance(keyFromString(stringId), conf);
+						return (V) method.invoke(null, keyFromString(stringId), conf);
 					}
 					throw new RuntimeException("Demigods was unable to find a constructor for one of its data types.");
 				}

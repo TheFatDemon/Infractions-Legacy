@@ -1,23 +1,17 @@
 /*
- * Copyright (c) 2014 Alexander Chauncey
+ * Copyright 2014 Alexander Chauncey
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.censoredsoftware.infractions.bukkit.legacy.compat;
@@ -36,16 +30,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.bukkit.configuration.ConfigurationSection;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Dossier
 {
 	private UUID mojangid;
-	private Set<Infraction> infractions;
+	private Set<String> infractions;
 	protected String lastKnownName;
 
-	LegacyDossier()
+	protected LegacyDossier()
 	{
 	}
 
@@ -57,14 +50,22 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public LegacyDossier(UUID mojangId, Set<Infraction> infractions)
 	{
 		this.mojangid = mojangId;
-		this.infractions = infractions;
+		this.infractions = Sets.newHashSet(Collections2.transform(infractions, new Function<Infraction, String>()
+		{
+			@Override
+			public String apply(Infraction infraction)
+			{
+				String id = MiscUtil.getInfractionId(infraction);
+				((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.put(id, LegacyInfraction.of(infraction));
+				return id;
+			}
+		}));
 	}
 
 	@Register(idType = IdType.UUID)
-	public LegacyDossier(UUID id, ConfigurationSection conf)
+	public static LegacyDossier of(UUID id, ConfigurationSection conf)
 	{
-		this.mojangid = id;
-
+		return (LegacyDossier) unserialize(id, conf.getValues(true));
 	}
 
 	@Override
@@ -85,19 +86,30 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	@Override
 	public Set<Infraction> getInfractions()
 	{
-		return infractions;
+		return Sets.newHashSet(Collections2.transform(infractions, new Function<String, Infraction>()
+		{
+			@Override
+			public Infraction apply(String s)
+			{
+				return ((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.get(s).toInfraction();
+			}
+		}));
 	}
 
 	@Override
 	public void cite(Infraction infraction)
 	{
-		infractions.add(infraction);
+		String id = MiscUtil.getInfractionId(infraction);
+		((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.put(id, LegacyInfraction.of(infraction));
+		infractions.add(id);
 	}
 
 	@Override
 	public void acquit(Infraction infraction)
 	{
-		infractions.remove(infraction);
+		String id = MiscUtil.getInfractionId(infraction);
+		((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.remove(id);
+		infractions.remove(id);
 	}
 
 	@Override
@@ -118,14 +130,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 		Map<String, Object> map = new HashMap<String, Object>();
 		if(lastKnownName != null) map.put("lastKnownName", lastKnownName);
 
-		List<String> infractionList = Lists.newArrayList(Collections2.transform(infractions, new Function<Infraction, String>()
-		{
-			@Override
-			public String apply(Infraction infraction)
-			{
-				return MiscUtil.getInfractionId(infraction);
-			}
-		}));
+		List<String> infractionList = Lists.newArrayList(infractions);
 
 		if(!infractionList.isEmpty()) map.put("infractions", infractionList);
 
@@ -145,21 +150,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 		else dossier = new LegacyDossier();
 		if(map.containsKey("infractions"))
 		{
-			dossier.infractions = Sets.newHashSet(Collections2.transform((List<String>) map.get("infractions"), new Function<String, Infraction>()
-			{
-				@Override
-				public Infraction apply(@Nullable String s)
-				{
-					try
-					{
-						return ((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.get(s);
-					}
-					catch(Exception ignored)
-					{
-					}
-					return null;
-				}
-			}));
+			dossier.infractions = Sets.newHashSet((List<String>) map.get("infractions"));
 		}
 		return dossier;
 	}

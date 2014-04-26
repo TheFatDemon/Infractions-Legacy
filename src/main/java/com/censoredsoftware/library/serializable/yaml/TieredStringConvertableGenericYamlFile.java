@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Alexander Chauncey
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.censoredsoftware.library.serializable.yaml;
 
 import com.censoredsoftware.library.serializable.DataSerializable;
@@ -51,7 +67,7 @@ public abstract class TieredStringConvertableGenericYamlFile<K extends Comparabl
 		FileConfiguration data = YamlFileUtil.getConfiguration(getDirectoryPath(), getFullFileName());
 
 		// Convert the raw file data into more usable data, in map form.
-		ConcurrentHashMap<K, V> map = new ConcurrentHashMap<>();
+		ConcurrentHashMap<K, V> map = new ConcurrentHashMap<K, V>();
 		for(String stringId : data.getKeys(false))
 		{
 			try

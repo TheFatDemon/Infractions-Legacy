@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Alexander Chauncey
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.censoredsoftware.infractions.bukkit.legacy.data;
 
 import com.google.common.base.Objects;
@@ -18,19 +34,21 @@ public class ServerData extends DataAccess<UUID, ServerData>
 	private Object value;
 	private Long expiration;
 
-	public ServerData()
+	private ServerData()
 	{
 	}
 
 	@Register(idType = IdType.UUID)
-	public ServerData(UUID id, ConfigurationSection conf)
+	public static ServerData of(UUID id, ConfigurationSection conf)
 	{
-		this.id = id;
-		type = ServerDataType.valueOf(conf.getString("type"));
-		row = conf.getString("row");
-		column = conf.getString("column");
-		value = conf.get("value");
-		if(expiration != null) expiration = conf.getLong("expiration");
+		ServerData data = new ServerData();
+		data.id = id;
+		data.type = ServerDataType.valueOf(conf.getString("type"));
+		data.row = conf.getString("row");
+		data.column = conf.getString("column");
+		data.value = conf.get("value");
+		if(conf.get("expiration") != null) data.expiration = conf.getLong("expiration");
+		return data;
 	}
 
 	@Override
