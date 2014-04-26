@@ -91,7 +91,12 @@
             <version>${mcstats.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.mojang</groupId>
+            <groupId>com.rosaloves</groupId>
+            <artifactId>bitlyj</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+        <groupId>com.mojang</groupId>
             <artifactId>AccountsClient</artifactId>
             <version>latest</version>
         </dependency>
@@ -127,6 +132,7 @@
                                 <includes>
                                     <include>org.censoredsoftware:infractions-bukkit-api</include>
                                     <include>org.mcstats.bukkit:metrics-lite</include>
+                                    <include>com.rosaloves:bitlyj</include>
                                     <include>com.mojang:AccountsClient</include>
                                 </includes>
                             </artifactSet>
@@ -136,7 +142,11 @@
                 <configuration>
                     <relocations>
                         <relocation>
-                            <pattern>com.mojang</pattern>
+                            <pattern>com.rosaloves</pattern>
+                            <shadedPattern>infractions.shaded.com.rosaloves</shadedPattern>
+                        </relocation>
+                        <relocation>
+                        <pattern>com.mojang</pattern>
                             <shadedPattern>infractions.shaded.com.mojang</shadedPattern>
                         </relocation>
                         <relocation>
