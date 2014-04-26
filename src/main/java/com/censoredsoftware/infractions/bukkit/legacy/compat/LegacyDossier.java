@@ -123,7 +123,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 			@Override
 			public String apply(Infraction infraction)
 			{
-				return MiscUtil.getId(infraction);
+				return MiscUtil.getInfractionId(infraction);
 			}
 		}));
 

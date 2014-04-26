@@ -9,6 +9,7 @@ import com.censoredsoftware.infractions.bukkit.evidence.EvidenceType;
 import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
 import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
+import com.censoredsoftware.infractions.bukkit.legacy.data.ServerData;
 import com.censoredsoftware.library.helper.MojangIdProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -20,38 +21,13 @@ import org.bukkit.entity.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 public class MiscUtil
 {
-
-	private static InfractionsPlugin plugin; // obviously needed
-	static Logger log = Logger.getLogger("Minecraft");
-	static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-	static Calendar cal = Calendar.getInstance();
-	static String date = dateFormat.format(cal.getTime());
-
-	public static void consoleMSG(String level, String msg)
-	{
-		// Define variables
-		Logger log = Logger.getLogger("Minecraft");
-
-		// Strip color from console messages
-		msg = ChatColor.stripColor(msg);
-
-		if(level.equalsIgnoreCase("info")) log.info("[Demigods] " + msg);
-		if(level.equalsIgnoreCase("warning")) log.warning("[Demigods] " + msg);
-		if(level.equalsIgnoreCase("severe")) log.severe("[Demigods] " + msg);
-	}
+	static Logger log = InfractionsPlugin.getInst().getLogger();
 
 	public static int getMaxScore(Player p)
 	{
@@ -145,12 +121,6 @@ public class MiscUtil
 		return maxScore;
 	}
 
-	public static ChatColor chatColor(Player p, ChatColor color)
-	{
-		if(p == null) return ChatColor.RESET;
-		return (color);
-	}
-
 	@SuppressWarnings("unchecked")
 	public static boolean addInfraction(String target, CommandSender sender, int score, String reason, String proof)
 	{
@@ -220,7 +190,7 @@ public class MiscUtil
 			}
 			catch(NullPointerException e)
 			{
-				log.info("[Infractions] Unable to set " + p.toString() + " to banned.");
+				log.info("Unable to set " + p.toString() + " to banned.");
 			}
 		}
 		else
@@ -231,7 +201,7 @@ public class MiscUtil
 			}
 			catch(NullPointerException e)
 			{
-				log.info("[Infractions] Unable to set " + p.toString() + " to unbanned.");
+				log.info("Unable to set " + p.toString() + " to unbanned.");
 			}
 		}
 	}
@@ -259,18 +229,13 @@ public class MiscUtil
 			}
 			catch(NullPointerException e)
 			{
-				SaveUtil.saveData(p, "NEWINFRACTION", true);
+				ServerData.put(p, "NEWINFRACTION", true);
 			}
 		}
 		else
 		{
 			VirtueUtil.rewardPlayer(p, reason);
 		}
-	}
-
-	public static InfractionsPlugin getPlugin()
-	{
-		return plugin;
 	}
 
 	public static int getScore(Player p)
@@ -284,47 +249,15 @@ public class MiscUtil
 	}
 
 	public static boolean hasPermissionOrOP(Player p, String pe)
-	{ // convenience
-		// method
-		// for
-		// permissions
+	{
 		return p == null || p.isOp() || p.hasPermission(pe);
 	}
 
-	public static boolean isValidURL(String input)
-	{
-		if(!input.startsWith("http://") && !input.startsWith("https://"))
-		{
-			input = ("http://" + input);
-		}
-		try
-		{
-			URI uri = new URI(input);
-			URL url = uri.toURL();
-			java.net.URLConnection conn = url.openConnection();
-			conn.connect();
-			return true;
-		}
-		catch(MalformedURLException e)
-		{
-			return false;
-		}
-		catch(IOException e)
-		{
-			return false;
-		}
-		catch(URISyntaxException e)
-		{
-			return false;
-		}
-	}
-
-	public static void messageSend(Player p, String str)
+	public static void sendMessage(Player p, String str)
 	{
 		if(p == null)
 		{
-			str = "[Infractions] " + str;
-			log.info(str);
+			log.info(ChatColor.stripColor(str));
 		}
 		else
 		{
@@ -340,7 +273,7 @@ public class MiscUtil
 			@Override
 			public boolean apply(Infraction infraction)
 			{
-				return givenID.equals(getId(infraction));
+				return givenID.equals(getInfractionId(infraction));
 			}
 		}, null);
 		if(infraction != null)
@@ -351,7 +284,7 @@ public class MiscUtil
 		return false;
 	}
 
-	public static String getId(Infraction infraction)
+	public static String getInfractionId(Infraction infraction)
 	{
 		String s = infraction.getTimeCreated().toString();
 		StringBuilder id = new StringBuilder();
@@ -375,10 +308,5 @@ public class MiscUtil
 		if(num == '8') return "W";
 		if(num == '9') return "j";
 		return "b"; // 0
-	}
-
-	public MiscUtil(InfractionsPlugin i)
-	{
-		plugin = i;
 	}
 }

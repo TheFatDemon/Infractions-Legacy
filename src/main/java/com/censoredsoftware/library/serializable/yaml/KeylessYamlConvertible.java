@@ -1,7 +1,7 @@
 package com.censoredsoftware.library.serializable.yaml;
 
 /**
- * Convenience abstract class for all YamlConvertible child classes that don't use a key-value system.
+ * Convenience abstract class for all YamlConvertible child classes that don't use a key-get system.
  */
 public abstract class KeylessYamlConvertible<V> extends YamlConvertible<Comparable, V>
 {

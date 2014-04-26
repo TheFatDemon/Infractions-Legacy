@@ -27,7 +27,7 @@ public interface YamlFile
 	/**
 	 * This method returns the data from the file in certain way.
 	 *
-	 * @param <V> Some value that the file returns.
+	 * @param <V> Some get that the file returns.
 	 * @return The file's data.
 	 */
 	<V> V getCurrentFileData();

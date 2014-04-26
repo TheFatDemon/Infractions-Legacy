@@ -1,7 +1,10 @@
 package com.censoredsoftware.infractions.bukkit.legacy;
 
+import com.censoredsoftware.infractions.bukkit.Infraction;
+import com.censoredsoftware.infractions.bukkit.Infractions;
+import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
+import com.censoredsoftware.infractions.bukkit.legacy.data.ServerData;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
-import com.censoredsoftware.infractions.bukkit.legacy.util.SaveUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -9,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.logging.Logger;
+import java.util.Set;
 
 public class PlayerListener implements Listener
 {
@@ -18,37 +21,39 @@ public class PlayerListener implements Listener
 	{
 		// sync to master file
 		final Player p = e.getPlayer();
-		if(SettingUtil.getSettingBoolean("motd")) p.sendMessage("This server is policed with infractions.");
+		Dossier dossier = Infractions.getCompleteDossier(p);
+		if(SettingUtil.getSettingBoolean("motd"))
+		{
+			// TODO Consolidate this into some sort of useful notification system.
+			p.sendMessage("This server is policed with infractions.");
+		}
 		if(p.hasPermission("infractions.ignore"))
 		{
-			if(MiscUtil.getInfractionsList(p.getName()) != null)
-				for(String infractionID : MiscUtil.getInfractionsList(p.getName()))
-					MiscUtil.removeInfraction(p.getName(), infractionID);
+
+			Set<Infraction> infractions = dossier.getInfractions();
+			if(!infractions.isEmpty())
+				for(Infraction infraction : infractions)
+					dossier.acquit(infraction);
 			return;
 		}
-		if(SaveUtil.hasData(p, "NEWINFRACTION"))
+		if(ServerData.exists(p.getName(), "NEWINFRACTION"))
 		{
-			if((Boolean) SaveUtil.getData(p, "NEWINFRACTION"))
+			if((Boolean) ServerData.get(p.getName(), "NEWINFRACTION"))
 			{
 				p.sendMessage(ChatColor.RED + "You have a new infraction!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
-				SaveUtil.saveData(p, "NEWINFRACTION", false);
+				ServerData.remove(p.getName(), "NEWINFRACTION");
 			}
 		}
-		if(SaveUtil.hasData(p, "NEWVIRTUE"))
+		if(ServerData.exists(p.getName(), "NEWVIRTUE"))
 		{
-			if((Boolean) SaveUtil.getData(p, "NEWVIRTUE"))
+			if((Boolean) ServerData.get(p.getName(), "NEWVIRTUE"))
 			{
 				p.sendMessage(ChatColor.RED + "You have a new virtue!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
-				SaveUtil.saveData(p, "NEWVIRTUE", false);
+				ServerData.remove(p.getName(), "NEWVIRTUE");
 			}
 		}
-		if(!SaveUtil.hasPlayer(p))
-		{
-			Logger.getLogger("Minecraft").info("[Infractions] " + p.getName() + " joined for the first time.");
-			SaveUtil.addPlayer(p);
-		}
 
-		SaveUtil.saveData(p, "LASTLOGINTIME", System.currentTimeMillis());
+		ServerData.put(p.getName(), "LASTLOGINTIME", System.currentTimeMillis());
 		MiscUtil.checkScore(p);
 	}
 }

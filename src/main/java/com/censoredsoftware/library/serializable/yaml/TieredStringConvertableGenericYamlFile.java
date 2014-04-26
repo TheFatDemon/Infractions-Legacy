@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * A key-value (generic-generic) tiered collection of data meant for one type of child class for DataSerializable.
+ * A key-get (generic-generic) tiered collection of data meant for one type of child class for DataSerializable.
  * Example layout of a Yaml file created by this class:
  * --------------------------------
  * key:
@@ -33,7 +33,7 @@ public abstract class TieredStringConvertableGenericYamlFile<K extends Comparabl
 	 * Serialize the data for a specific key (from the loaded data).
 	 *
 	 * @param key The key.
-	 * @return Map of the data from the value.
+	 * @return Map of the data from the get.
 	 */
 	public abstract Map<String, Object> serialize(K key);
 

@@ -70,10 +70,10 @@ public class Strings
 	}
 
 	/**
-	 * Returns a color (red, yellow, green) based on the <code>value</code> and <code>max</code> passed in.
+	 * Returns a color (red, yellow, green) based on the <code>get</code> and <code>max</code> passed in.
 	 *
-	 * @param value the actual value.
-	 * @param max   the maximum value possible.
+	 * @param value the actual get.
+	 * @param max   the maximum get possible.
 	 */
 	public static ChatColor getColor(double value, double max)
 	{

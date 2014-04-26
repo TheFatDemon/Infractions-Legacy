@@ -14,13 +14,13 @@ import java.util.NoSuchElementException;
 public enum DataType
 {
 	/**
-	 * DemigodsPlayer.
+	 * Dossier.
 	 */
 	DOSSIER(LegacyDossier.class, IdType.UUID, "do"),
 	/**
-	 * TimedServerData.
+	 * Infraction.
 	 */
-	TIMED(TimedServerData.class, IdType.UUID, "ti"),
+	INFRACTION(LegacyDossier.class, IdType.UUID, "in"),
 	/**
 	 * ServerData.
 	 */

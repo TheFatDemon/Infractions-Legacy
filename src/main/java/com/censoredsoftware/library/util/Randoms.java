@@ -45,10 +45,10 @@ public class Randoms
 	}
 
 	/**
-	 * Generates an integer with a value between <code>min</code> and <code>max</code>.
+	 * Generates an integer with a get between <code>min</code> and <code>max</code>.
 	 *
-	 * @param min the minimum value of the integer.
-	 * @param max the maximum value of the integer.
+	 * @param min the minimum get of the integer.
+	 * @param max the maximum get of the integer.
 	 * @return Integer
 	 */
 	public static int generateIntRange(int min, int max)
@@ -57,10 +57,10 @@ public class Randoms
 	}
 
 	/**
-	 * Generates a double with a value between <code>min</code> and <code>max</code>.
+	 * Generates a double with a get between <code>min</code> and <code>max</code>.
 	 *
-	 * @param min the minimum value of the integer.
-	 * @param max the maximum value of the integer.
+	 * @param min the minimum get of the integer.
+	 * @param max the maximum get of the integer.
 	 * @return Integer
 	 */
 	public static double generateDoubleRange(double min, double max)
@@ -69,7 +69,7 @@ public class Randoms
 	}
 
 	/**
-	 * Returns a boolean whose value is based on the given <code>percent</code>.
+	 * Returns a boolean whose get is based on the given <code>percent</code>.
 	 *
 	 * @param percent the percent chance for true.
 	 * @return Boolean

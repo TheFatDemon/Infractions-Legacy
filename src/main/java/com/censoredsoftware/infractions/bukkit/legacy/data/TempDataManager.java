@@ -21,28 +21,28 @@ public class TempDataManager
 		}
 	});
 
-	public static boolean hasKeyTemp(String row, String column)
+	public static boolean exists(String row, String column)
 	{
 		return TEMP.contains(row, column);
 	}
 
-	public static Object getValueTemp(String row, String column)
+	public static Object get(String row, String column)
 	{
-		if(hasKeyTemp(row, column)) return TEMP.get(row, column);
+		if(exists(row, column)) return TEMP.get(row, column);
 		else return null;
 	}
 
-	public static void saveTemp(String row, String column, Object value)
+	public static void put(String row, String column, Object value)
 	{
 		TEMP.put(row, column, value);
 	}
 
-	public static void removeTemp(String row, String column)
+	public static void remove(String row, String column)
 	{
-		if(hasKeyTemp(row, column)) TEMP.remove(row, column);
+		if(exists(row, column)) TEMP.remove(row, column);
 	}
 
-	public static void clear()
+	public static void purge()
 	{
 		TEMP.clear();
 	}

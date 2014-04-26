@@ -1,11 +1,10 @@
 package com.censoredsoftware.infractions.bukkit.legacy.data.file;
 
-import com.demigodsrpg.demigods.engine.DemigodsPlugin;
-import com.demigodsrpg.demigods.engine.data.DataAccess;
-import com.demigodsrpg.demigods.engine.data.DataManager;
-import com.demigodsrpg.demigods.engine.data.DataType;
-import com.demigodsrpg.demigods.engine.data.TempDataManager;
-import com.demigodsrpg.demigods.engine.language.English;
+import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataType;
+import com.censoredsoftware.infractions.bukkit.legacy.data.TempDataManager;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,7 +22,7 @@ public class FileDataManager extends DataManager
 	// -- VARIABLES -- //
 
 	// Data Folder
-	public static final String SAVE_PATH = DemigodsPlugin.getInst().getDataFolder() + "/data/"; // Don't change this.
+	public static final String SAVE_PATH = InfractionsPlugin.getInst().getDataFolder() + "/data/"; // Don't change this.
 
 	// -- YAML FILES -- //
 
@@ -33,12 +32,6 @@ public class FileDataManager extends DataManager
 
 	// Prevent accidental double init.
 	private static boolean didInit = false;
-
-	@Override
-	protected boolean preInit()
-	{
-		return true;
-	}
 
 	@Override
 	public void init()
@@ -72,18 +65,18 @@ public class FileDataManager extends DataManager
 	{
 		// Kick everyone
 		for(Player player : Bukkit.getOnlinePlayers())
-			player.kickPlayer(ChatColor.GREEN + English.DATA_RESET_KICK.getLine());
+			player.kickPlayer(ChatColor.GREEN + "Resetting data.");
 
 		// Clear the data
 		for(InfractionsFile data : yamlFiles.values())
 			data.clear();
-		TempDataManager.clear();
+		TempDataManager.purge();
 
 		save();
 
 		// Reload the PLUGIN
-		Bukkit.getServer().getPluginManager().disablePlugin(DemigodsPlugin.getInst());
-		Bukkit.getServer().getPluginManager().enablePlugin(DemigodsPlugin.getInst());
+		Bukkit.getServer().getPluginManager().disablePlugin(InfractionsPlugin.getInst());
+		Bukkit.getServer().getPluginManager().enablePlugin(InfractionsPlugin.getInst());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -123,6 +116,6 @@ public class FileDataManager extends DataManager
 	private <K extends Comparable, V extends DataAccess<K, V>> InfractionsFile<K, V> getFile(Class<V> clazz)
 	{
 		if(yamlFiles.containsKey(clazz)) return (InfractionsFile<K, V>) yamlFiles.get(clazz);
-		throw new UnsupportedOperationException("Demigods wants a data type that does not exist.");
+		throw new UnsupportedOperationException("Infractions wants a data type that does not exist.");
 	}
 }

@@ -1,27 +1,22 @@
 package com.censoredsoftware.infractions.bukkit.legacy;
 
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
-import com.censoredsoftware.infractions.bukkit.legacy.util.SaveUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.Updater;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scheduler.BukkitWorker;
 import org.mcstats.MetricsLite;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Map;
 
 public class InfractionsPlugin extends JavaPlugin
 {
-	MiscUtil initialize;
-	SaveUtil SAVE;
-
 	static InfractionsPlugin inst;
 
 	private static ImmutableMap<Integer, String> CHAT_SCORES;
@@ -37,33 +32,20 @@ public class InfractionsPlugin extends JavaPlugin
 		int savefrequency = SettingUtil.getSettingInt("save_interval_seconds") * 20;
 		if(startdelay <= 0) startdelay = 1;
 		if(savefrequency <= 0) savefrequency = 300;
-		// data save
+		// data
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				try
-				{
-					SaveUtil.save(getDataFolder().getPath());
-				}
-				catch(FileNotFoundException e)
-				{
-					e.printStackTrace();
-					getLogger().severe("[Infractions] SaveUtil location error. Screenshot the stack trace and send to HmmmQuestionMark.");
-				}
-				catch(IOException e)
-				{
-					e.printStackTrace();
-					getLogger().severe("[Infractions] SaveUtil write error. Screenshot the stack trace and send to HmmmQuestionMark.");
-				}
+				DataManager.saveAllData();
 			}
 		}, startdelay, savefrequency);
 	}
 
 	public void loadCommands()
 	{
-		CommandHandler ce = new CommandHandler(this);
+		CommandHandler ce = new CommandHandler();
 		// info
 		getCommand("infractions").setExecutor(ce);
 		getCommand("virtues").setExecutor(ce);
@@ -88,27 +70,10 @@ public class InfractionsPlugin extends JavaPlugin
 	@Override
 	public void onDisable()
 	{
-		try
-		{
-			SaveUtil.save(getDataFolder().getPath());
-		}
-		catch(FileNotFoundException e)
-		{
-			e.printStackTrace();
-			getLogger().severe("[Infractions] SaveUtil location error. Screenshot the stack trace and send to HmmmQuestionMark.");
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-			getLogger().severe("[Infractions] SaveUtil write error. Screenshot the stack trace and send to HmmmQuestionMark.");
-		}
-		int c = 0;
-		for(BukkitWorker bw : getServer().getScheduler().getActiveWorkers())
-			if(bw.getOwner().equals(this)) c++;
-		for(BukkitTask bt : getServer().getScheduler().getPendingTasks())
-			if(bt.getOwner().equals(this)) c++;
-		this.getServer().getScheduler().cancelTasks(this);
-		getLogger().info("[Infractions] SaveUtil completed and " + c + " tasks cancelled.");
+		DataManager.saveAllData();
+		HandlerList.unregisterAll(this);
+		Bukkit.getScheduler().cancelTasks(this);
+		getLogger().info("Disabled cleanly.");
 	}
 
 	@Override
@@ -117,14 +82,10 @@ public class InfractionsPlugin extends JavaPlugin
 		inst = this;
 
 		long firstTime = System.currentTimeMillis();
-		getLogger().info("[Infractions] Initializing.");
-		new SettingUtil(this); // #1 (needed for MiscUtil to load)
-		getLogger().info("[Infractions] Updating configuration.");
-		initialize = new MiscUtil(this); // #2 (needed for everything else to work)
-		SAVE = new SaveUtil(getDataFolder().getPath()); // #3 (needed to start save system)
-		loadCommands(); // #5 (needed)
-		loadMetrics(); // #6
-		initializeThreads(); // #7 (regen and etc)
+		getLogger().info("Initializing.");
+		loadCommands();
+		loadMetrics();
+		initializeThreads();
 
 		Map<Integer, String> scores = Maps.newHashMap();
 		for(int i = 1; i < 6; i++)
@@ -134,7 +95,7 @@ public class InfractionsPlugin extends JavaPlugin
 		if(SettingUtil.getSettingBoolean("update"))
 			new Updater(this, 44721, getFile(), Updater.UpdateType.DEFAULT, true);
 
-		getLogger().info("[Infractions] Preparation completed in " + ((double) (System.currentTimeMillis() - firstTime) / 1000) + " seconds.");
+		getLogger().info("Preparation completed in " + ((double) (System.currentTimeMillis() - firstTime) / 1000) + " seconds.");
 	}
 
 	/**

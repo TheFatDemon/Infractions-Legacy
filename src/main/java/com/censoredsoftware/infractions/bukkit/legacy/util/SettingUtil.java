@@ -9,8 +9,14 @@ import java.util.List;
 
 public class SettingUtil
 {
-
 	static InfractionsPlugin plugin;
+
+	static
+	{
+		plugin = InfractionsPlugin.getInst();
+		plugin.getConfig().options().copyDefaults(true);
+		plugin.saveConfig();
+	}
 
 	public static <T> List<T> castList(Class<? extends T> clazz, Collection<?> c)
 	{
@@ -52,12 +58,5 @@ public class SettingUtil
 	{
 		if(plugin.getConfig().isString(id)) return plugin.getConfig().getString(id);
 		else return null;
-	}
-
-	public SettingUtil(InfractionsPlugin instance)
-	{
-		plugin = instance;
-		plugin.getConfig().options().copyDefaults(true);
-		plugin.saveConfig();
 	}
 }
