@@ -1,4 +1,4 @@
-![Infractions](http://i.imgur.com/Bo4OW.png)
+![Infractions](http://censoredsoftware.com/projects/infractions/logo.png)
 
 **Infractions** is a policing plugin for Bukkit based on a number of small warnings given to a player before they are automatically banned.
 
