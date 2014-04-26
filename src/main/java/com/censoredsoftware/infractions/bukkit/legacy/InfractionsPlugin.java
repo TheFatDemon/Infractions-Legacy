@@ -16,6 +16,7 @@
 
 package com.censoredsoftware.infractions.bukkit.legacy;
 
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyData;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
@@ -99,6 +100,8 @@ public class InfractionsPlugin extends JavaPlugin
 
 		long firstTime = System.currentTimeMillis();
 		getLogger().info("Initializing.");
+		DataManager.initAllData();
+		LegacyData.convert();
 		loadCommands();
 		loadMetrics();
 		initializeThreads();

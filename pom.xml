@@ -130,7 +130,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>org.censoredsoftware:infractions-bukkit-api</include>
+                                    <include>com.censoredsoftware:infractions-bukkit-api</include>
                                     <include>org.mcstats.bukkit:metrics-lite</include>
                                     <include>com.rosaloves:bitlyj</include>
                                     <include>com.mojang:AccountsClient</include>
