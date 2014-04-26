@@ -16,7 +16,6 @@
 
 package com.censoredsoftware.infractions.bukkit.legacy;
 
-import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.legacy.data.ServerData;
@@ -27,8 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import java.util.Set;
 
 public class PlayerListener implements Listener
 {
@@ -42,15 +39,6 @@ public class PlayerListener implements Listener
 		{
 			// TODO Consolidate this into some sort of useful notification system.
 			p.sendMessage("This server is policed with infractions.");
-		}
-		if(p.hasPermission("infractions.ignore"))
-		{
-
-			Set<Infraction> infractions = dossier.getInfractions();
-			if(!infractions.isEmpty())
-				for(Infraction infraction : infractions)
-					dossier.acquit(infraction);
-			return;
 		}
 		if(ServerData.exists(p.getName(), "NEWINFRACTION"))
 		{
