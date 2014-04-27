@@ -90,15 +90,15 @@ public class Times
 
 	public static String timeSincePretty(long time)
 	{
-		long diff = (time - System.currentTimeMillis()) / 1000;
+		long diff = (System.currentTimeMillis() - time) / 1000;
 		double day_diff = Math.floor(diff / 86400);
 
-		if(day_diff == 0 && diff < 60) return " in under a minute";
+		if(day_diff == 0 && diff < 60) return "in under a minute";
 		if(diff < 120) return "in 1 minute";
 		if(diff < 3600) return "in " + Math.floor(diff / 60) + " minutes";
 		if(diff < 7200) return "in 1 hour";
 		if(diff < 86400) return "in " + Math.floor(diff / 3600) + " hours";
-		if(day_diff == 1) return "in 1 whole day";
+		if(day_diff == 1) return "in over a day";
 		if(day_diff < 7) return "in " + day_diff + " days";
 		return "in " + Math.ceil(day_diff / 7) + " weeks";
 	}
