@@ -79,7 +79,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 	public static Infraction unserialize(Map<String, Object> map)
 	{
 		UUID playerId = UUID.fromString(map.get("playerId").toString());
-		Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).ISSUER_MAP.get(map.get("issuer").toString()).toIssuer();
+		Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().get(map.get("issuer").toString()).toIssuer();
 		Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
 		String reason = map.get("reason").toString();
 		Integer score = Integer.parseInt(map.get("score").toString());
@@ -88,11 +88,11 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 			@Override
 			public Evidence apply(Map<String, Object> map)
 			{
-				Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).ISSUER_MAP.get(map.get("issuer").toString()).toIssuer();
+				Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().get(map.get("issuer").toString()).toIssuer();
 				EvidenceType type = EvidenceType.valueOf(map.get("type").toString());
-				Long dateCreated = Long.parseLong(map.get("dateCreated").toString());
+				Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
 				String data = map.get("data").toString();
-				return new Evidence(issuer, type, dateCreated, data);
+				return new Evidence(issuer, type, timeCreated, data);
 			}
 		}));
 		List<String> notes = (List<String>) map.get("notes");
@@ -104,7 +104,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 	public static Map<String, Object> serialize(Infraction infraction)
 	{
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("playerId", infraction.getPlayerId());
+		map.put("playerId", infraction.getPlayerId().toString());
 		map.put("issuer", infraction.getIssuer().getId());
 		LegacyIssuer.of(infraction.getIssuer());
 		map.put("timeCreated", infraction.getTimeCreated());
@@ -118,8 +118,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("data", evidence.getRawData());
 				map.put("issuer", evidence.getIssuer().getId());
-				map.put("dateCreated", evidence.getDateCreated());
-				map.put("origin", evidence.getOrigin().getId());
+				map.put("timeCreated", evidence.getTimeCreated());
 				map.put("type", evidence.getType().name());
 				return map;
 			}

@@ -45,14 +45,21 @@ public class MiscUtil
 {
 	static Logger log = InfractionsPlugin.getInst().getLogger();
 
+	public static Integer getMaxScore(UUID mojangId)
+	{
+		if(ServerData.exists(mojangId.toString(), "MAXSCORE"))
+			return (Integer) ServerData.get(mojangId.toString(), "MAXSCORE");
+		return null;
+	}
+
 	public static int getMaxScore(Player p)
 	{
 		int maxScore = SettingUtil.getSettingInt("ban_at_score");
 		if(maxScore < 1) maxScore = 1;
 		else if(maxScore > 20) maxScore = 20;
 		if(p.hasPermission("infractions.*"))
-		{ // '*' Permission check.
-			maxScore = SettingUtil.getSettingInt("ban_at_score");
+		{
+			// do nothing
 		}
 		else if(p.hasPermission("infractions.maxscore.1"))
 		{
@@ -134,6 +141,7 @@ public class MiscUtil
 		{
 			maxScore = 20;
 		}
+		ServerData.put(p.getUniqueId().toString(), "MAXSCORE", maxScore);
 		return maxScore;
 	}
 
@@ -199,7 +207,7 @@ public class MiscUtil
 		if(!SettingUtil.getSettingBoolean("ban") || p.hasPermission("infractions.ignore")) return;
 		if(getMaxScore(p) <= getScore(p) && (!p.hasPermission("infractions.banexempt")))
 		{
-			p.kickPlayer("You have been banned.");
+			p.kickPlayer(ChatColor.DARK_RED + "☠ You have been banned. ☠");
 			try
 			{
 				p.setBanned(true);
@@ -235,12 +243,12 @@ public class MiscUtil
 				}
 				else if(SettingUtil.getSettingBoolean("kick_on_cite"))
 				{
-					player.kickPlayer("You've been cited for " + reason + "."); // Kick a
+					player.kickPlayer(ChatColor.GOLD + "⚠" + ChatColor.WHITE + " You've been cited for " + reason + ".");
 				}
 				else
 				{
-					player.sendMessage(ChatColor.RED + "You've been cited for " + reason + ".");
-					player.sendMessage("Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information."); // Send
+					player.sendMessage(ChatColor.GOLD + "⚠" + ChatColor.RED + " You've been cited for " + reason + ".");
+					player.sendMessage(ChatColor.GOLD + "⚠" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
 				}
 			}
 			catch(NullPointerException e)
@@ -262,6 +270,11 @@ public class MiscUtil
 	public static int getScore(String p)
 	{
 		return Infractions.getCompleteDossier(p).getScore();
+	}
+
+	public static int getScore(UUID id)
+	{
+		return Infractions.getDossier(id).getScore();
 	}
 
 	public static boolean hasPermissionOrOP(Player p, String pe)

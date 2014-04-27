@@ -212,7 +212,7 @@ public class ServerData extends DataAccess<UUID, ServerData>
 		for(ServerData data : findByRow(row))
 			if(data.getColumn().equals(column)) return data;
 
-		throw new NullPointerException("Cannot find timed value at (row: " + row + ", column: " + column + ").");
+		return null;
 	}
 
 	public static Set<ServerData> findByRow(final String row)

@@ -18,12 +18,12 @@ package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.Infractions;
+import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
 import com.censoredsoftware.infractions.bukkit.evidence.EvidenceType;
 import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
 import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
-import com.censoredsoftware.infractions.bukkit.legacy.util.Messages;
 import com.censoredsoftware.library.helper.MojangIdProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -33,24 +33,41 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 @SuppressWarnings({ "ResultOfMethodCallIgnored", "ConstantConditions" })
 public class LegacyData implements Runnable
 {
-	public static void convert()
+	static final Logger log = InfractionsPlugin.getInst().getLogger();
+
+	public static void asyncConvert()
 	{
 		if(InfractionsPlugin.getInst().getConfig().getBoolean("convert"))
 		{
 			// New thread
-			new Thread(new com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyData()).start();
+			new Thread(new LegacyData()).start();
 		}
 	}
 
-	private static Issuer LEGACY_ISSUER = new Issuer(IssuerType.LEGACY, "Legacy");
+	public static void syncConvert()
+	{
+		if(InfractionsPlugin.getInst().getConfig().getBoolean("convert"))
+		{
+			// Main thread
+			new LegacyData().run();
+		}
+	}
+
+	private static Issuer LEGACY_ISSUER = new Issuer(IssuerType.LEGACY, "LEGACY");
 
 	@Override
 	public void run()
 	{
+		log.warning("CONVERTING ALL DATA TO A NEW FORMAT.");
+		log.warning("CONVERTING ALL DATA TO A NEW FORMAT.");
+		log.warning("THIS WILL CAUSE LAG FOR A FEW SECONDS.");
+		log.warning("THIS WILL CAUSE LAG FOR A FEW SECONDS.");
+
 		List<String> playerList = Lists.newArrayList();
 
 		for(Map.Entry<String, HashMap<String, Object>> entry : getLegacyData().entrySet())
@@ -64,11 +81,28 @@ public class LegacyData implements Runnable
 
 		InfractionsPlugin.getInst().getConfig().set("convert", false);
 		InfractionsPlugin.getInst().saveConfig();
+
+		log.warning("CONVERSION COMPLETE.");
+		log.warning("CONVERSION COMPLETE.");
+
+		legacyData.clear();
 	}
 
 	@SuppressWarnings("unchecked")
 	public static void convertLegacyInfraction(String target)
 	{
+		UUID id = MojangIdProvider.getId(target);
+		if(id == null)
+		{
+			log.warning("Is \"" + target + "\" an actual player?");
+			return;
+		}
+
+		Dossier dossier = Infractions.getDossier(id);
+		dossier = dossier.complete(target);
+
+		log.info("Organizing dossier for " + target + ".");
+
 		if(hasData(target, "INFRACTIONS"))
 		{
 			int error = 0;
@@ -96,9 +130,9 @@ public class LegacyData implements Runnable
 							if(!legacyData.substring(0, 1).equals("-")) score = (Integer.parseInt(legacyData.substring(0, 1)));
 							else score = (Integer.parseInt(legacyData.substring(0, 2)));
 
+							// don't convert virtues
 							if(score <= 0) continue;
 
-							UUID id = MojangIdProvider.getId(target);
 							String reason = otherData.get(0);
 							String proof = otherData.get(1);
 							String date = otherData.get(2);
@@ -116,7 +150,7 @@ public class LegacyData implements Runnable
 							if(id != null)
 							{
 								Infraction infraction = new Infraction(id, dateTime != null ? dateTime : System.currentTimeMillis(), reason, score, LEGACY_ISSUER, new Evidence(LEGACY_ISSUER, EvidenceType.UNKNOWN, dateTime != null ? dateTime : System.currentTimeMillis(), proof));
-								Infractions.getDossier(id).cite(infraction);
+								dossier.cite(infraction);
 							}
 						}
 						catch(Exception e)
@@ -127,7 +161,7 @@ public class LegacyData implements Runnable
 					}
 				}
 			}
-			if(error > 0) Messages.warning("Error converting " + error + " of " + count + " infractions for " + target + ".");
+			if(error > 0) log.warning("Error converting " + error + " of " + count + " infractions for " + target + ".");
 		}
 	}
 
@@ -155,13 +189,10 @@ public class LegacyData implements Runnable
 					HashMap<String, Object> cast = (HashMap<String, Object>) result;
 					getLegacyData().put(load, cast);
 					ois.close();
-
-					// Delete legacy information after loading it in.
-					element.delete();
 				}
 				catch(Exception error)
 				{
-					Messages.severe("Deleting corrupt save for player " + load);
+					log.severe("Deleting corrupt save for player " + load);
 					element.delete();
 				}
 			}

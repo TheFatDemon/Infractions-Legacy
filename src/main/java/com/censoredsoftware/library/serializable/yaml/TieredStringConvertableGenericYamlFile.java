@@ -16,7 +16,6 @@
 
 package com.censoredsoftware.library.serializable.yaml;
 
-import com.censoredsoftware.library.serializable.DataSerializable;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -43,7 +42,7 @@ import java.util.concurrent.ConcurrentMap;
  * @param <V> Value type.
  */
 @SuppressWarnings({ "unchecked", "SuspiciousMethodCalls" })
-public abstract class TieredStringConvertableGenericYamlFile<K extends Comparable, V extends DataSerializable> extends YamlConvertible<K, V> implements YamlFile
+public abstract class TieredStringConvertableGenericYamlFile<K extends Comparable, V> extends YamlConvertible<K, V> implements YamlFile
 {
 	/**
 	 * Serialize the data for a specific key (from the loaded data).

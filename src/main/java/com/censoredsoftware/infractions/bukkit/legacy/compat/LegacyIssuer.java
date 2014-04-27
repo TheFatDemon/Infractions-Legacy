@@ -29,6 +29,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemorySection;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,19 +79,16 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 	{
 		IssuerType type = IssuerType.valueOf(map.get("type").toString());
 		String id = map.get("id").toString();
-		Origin origin = new Function<Map<String, Object>, Origin>()
-		{
-
-			@Override
-			public Origin apply(Map<String, Object> map)
-			{
-				String id = map.get("id").toString();
-				String name = map.get("name").toString();
-				OriginType type = OriginType.valueOf(map.get("type").toString());
-				return new Origin(id, name, type);
-			}
-		}.apply((Map<String, Object>) map.get("origin"));
+		Origin origin = unpackOrigin(((MemorySection) map.get("origin")).getValues(true));
 		return new Issuer(type, id, origin);
+	}
+
+	public static Origin unpackOrigin(Map<String, Object> map)
+	{
+		String id = map.get("id").toString();
+		String name = map.get("name").toString();
+		OriginType type = OriginType.valueOf(map.get("type").toString());
+		return new Origin(id, name, type);
 	}
 
 	public static Map<String, Object> serialize(Issuer issuer)
@@ -114,7 +112,7 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 
 	public static Issuer of(final String id)
 	{
-		LegacyIssuer issuer = Iterables.find(((LegacyDatabase) Infractions.getDatabase()).ISSUER_MAP.values(), new Predicate<LegacyIssuer>()
+		LegacyIssuer issuer = Iterables.find(((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().values(), new Predicate<LegacyIssuer>()
 		{
 			@Override
 			public boolean apply(LegacyIssuer legacyIssuer)
@@ -128,7 +126,7 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 	public static LegacyIssuer of(Issuer issuer)
 	{
 		LegacyIssuer legacyIssuer = new LegacyIssuer(issuer);
-		((LegacyDatabase) Infractions.getDatabase()).ISSUER_MAP.putIfAbsent(issuer.getId(), legacyIssuer);
+		((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().putIfAbsent(issuer.getId(), legacyIssuer);
 		return legacyIssuer;
 	}
 }

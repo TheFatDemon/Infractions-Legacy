@@ -21,6 +21,7 @@ import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.library.helper.MojangIdProvider;
 import com.google.common.collect.Sets;
 import org.bukkit.entity.Player;
@@ -28,20 +29,30 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class LegacyDatabase implements Database
 {
-	final ConcurrentMap<UUID, Dossier> DOSSIER_MAP = new ConcurrentHashMap<UUID, Dossier>();
-	final ConcurrentMap<String, LegacyIssuer> ISSUER_MAP = new ConcurrentHashMap<String, LegacyIssuer>();
-	final ConcurrentMap<String, LegacyInfraction> INFRACTION_MAP = new ConcurrentHashMap<String, LegacyInfraction>();
+	ConcurrentMap<UUID, Dossier> getDossierMap()
+	{
+		return DataManager.getManager().getMapFor(LegacyDossier.class);
+	}
+
+	ConcurrentMap<String, LegacyInfraction> getInfractionMap()
+	{
+		return DataManager.getManager().getMapFor(LegacyInfraction.class);
+	}
+
+	ConcurrentMap<String, LegacyIssuer> getIssuerMap()
+	{
+		return DataManager.getManager().getMapFor(LegacyIssuer.class);
+	}
 
 	@Override
 	public CompleteDossier getCompleteDossier(UUID playerId) throws NullPointerException
 	{
 		Dossier dossier = getDossier(playerId);
-		if(dossier instanceof CompleteDossier) return (CompleteDossier) dossier;
+		if(dossier instanceof LegacyCompleteDossier) return (CompleteDossier) dossier;
 		throw new NullPointerException("Incomplete dossier.");
 	}
 
@@ -51,7 +62,9 @@ public class LegacyDatabase implements Database
 		UUID id = MojangIdProvider.getId(playerName);
 		if(id != null)
 		{
-			DOSSIER_MAP.putIfAbsent(id, new LegacyCompleteDossier(id, playerName));
+			Dossier dossier = getDossier(id);
+			if(!(dossier instanceof LegacyCompleteDossier))
+				getDossierMap().put(id, dossier.complete(playerName));
 			return getCompleteDossier(id);
 		}
 		throw new NullPointerException("No such player exists.");
@@ -66,8 +79,9 @@ public class LegacyDatabase implements Database
 	@Override
 	public Dossier getDossier(UUID playerId)
 	{
-		DOSSIER_MAP.putIfAbsent(playerId, new LegacyDossier(playerId));
-		return DOSSIER_MAP.get(playerId);
+		if(playerId == null) return null;
+		getDossierMap().putIfAbsent(playerId, new LegacyDossier(playerId));
+		return getDossierMap().get(playerId);
 	}
 
 	@Override
@@ -82,25 +96,25 @@ public class LegacyDatabase implements Database
 	@Override
 	public void addDossier(Dossier dossier)
 	{
-		DOSSIER_MAP.put(dossier.getId(), dossier);
+		getDossierMap().put(dossier.getId(), dossier);
 	}
 
 	@Override
 	public void removeDossier(Dossier dossier)
 	{
-		DOSSIER_MAP.remove(dossier.getId());
+		getDossierMap().remove(dossier.getId());
 	}
 
 	@Override
 	public void removeDossier(UUID playerId)
 	{
-		DOSSIER_MAP.remove(playerId);
+		getDossierMap().remove(playerId);
 	}
 
 	@Override
 	public Set<Dossier> allDossiers()
 	{
-		return Sets.newHashSet(DOSSIER_MAP.values());
+		return Sets.newHashSet(getDossierMap().values());
 	}
 
 	@Override

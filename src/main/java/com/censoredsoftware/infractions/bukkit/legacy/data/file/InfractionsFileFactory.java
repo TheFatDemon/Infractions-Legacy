@@ -59,17 +59,17 @@ public class InfractionsFileFactory
 	 * @param filePath  The path to the file directory.
 	 * @return A new DemigodsFile object.
 	 */
-	public static <K extends Comparable, V extends DataAccess<K, V>> InfractionsFile<K, V> create(final IdType idType, final Class<V> dataClass, String abbr, String filePath)
+	public static <K extends Comparable, V extends DataAccess<K, V>, I> InfractionsFile<K, V, I> create(final IdType idType, final Class<V> dataClass, String abbr, String filePath)
 	{
 		// Check for void type.
 		if(IdType.VOID.equals(idType)) return null;
 
 		// Construct a new Infractions File from the abbreviation, file extension, and file directory path.
-		return new InfractionsFile<K, V>(abbr, ".know", filePath)
+		return new InfractionsFile<K, V, I>(abbr, ".know", filePath)
 		{
 			// Overridden method to create an new data object from the file data.
 			@Override
-			public V valueFromData(String stringId, ConfigurationSection conf)
+			public I valueFromData(String stringId, ConfigurationSection conf)
 			{
 				try
 				{
@@ -89,7 +89,7 @@ public class InfractionsFileFactory
 							throw new RuntimeException("The defined constructor for a data file is invalid.");
 
 						// Everything looks perfect so far. Last thing to do is construct a new instance.
-						return (V) method.invoke(null, keyFromString(stringId), conf);
+						return (I) method.invoke(null, keyFromString(stringId), conf);
 					}
 					throw new RuntimeException("Demigods was unable to find a constructor for one of its data types.");
 				}

@@ -19,11 +19,11 @@ package com.censoredsoftware.infractions.bukkit.legacy;
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
-import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.legacy.util.*;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -31,7 +31,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class CommandHandler implements CommandExecutor
@@ -58,9 +58,6 @@ public class CommandHandler implements CommandExecutor
 				MiscUtil.sendMessage(p, ChatColor.GRAY + "/history [player]");
 				MiscUtil.sendMessage(p, ChatColor.GRAY + "/infractions types " + ChatColor.WHITE + "- Shows all valid infraction types.");
 				MiscUtil.sendMessage(p, ChatColor.GRAY + "/virtues " + ChatColor.WHITE + "- Shows all valid virtue types.");
-				MiscUtil.sendMessage(p, ChatColor.AQUA + "Using the GNU " + ChatColor.DARK_AQUA + "Affero" + ChatColor.AQUA + " General Public License.");
-				MiscUtil.sendMessage(p, ChatColor.AQUA + "Read the AGPL at " + ChatColor.YELLOW + "http://bit.ly/TLY1xB");
-				MiscUtil.sendMessage(p, ChatColor.AQUA + "Source: " + ChatColor.YELLOW + "https://github.com/Clashnia/Infractions");
 				return true;
 			}
 			else if(args[0].equalsIgnoreCase("types"))
@@ -205,33 +202,46 @@ public class CommandHandler implements CommandExecutor
 					return true;
 				}
 
-				p.performCommand("/history " + p.getName());
+				p.performCommand("history " + p.getName());
 				return true;
 			}
 			if((p == null) && !(args.length == 1))
 			{
-				log.info("import com.demigodsrpg.game.*;You must provide a username in the console.");
+				log.info("You must provide a username in the console.");
 				return false;
 			}
-			if(MiscUtil.hasPermissionOrOP(p, "infractions.mod"))
+
+			if(!MiscUtil.hasPermissionOrOP(p, "infractions.mod") && !p.getName().toLowerCase().equals(args[0]))
 			{
-				/**
-				 * DISPLAY ALL CURRENT INFRACTIONS
-				 */
+				p.sendMessage(ChatColor.RED + "You don't have permission to do that.");
+				return true;
+			}
+
+			/**
+			 * DISPLAY ALL CURRENT INFRACTIONS
+			 */
+
+			String player = MiscUtil.getInfractionsPlayer(args[0]);
+			if(player != null)
+			{
+				Integer maxScore = MiscUtil.getMaxScore(Infractions.getCompleteDossier(player).getId());
+				String chatLevel = InfractionsPlugin.getLevelForChat(player);
+				MiscUtil.sendMessage(p, ChatColor.WHITE + (chatLevel.equals("") ? "" : chatLevel + " ") + ChatColor.YELLOW + player + ChatColor.WHITE + " - " + MiscUtil.getScore(player) + (maxScore == null ? " points towards a ban." : "points out of " + maxScore + " until a ban."));
+
 				try
 				{
-					MiscUtil.sendMessage(p, ChatColor.WHITE + "--- " + ChatColor.YELLOW + MiscUtil.getInfractionsPlayer(args[0]) + ChatColor.WHITE + " - " + MiscUtil.getScore(MiscUtil.getInfractionsPlayer(args[0])) + "/" + MiscUtil.getMaxScore(Bukkit.getPlayer(MiscUtil.getInfractionsPlayer(args[0]))) + " ---");
-				}
-				catch(NullPointerException e)
-				{
-					MiscUtil.sendMessage(p, ChatColor.WHITE + "--- " + ChatColor.YELLOW + MiscUtil.getInfractionsPlayer(args[0]) + ChatColor.WHITE + " - " + MiscUtil.getScore(MiscUtil.getInfractionsPlayer(args[0])) + " ---");
-				}
-				try
-				{
-					for(Infraction infraction : Infractions.getCompleteDossier(MiscUtil.getInfractionsPlayer(args[0])).getInfractions())
+					boolean staff = MiscUtil.hasPermissionOrOP(p, "infractions.mod");
+					Set<Infraction> infractions = Infractions.getCompleteDossier(player).getInfractions();
+					if(infractions.isEmpty())
 					{
-						MiscUtil.sendMessage(p, infraction.getScore() + " - " + infraction.getReason() + " - " + infraction.getDateCreated());
-						MiscUtil.sendMessage(p, " -- Proof: " + ChatColor.GRAY + Iterables.getFirst(Collections2.transform(infraction.getEvidence(), new Function<Evidence, Object>()
+						MiscUtil.sendMessage(p, ChatColor.DARK_GREEN + "✔ " + ChatColor.WHITE + " No infractions found for this player.");
+						return true;
+					}
+					for(Infraction infraction : infractions)
+					{
+						MiscUtil.sendMessage(p, ChatColor.DARK_RED + "✘ " + ChatColor.DARK_AQUA + StringUtils.capitalize(infraction.getReason()) + ChatColor.GRAY + " - " + ChatColor.WHITE + infraction.getDateCreated());
+						MiscUtil.sendMessage(p, ChatColor.GRAY + "     Score: " + ChatColor.WHITE + infraction.getScore());
+						MiscUtil.sendMessage(p, ChatColor.GRAY + "     Proof: " + ChatColor.WHITE + Iterables.getFirst(Collections2.transform(infraction.getEvidence(), new Function<Evidence, Object>()
 						{
 							@Override
 							public String apply(Evidence evidence)
@@ -239,24 +249,11 @@ public class CommandHandler implements CommandExecutor
 								return evidence.getRawData();
 							}
 						}), "No Proof."));
-						if(MiscUtil.hasPermissionOrOP(p, "infractions.mod"))
+						if(staff)
 						{
 							String id = MiscUtil.getInfractionId(infraction);
-							MiscUtil.sendMessage(p, " -- Key: " + ChatColor.GOLD + id);
-
-							Issuer issuer = infraction.getIssuer();
-							String issuerId;
-							try
-							{
-								issuerId = Infractions.getCompleteDossier(UUID.fromString(issuer.getId())).getLastKnownName();
-							}
-							catch(Exception oops)
-							{
-								issuerId = issuer.getId();
-							}
-
-							MiscUtil.sendMessage(p, " -- Issuer: " + ChatColor.GREEN + issuerId);
-							MiscUtil.sendMessage(p, " -- Origin: " + ChatColor.AQUA + infraction.getOrigin().getName());
+							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Key: " + ChatColor.WHITE + id);
+							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Issuer: " + ChatColor.WHITE + infraction.getIssuer().getId());
 						}
 					}
 					return true;
@@ -265,6 +262,11 @@ public class CommandHandler implements CommandExecutor
 				{
 					return true;
 				}
+			}
+			else
+			{
+				MiscUtil.sendMessage(p, "No player found with that name.");
+				return true;
 			}
 		}
 		else if(c.getName().equalsIgnoreCase("clearhistory") && p != null && p.hasPermission("infractions.clearhistory") && args.length > 0)

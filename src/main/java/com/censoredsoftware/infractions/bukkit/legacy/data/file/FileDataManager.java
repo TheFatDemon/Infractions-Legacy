@@ -97,23 +97,23 @@ public class FileDataManager extends DataManager
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <K extends Comparable, V extends DataAccess<K, V>> V getFor(final Class<V> clazz, final K key)
+	public <K extends Comparable, V extends DataAccess<K, V>, I> I getFor(final Class<V> clazz, final K key)
 	{
-		if(getFile(clazz).containsKey(key)) return getFile(clazz).get(key);
+		if(getFile(clazz).containsKey(key)) return (I) getFile(clazz).get(key);
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <K extends Comparable, V extends DataAccess<K, V>> Collection<V> getAllOf(final Class<V> clazz)
+	public <K extends Comparable, V extends DataAccess<K, V>, I> Collection<I> getAllOf(final Class<V> clazz)
 	{
-		return getFile(clazz).values();
+		return (Collection<I>) getFile(clazz).values();
 	}
 
 	@Override
-	public <K extends Comparable, V extends DataAccess<K, V>> ConcurrentMap<K, V> getMapFor(final Class<V> clazz)
+	public <K extends Comparable, V extends DataAccess<K, V>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz)
 	{
-		return getFile(clazz).getLoadedData();
+		return (ConcurrentMap<K, I>) getFile(clazz).getLoadedData();
 	}
 
 	@Override
@@ -129,9 +129,9 @@ public class FileDataManager extends DataManager
 	}
 
 	@SuppressWarnings("unchecked")
-	private <K extends Comparable, V extends DataAccess<K, V>> InfractionsFile<K, V> getFile(Class<V> clazz)
+	private <K extends Comparable, V extends DataAccess<K, V>, I> InfractionsFile<K, V, I> getFile(Class<V> clazz)
 	{
-		if(yamlFiles.containsKey(clazz)) return (InfractionsFile<K, V>) yamlFiles.get(clazz);
+		if(yamlFiles.containsKey(clazz)) return (InfractionsFile<K, V, I>) yamlFiles.get(clazz);
 		throw new UnsupportedOperationException("Infractions wants a data type that does not exist.");
 	}
 }

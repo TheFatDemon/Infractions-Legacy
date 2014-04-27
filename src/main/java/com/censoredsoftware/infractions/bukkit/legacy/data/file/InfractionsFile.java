@@ -31,10 +31,10 @@ import java.util.concurrent.ConcurrentMap;
  * @param <K> The id type.
  * @param <V> The data type.
  */
-public abstract class InfractionsFile<K extends Comparable, V extends DataAccess<K, V>> extends TieredStringConvertableGenericYamlFile<K, V>
+public abstract class InfractionsFile<K extends Comparable, V extends DataAccess<K, V>, I> extends TieredStringConvertableGenericYamlFile<K, I>
 {
 	private final String fileName, fileType, savePath;
-	ConcurrentMap<K, V> dataStore = Maps.newConcurrentMap();
+	ConcurrentMap<K, I> dataStore = Maps.newConcurrentMap();
 
 	public InfractionsFile(String fileName, String fileType, String savePath)
 	{
@@ -44,7 +44,7 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 	}
 
 	@Override
-	public final ConcurrentMap<K, V> getLoadedData()
+	public final ConcurrentMap<K, I> getLoadedData()
 	{
 		return dataStore;
 	}
@@ -52,7 +52,7 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 	@Override
 	public final Map<String, Object> serialize(K id)
 	{
-		return getLoadedData().get(id).serialize();
+		return ((V) getLoadedData().get(id)).serialize();
 	}
 
 	@Override
@@ -78,12 +78,12 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 		return key != null && dataStore.containsKey(key);
 	}
 
-	public final V get(K key)
+	public final I get(K key)
 	{
 		return dataStore.get(key);
 	}
 
-	public final void put(K key, V value)
+	public final void put(K key, I value)
 	{
 		dataStore.put(key, value);
 	}
@@ -93,12 +93,12 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 		dataStore.remove(key);
 	}
 
-	public final Set<Map.Entry<K, V>> entrySet()
+	public final Set<Map.Entry<K, I>> entrySet()
 	{
 		return dataStore.entrySet();
 	}
 
-	public final Collection<V> values()
+	public final Collection<I> values()
 	{
 		return dataStore.values();
 	}

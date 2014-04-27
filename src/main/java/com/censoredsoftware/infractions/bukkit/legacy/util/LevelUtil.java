@@ -26,9 +26,7 @@ import java.util.logging.Logger;
 
 public class LevelUtil
 {
-
-	static InfractionsPlugin plugin;
-	static Logger log = plugin.getLogger();
+	static Logger log = InfractionsPlugin.getInst().getLogger();
 	static File f = new File("plugins" + File.separator + "Infractions" + File.separator + "config.yml");
 	static FileConfiguration config = YamlConfiguration.loadConfiguration(f);
 
@@ -79,10 +77,9 @@ public class LevelUtil
 		return level5;
 	}
 
-	public LevelUtil(InfractionsPlugin instance)
+	public LevelUtil()
 	{
-		plugin = instance;
-		plugin.getConfig().options().copyDefaults(true);
-		plugin.saveConfig();
+		InfractionsPlugin.getInst().getConfig().options().copyDefaults(true);
+		InfractionsPlugin.getInst().saveConfig();
 	}
 }

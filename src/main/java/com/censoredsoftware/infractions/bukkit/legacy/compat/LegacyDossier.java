@@ -56,7 +56,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 			public String apply(Infraction infraction)
 			{
 				String id = MiscUtil.getInfractionId(infraction);
-				((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.put(id, LegacyInfraction.of(infraction));
+				((LegacyDatabase) Infractions.getDatabase()).getInfractionMap().put(id, LegacyInfraction.of(infraction));
 				return id;
 			}
 		}));
@@ -91,7 +91,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 			@Override
 			public Infraction apply(String s)
 			{
-				return ((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.get(s).toInfraction();
+				return ((LegacyDatabase) Infractions.getDatabase()).getInfractionMap().get(s).toInfraction();
 			}
 		}));
 	}
@@ -100,7 +100,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public void cite(Infraction infraction)
 	{
 		String id = MiscUtil.getInfractionId(infraction);
-		((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.put(id, LegacyInfraction.of(infraction));
+		((LegacyDatabase) Infractions.getDatabase()).getInfractionMap().put(id, LegacyInfraction.of(infraction));
 		infractions.add(id);
 	}
 
@@ -108,14 +108,16 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public void acquit(Infraction infraction)
 	{
 		String id = MiscUtil.getInfractionId(infraction);
-		((LegacyDatabase) Infractions.getDatabase()).INFRACTION_MAP.remove(id);
+		((LegacyDatabase) Infractions.getDatabase()).getInfractionMap().remove(id);
 		infractions.remove(id);
 	}
 
 	@Override
 	public CompleteDossier complete(String playerName)
 	{
-		return new LegacyCompleteDossier(getId(), playerName, getInfractions());
+		CompleteDossier dossier = new LegacyCompleteDossier(getId(), playerName, getInfractions());
+		((LegacyDatabase) Infractions.getDatabase()).getDossierMap().put(getId(), dossier);
+		return dossier;
 	}
 
 	@Override
@@ -130,9 +132,11 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 		Map<String, Object> map = new HashMap<String, Object>();
 		if(lastKnownName != null) map.put("lastKnownName", lastKnownName);
 
-		List<String> infractionList = Lists.newArrayList(infractions);
+		List<String> infractionList;
+		if(infractions != null) infractionList = Lists.newArrayList(infractions);
+		else infractionList = Lists.newArrayList();
 
-		if(!infractionList.isEmpty()) map.put("infractions", infractionList);
+		map.put("infractions", infractionList);
 
 		return map;
 	}
@@ -141,7 +145,6 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public static Dossier unserialize(UUID id, Map<String, Object> map)
 	{
 		LegacyDossier dossier;
-		if(map.isEmpty()) return Infractions.getDossier(id);
 		if(map.containsKey("lastKnownName"))
 		{
 			dossier = new LegacyCompleteDossier();
@@ -152,6 +155,8 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 		{
 			dossier.infractions = Sets.newHashSet((List<String>) map.get("infractions"));
 		}
+		else dossier.infractions = Sets.newHashSet();
+		dossier.mojangid = id;
 		return dossier;
 	}
 }

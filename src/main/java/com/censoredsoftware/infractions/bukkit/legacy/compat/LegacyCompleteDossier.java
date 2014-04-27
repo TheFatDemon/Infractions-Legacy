@@ -19,6 +19,7 @@ package com.censoredsoftware.infractions.bukkit.legacy.compat;
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.google.common.collect.Sets;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import java.util.Set;
@@ -43,9 +44,9 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 	}
 
 	@Override
-	public OfflinePlayer getOfflinePlayer() throws IllegalStateException
+	public OfflinePlayer getOfflinePlayer()
 	{
-		throw new IllegalStateException("This is a test case, no server is running.");
+		return Bukkit.getOfflinePlayer(lastKnownName);
 	}
 
 	@Override

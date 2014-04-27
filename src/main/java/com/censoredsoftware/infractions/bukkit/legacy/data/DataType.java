@@ -31,17 +31,17 @@ import java.util.Arrays;
 public enum DataType
 {
 	/**
-	 * Dossier.
+	 * Issuer.
 	 */
-	DOSSIER(LegacyDossier.class, IdType.UUID, "dos"),
+	ISSUER(LegacyIssuer.class, IdType.STRING, "iss"),
 	/**
 	 * Infraction.
 	 */
 	INFRACTION(LegacyInfraction.class, IdType.STRING, "inf"),
 	/**
-	 * Issuer.
+	 * Dossier.
 	 */
-	ISSUER(LegacyIssuer.class, IdType.STRING, "iss"),
+	DOSSIER(LegacyDossier.class, IdType.UUID, "dos"),
 	/**
 	 * ServerData.
 	 */

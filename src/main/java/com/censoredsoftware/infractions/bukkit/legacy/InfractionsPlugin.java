@@ -16,21 +16,30 @@
 
 package com.censoredsoftware.infractions.bukkit.legacy;
 
+import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyData;
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDatabase;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.util.LevelUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.Updater;
+import com.censoredsoftware.infractions.bukkit.origin.Origin;
+import com.censoredsoftware.infractions.bukkit.origin.OriginType;
+import com.censoredsoftware.library.helper.MojangIdProvider;
+import com.censoredsoftware.library.util.Times;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.MetricsLite;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class InfractionsPlugin extends JavaPlugin
 {
@@ -58,6 +67,12 @@ public class InfractionsPlugin extends JavaPlugin
 				DataManager.saveAllData();
 			}
 		}, startdelay, savefrequency);
+	}
+
+	public void loadListeners()
+	{
+		PluginManager manager = Bukkit.getPluginManager();
+		manager.registerEvents(new PlayerListener(), this);
 	}
 
 	public void loadCommands()
@@ -98,11 +113,19 @@ public class InfractionsPlugin extends JavaPlugin
 	{
 		inst = this;
 
+		// Setup database
+		Infractions.setDatabase(new LegacyDatabase());
+		Infractions.setDefaultOrigin(new Origin(Bukkit.getServerName(), Bukkit.getServerName(), OriginType.SERVER));
+
+		//LevelUtil
+		new LevelUtil();
+
 		long firstTime = System.currentTimeMillis();
 		getLogger().info("Initializing.");
 		DataManager.initAllData();
-		LegacyData.convert();
+		LegacyData.syncConvert();
 		loadCommands();
+		loadListeners();
 		loadMetrics();
 		initializeThreads();
 
@@ -114,7 +137,7 @@ public class InfractionsPlugin extends JavaPlugin
 		if(SettingUtil.getSettingBoolean("update"))
 			new Updater(this, 44721, getFile(), Updater.UpdateType.DEFAULT, true);
 
-		getLogger().info("Preparation completed in " + ((double) (System.currentTimeMillis() - firstTime) / 1000) + " seconds.");
+		getLogger().info("Preparation completed " + Times.timeSincePretty(firstTime) + ".");
 	}
 
 	/**
@@ -123,8 +146,22 @@ public class InfractionsPlugin extends JavaPlugin
 	public static String getLevelForChat(Player player)
 	{
 		if(player.hasPermission("infractions.ignore")) return SettingUtil.getSettingString("chat_score_ignore");
-		double scoreRange = MiscUtil.getMaxScore(player) / 5.0;
-		int chatScore = (int) ((MiscUtil.getScore(player) != 0 ? MiscUtil.getScore(player) : 1) / scoreRange);
+		return getLevelForChat(player.getUniqueId());
+	}
+
+	public static String getLevelForChat(String playerName)
+	{
+		UUID id = MojangIdProvider.getId(playerName);
+		if(id != null) return getLevelForChat(id);
+		return "";
+	}
+
+	public static String getLevelForChat(UUID mojangId)
+	{
+		Integer maxScore = MiscUtil.getMaxScore(mojangId);
+		if(maxScore == null) return "";
+		double scoreRange = maxScore / 5.0;
+		int chatScore = (int) ((MiscUtil.getScore(mojangId) != 0 ? MiscUtil.getScore(mojangId) : 1) / scoreRange);
 		if(chatScore < 1) chatScore = 1;
 		if(chatScore > 5) chatScore = 5;
 		return CHAT_SCORES.get(chatScore);

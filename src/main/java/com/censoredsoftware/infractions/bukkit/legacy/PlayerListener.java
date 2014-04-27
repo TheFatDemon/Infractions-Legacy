@@ -17,7 +17,6 @@
 package com.censoredsoftware.infractions.bukkit.legacy;
 
 import com.censoredsoftware.infractions.bukkit.Infractions;
-import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.legacy.data.ServerData;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
@@ -26,25 +25,32 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 public class PlayerListener implements Listener
 {
+	public void onPlayerConnect(PlayerLoginEvent e)
+	{
+		// Create data that we track
+		Infractions.getCompleteDossier(e.getPlayer());
+		MiscUtil.getMaxScore(e.getPlayer());
+	}
+
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e)
 	{
 		// sync to master file
 		final Player p = e.getPlayer();
-		Dossier dossier = Infractions.getCompleteDossier(p);
 		if(SettingUtil.getSettingBoolean("motd"))
 		{
 			// TODO Consolidate this into some sort of useful notification system.
-			p.sendMessage("This server is policed with infractions.");
+			p.sendMessage(ChatColor.YELLOW + "⚠" + ChatColor.WHITE + " This server is policed with infractions.");
 		}
 		if(ServerData.exists(p.getName(), "NEWINFRACTION"))
 		{
 			if((Boolean) ServerData.get(p.getName(), "NEWINFRACTION"))
 			{
-				p.sendMessage(ChatColor.RED + "You have a new infraction!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
+				p.sendMessage(ChatColor.YELLOW + "⚠" + ChatColor.RED + " You have a new infraction!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
 				ServerData.remove(p.getName(), "NEWINFRACTION");
 			}
 		}
@@ -52,7 +58,7 @@ public class PlayerListener implements Listener
 		{
 			if((Boolean) ServerData.get(p.getName(), "NEWVIRTUE"))
 			{
-				p.sendMessage(ChatColor.RED + "You have a new virtue!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
+				p.sendMessage(ChatColor.DARK_AQUA + "✉" + ChatColor.RED + " You have a new virtue!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
 				ServerData.remove(p.getName(), "NEWVIRTUE");
 			}
 		}

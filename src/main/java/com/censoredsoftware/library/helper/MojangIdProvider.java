@@ -49,6 +49,8 @@ public class MojangIdProvider
 	 */
 	public static UUID getId(String playerName)
 	{
+		if(playerName == null) throw new NullPointerException("Cannot find a player id from null.");
+
 		// Check if we already know this id, of if the name actually belongs to a player.
 		if(CACHE.containsKey(playerName)) return CACHE.get(playerName);
 
