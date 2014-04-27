@@ -67,21 +67,21 @@ public class LegacyData implements Runnable
 		log.warning("CONVERTING ALL DATA TO A NEW FORMAT.");
 		log.warning("THIS WILL CAUSE LAG FOR A FEW SECONDS.");
 		log.warning("THIS WILL CAUSE LAG FOR A FEW SECONDS.");
+		log.warning("--------------------------------------");
 
-		List<String> playerList = Lists.newArrayList();
-
-		for(Map.Entry<String, HashMap<String, Object>> entry : getLegacyData().entrySet())
-			playerList.add(entry.getKey());
+		List<String> playerList = Lists.newArrayList(getLegacyData().keySet());
 
 		// Don't convert if no suitable data is found
-		if(playerList.isEmpty()) return;
+		if(!playerList.isEmpty())
+		{
+			for(String aPlayerList : playerList)
+				convertLegacyInfraction(aPlayerList);
 
-		for(String target : playerList)
-			convertLegacyInfraction(target);
+			InfractionsPlugin.getInst().getConfig().set("convert", false);
+			InfractionsPlugin.getInst().saveConfig();
+		}
 
-		InfractionsPlugin.getInst().getConfig().set("convert", false);
-		InfractionsPlugin.getInst().saveConfig();
-
+		log.warning("--------------------");
 		log.warning("CONVERSION COMPLETE.");
 		log.warning("CONVERSION COMPLETE.");
 

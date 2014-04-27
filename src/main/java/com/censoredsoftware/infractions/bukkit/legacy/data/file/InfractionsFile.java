@@ -20,6 +20,7 @@ import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
 import com.censoredsoftware.library.serializable.yaml.TieredStringConvertableGenericYamlFile;
 import com.google.common.collect.Maps;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -33,14 +34,23 @@ import java.util.concurrent.ConcurrentMap;
  */
 public abstract class InfractionsFile<K extends Comparable, V extends DataAccess<K, V>, I> extends TieredStringConvertableGenericYamlFile<K, I>
 {
+	private final String name;
 	private final String fileName, fileType, savePath;
 	ConcurrentMap<K, I> dataStore = Maps.newConcurrentMap();
+	Method valueConstructor;
 
-	public InfractionsFile(String fileName, String fileType, String savePath)
+	public InfractionsFile(String fileName, String fileType, String savePath, String name, Method valueConstructor)
 	{
 		this.fileName = fileName;
 		this.fileType = fileType;
 		this.savePath = savePath;
+		this.name = name;
+		this.valueConstructor = valueConstructor;
+	}
+
+	public final String getName()
+	{
+		return name;
 	}
 
 	@Override
@@ -49,6 +59,7 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 		return dataStore;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public final Map<String, Object> serialize(K id)
 	{

@@ -16,6 +16,7 @@
 
 package com.censoredsoftware.library.serializable.yaml;
 
+import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -71,6 +72,12 @@ public abstract class TieredStringConvertableGenericYamlFile<K extends Comparabl
 		{
 			try
 			{
+				V v = valueFromData(stringId, data.getConfigurationSection(stringId));
+				if(v == null)
+				{
+					InfractionsPlugin.getInst().getLogger().warning("Corrupt: " + stringId + ", in file: " + getFullFileName());
+					continue;
+				}
 				map.put(keyFromString(stringId), valueFromData(stringId, data.getConfigurationSection(stringId)));
 			}
 			catch(Exception ignored)

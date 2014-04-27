@@ -78,35 +78,42 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 	@SuppressWarnings("unchecked")
 	public static Infraction unserialize(Map<String, Object> map)
 	{
-		UUID playerId = UUID.fromString(map.get("playerId").toString());
-		Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().get(map.get("issuer").toString()).toIssuer();
-		Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
-		String reason = map.get("reason").toString();
-		Integer score = Integer.parseInt(map.get("score").toString());
-		Set<Evidence> evidence = Sets.newHashSet(Collections2.transform((List<Map<String, Object>>) map.get("evidence"), new Function<Map<String, Object>, Evidence>()
+		try
 		{
-			@Override
-			public Evidence apply(Map<String, Object> map)
+			UUID playerId = UUID.fromString(map.get("playerId").toString());
+			Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().get(map.get("issuer").toString()).toIssuer();
+			Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
+			String reason = map.get("reason").toString();
+			Integer score = Integer.parseInt(map.get("score").toString());
+			Set<Evidence> evidence = Sets.newHashSet(Collections2.transform((List<Map<String, Object>>) map.get("evidence"), new Function<Map<String, Object>, Evidence>()
 			{
-				Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().get(map.get("issuer").toString()).toIssuer();
-				EvidenceType type = EvidenceType.valueOf(map.get("type").toString());
-				Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
-				String data = map.get("data").toString();
-				return new Evidence(issuer, type, timeCreated, data);
-			}
-		}));
-		List<String> notes = (List<String>) map.get("notes");
-		Infraction infraction = new Infraction(playerId, timeCreated, reason, score, issuer, evidence);
-		infraction.setNotes(notes);
-		return infraction;
+				@Override
+				public Evidence apply(Map<String, Object> map)
+				{
+					Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().get(map.get("issuer").toString()).toIssuer();
+					EvidenceType type = EvidenceType.valueOf(map.get("type").toString());
+					Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
+					String data = map.get("data").toString();
+					return new Evidence(issuer, type, timeCreated, data);
+				}
+			}));
+			List<String> notes = (List<String>) map.get("notes");
+			Infraction infraction = new Infraction(playerId, timeCreated, reason, score, issuer, evidence);
+			infraction.setNotes(notes);
+			return infraction;
+		}
+		catch(NullPointerException ex)
+		{
+			return null;
+		}
 	}
 
 	public static Map<String, Object> serialize(Infraction infraction)
 	{
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("playerId", infraction.getPlayerId().toString());
-		map.put("issuer", infraction.getIssuer().getId());
 		LegacyIssuer.of(infraction.getIssuer());
+		map.put("issuer", infraction.getIssuer().getId());
 		map.put("timeCreated", infraction.getTimeCreated());
 		map.put("reason", infraction.getReason());
 		map.put("score", infraction.getScore());

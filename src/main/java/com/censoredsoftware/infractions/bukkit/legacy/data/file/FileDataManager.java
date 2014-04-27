@@ -55,14 +55,29 @@ public class FileDataManager extends DataManager
 		// Check if init has happened already...
 		if(didInit) throw new RuntimeException("Data tried to initialize more than once.");
 
-		// Create/Load YAML files.
+		// Create YAML files.
 		yamlFiles = Maps.newConcurrentMap();
-		for(Class clazz : DataType.classes())
+		for(DataType dataType : DataType.values())
 		{
-			InfractionsFile file = InfractionsFileFactory.create(DataType.typeFromClass(clazz), SAVE_PATH);
+			InfractionsFile file = InfractionsFileFactory.create(dataType, SAVE_PATH);
 			if(file == null) continue;
-			file.loadDataFromFile();
-			yamlFiles.put(clazz, file);
+			InfractionsPlugin.getInst().getLogger().info("Marked \"" + dataType.name() + "\" for data import.");
+			yamlFiles.put(dataType.getDataClass(), file);
+		}
+
+		// Load YAML files.
+		for(InfractionsFile file : yamlFiles.values())
+		{
+			try
+			{
+				file.loadDataFromFile();
+			}
+			catch(Exception ex)
+			{
+				InfractionsPlugin.getInst().getLogger().severe("Failure to import data from \"" + file.getName() + "\" file.");
+				continue;
+			}
+			InfractionsPlugin.getInst().getLogger().info("Data import from \"" + file.getName() + "\" file complete.");
 		}
 
 		// Let the plugin know that this has finished.
@@ -72,6 +87,10 @@ public class FileDataManager extends DataManager
 	@Override
 	public void save()
 	{
+		// Make sure data actually is loaded.
+		if(!didInit) return;
+
+		// Save all data.
 		for(InfractionsFile data : yamlFiles.values())
 			data.saveDataToFile();
 	}
@@ -79,6 +98,9 @@ public class FileDataManager extends DataManager
 	@Override
 	public void flushData()
 	{
+		// Make sure data actually is loaded.
+		if(!didInit) return;
+
 		// Kick everyone
 		for(Player player : Bukkit.getOnlinePlayers())
 			player.kickPlayer(ChatColor.GREEN + "Resetting data.");

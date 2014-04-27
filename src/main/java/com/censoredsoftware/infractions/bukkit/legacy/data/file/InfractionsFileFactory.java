@@ -47,7 +47,7 @@ public class InfractionsFileFactory
 	 */
 	public static InfractionsFile create(DataType type, String filePath)
 	{
-		return create(type.getIdType(), type.getDataClass(), type.getAbbreviation(), filePath);
+		return create(type.getIdType(), type.getDataClass(), type.getAbbreviation(), filePath, type.name());
 	}
 
 	/**
@@ -59,13 +59,41 @@ public class InfractionsFileFactory
 	 * @param filePath  The path to the file directory.
 	 * @return A new DemigodsFile object.
 	 */
-	public static <K extends Comparable, V extends DataAccess<K, V>, I> InfractionsFile<K, V, I> create(final IdType idType, final Class<V> dataClass, String abbr, String filePath)
+	public static <K extends Comparable, V extends DataAccess<K, V>, I> InfractionsFile<K, V, I> create(final IdType idType, final Class<V> dataClass, String abbr, String filePath, String name)
 	{
 		// Check for void type.
 		if(IdType.VOID.equals(idType)) return null;
 
+		Method foundMethod = null;
+
+		try
+		{
+			// Look over all constructors in the data class.
+			for(Method method : dataClass.getMethods())
+			{
+				// Attempt to find a registered constructor.
+				Register methodConstructor = method.getAnnotation(Register.class);
+
+				// Is the constructor suitable for use?
+				if(methodConstructor == null || !Modifier.isStatic(method.getModifiers()) || !idType.equals(methodConstructor.idType())) continue;
+
+				// So far so good, now we double check the params.
+				Class<?>[] params = method.getParameterTypes();
+				if(params.length < 2 || !params[0].equals(idType.getCastClass()) || !params[1].equals(ConfigurationSection.class))
+					// No good.
+					throw new RuntimeException("The defined constructor for " + dataClass.getName() + " is invalid.");
+
+				foundMethod = method;
+				break;
+			}
+		}
+		catch(Exception ignored)
+		{
+		}
+		if(foundMethod == null) throw new RuntimeException("Infractions was unable to find a constructor for " + dataClass.getName() + ".");
+
 		// Construct a new Infractions File from the abbreviation, file extension, and file directory path.
-		return new InfractionsFile<K, V, I>(abbr, ".know", filePath)
+		return new InfractionsFile<K, V, I>(abbr, ".know", filePath, name, foundMethod)
 		{
 			// Overridden method to create an new data object from the file data.
 			@Override
@@ -73,29 +101,14 @@ public class InfractionsFileFactory
 			{
 				try
 				{
-					// Look over all constructors in the data class.
-					for(Method method : dataClass.getMethods())
-					{
-						// Attempt to find a registered constructor.
-						Register methodConstructor = method.getAnnotation(Register.class);
-
-						// Is the constructor suitable for use?
-						if(methodConstructor == null || !Modifier.isStatic(method.getModifiers()) || !idType.equals(methodConstructor.idType())) continue;
-
-						// So far so good, now we double check the params.
-						Class<?>[] params = method.getParameterTypes();
-						if(params.length < 2 || !params[0].equals(idType.getCastClass()) || !params[1].equals(ConfigurationSection.class))
-							// No good.
-							throw new RuntimeException("The defined constructor for a data file is invalid.");
-
-						// Everything looks perfect so far. Last thing to do is construct a new instance.
-						return (I) method.invoke(null, keyFromString(stringId), conf);
-					}
-					throw new RuntimeException("Demigods was unable to find a constructor for one of its data types.");
+					// Everything looks perfect so far. Last thing to do is construct a new instance.
+					return (I) valueConstructor.invoke(null, keyFromString(stringId), conf);
 				}
 				catch(Exception e)
 				{
-					throw new RuntimeException("Demigods can't manage it's own data for some reason.", e);
+					e.printStackTrace();
+					// throw new RuntimeException("Infractions can't manage it's own data for some reason.", e);
+					return null;
 				}
 			}
 
