@@ -19,7 +19,6 @@ package com.censoredsoftware.infractions.bukkit.legacy.compat;
 import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
-import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
 import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
 import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
@@ -35,7 +34,7 @@ import org.bukkit.configuration.MemorySection;
 import java.util.HashMap;
 import java.util.Map;
 
-// FIXME Origin is ignored in version 0.5 when two issues have the same ID (they merge).
+// FIXME Origin is ignored in version 0.5.
 
 public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements DataSerializable
 {
@@ -53,9 +52,6 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 	@Register(idType = IdType.STRING)
 	public static LegacyIssuer of(String ignored, ConfigurationSection conf)
 	{
-		// FIXME TODO DEBUG REMOVE THIS
-		InfractionsPlugin.getInst().getLogger().info("Issuer: " + ignored);
-		// FIXME TODO DEBUG REMOVE THIS
 		LegacyIssuer data = new LegacyIssuer();
 		data.issuer = unserialize(conf.getValues(true));
 		return data;

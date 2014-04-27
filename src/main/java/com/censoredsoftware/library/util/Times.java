@@ -71,6 +71,21 @@ public class Times
 		else return format.format(getSeconds(time)) + "s";
 	}
 
+	public static String prettyTime(long time)
+	{
+		long diff = (System.currentTimeMillis() - time) / 1000;
+		double day_diff = Math.floor(diff / 86400);
+
+		if(day_diff == 0 && diff < 60) return "a few seconds";
+		if(diff < 120) return "a minute";
+		if(diff < 3600) return Math.floor(diff / 60) + " minutes";
+		if(diff < 7200) return "an hour";
+		if(diff < 86400) return Math.floor(diff / 3600) + " hours";
+		if(day_diff == 1) return "a day";
+		if(day_diff < 7) return day_diff + " days";
+		return Math.ceil(day_diff / 7) + " weeks";
+	}
+
 	public static String prettyDate(long time)
 	{
 		long diff = (System.currentTimeMillis() - time) / 1000;
@@ -90,16 +105,6 @@ public class Times
 
 	public static String timeSincePretty(long time)
 	{
-		long diff = (System.currentTimeMillis() - time) / 1000;
-		double day_diff = Math.floor(diff / 86400);
-
-		if(day_diff == 0 && diff < 60) return "in under a minute";
-		if(diff < 120) return "in 1 minute";
-		if(diff < 3600) return "in " + Math.floor(diff / 60) + " minutes";
-		if(diff < 7200) return "in 1 hour";
-		if(diff < 86400) return "in " + Math.floor(diff / 3600) + " hours";
-		if(day_diff == 1) return "in over a day";
-		if(day_diff < 7) return "in " + day_diff + " days";
-		return "in " + Math.ceil(day_diff / 7) + " weeks";
+		return "in " + prettyTime(time);
 	}
 }
