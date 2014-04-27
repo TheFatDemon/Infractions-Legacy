@@ -96,6 +96,11 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 		}));
 	}
 
+	public Set<String> getInfractionIds()
+	{
+		return infractions;
+	}
+
 	@Override
 	public void cite(Infraction infraction)
 	{

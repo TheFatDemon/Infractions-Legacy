@@ -17,6 +17,7 @@
 package com.censoredsoftware.infractions.bukkit.legacy.util;
 
 import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
+import com.google.common.collect.Lists;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -40,6 +41,17 @@ public class LevelUtil
 
 		log.warning("Unable to find level for reason '" + levelArg + "'.");
 		return null;
+	}
+
+	public static List<String> getAll()
+	{
+		List<String> all = Lists.newArrayList();
+		all.addAll(getLevel1());
+		all.addAll(getLevel2());
+		all.addAll(getLevel3());
+		all.addAll(getLevel4());
+		all.addAll(getLevel5());
+		return all;
 	}
 
 	public static List<String> getLevel1()

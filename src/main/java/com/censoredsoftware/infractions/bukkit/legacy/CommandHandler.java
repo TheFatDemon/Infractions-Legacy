@@ -18,23 +18,29 @@ package com.censoredsoftware.infractions.bukkit.legacy;
 
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.Infractions;
+import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
+import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
 import com.censoredsoftware.infractions.bukkit.legacy.util.*;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class CommandHandler implements CommandExecutor
+public class CommandHandler implements TabExecutor
 {
 	static Logger log = InfractionsPlugin.getInst().getLogger();
 
@@ -286,5 +292,53 @@ public class CommandHandler implements CommandExecutor
 		}
 		MiscUtil.sendMessage(p, "Something went wrong, please try again.");
 		return false;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender commandSender, Command command, String s, final String[] args)
+	{
+		List<String> list = Lists.newArrayList();
+		if(args.length == 1 && ("cite".equals(command.getName()) || "uncite".equals(command.getName()) || "history".equals(command.getName())))
+		{
+			list.addAll(Collections2.transform(Collections2.filter(Infractions.allDossiers(), new Predicate<Dossier>()
+			{
+				@Override
+				public boolean apply(Dossier dossier)
+				{
+					return dossier instanceof CompleteDossier && ((CompleteDossier) dossier).getLastKnownName().toLowerCase().startsWith(args[0].toLowerCase());
+				}
+			}), new Function<Dossier, String>()
+			{
+				@Override
+				public String apply(Dossier dossier)
+				{
+					return ((CompleteDossier) dossier).getLastKnownName();
+				}
+			}));
+		}
+		else if(args.length == 2)
+		{
+			boolean step1Done = false;
+			try
+			{
+				step1Done = Infractions.getCompleteDossier(args[0]) != null;
+			}
+			catch(Exception ignored)
+			{
+			}
+			Predicate<String> predicate = new Predicate<String>()
+			{
+				@Override
+				public boolean apply(String s)
+				{
+					return s.toLowerCase().startsWith(args[1].toLowerCase());
+				}
+			};
+			if("cite".equals(command.getName()))
+				list.addAll(Collections2.filter(LevelUtil.getAll(), predicate));
+			else if("uncite".equals(command.getName()) && step1Done)
+				list.addAll(Collections2.filter(((LegacyDossier) Infractions.getCompleteDossier(args[0])).getInfractionIds(), predicate));
+		}
+		return list;
 	}
 }

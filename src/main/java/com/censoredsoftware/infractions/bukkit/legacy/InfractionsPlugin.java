@@ -82,9 +82,12 @@ public class InfractionsPlugin extends JavaPlugin
 		getCommand("infractions").setExecutor(ce);
 		getCommand("virtues").setExecutor(ce);
 		getCommand("history").setExecutor(ce);
+		getCommand("history").setTabCompleter(ce);
 		// actions
 		getCommand("cite").setExecutor(ce);
+		getCommand("cite").setTabCompleter(ce);
 		getCommand("uncite").setExecutor(ce);
+		getCommand("uncite").setTabCompleter(ce);
 		getCommand("clearhistory").setExecutor(ce);
 	}
 
