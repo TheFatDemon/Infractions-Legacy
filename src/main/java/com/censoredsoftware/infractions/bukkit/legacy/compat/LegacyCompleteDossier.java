@@ -32,11 +32,6 @@ import java.util.UUID;
 
 public class LegacyCompleteDossier extends LegacyDossier implements CompleteDossier
 {
-	LegacyCompleteDossier()
-	{
-		super();
-	}
-
 	public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Infraction... infractions)
 	{
 		this(mojangId, lastKnownName, Sets.newHashSet(infractions));
@@ -51,13 +46,13 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 	@Override
 	public OfflinePlayer getOfflinePlayer()
 	{
-		return Bukkit.getOfflinePlayer(lastKnownName);
+		return Bukkit.getOfflinePlayer(this.lastKnownName);
 	}
 
 	@Override
 	public String getLastKnownName()
 	{
-		return lastKnownName;
+		return this.lastKnownName;
 	}
 
 	@Override
@@ -85,14 +80,14 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 		return this.ipAddresses;
 	}
 
-	public void addIPAddress(InetAddress address)
+	public void addIPAddress(String address)
 	{
-		ipAddresses.add(address.getHostAddress());
+		this.ipAddresses.add(address);
 	}
 
 	public void removeIPAddress(InetAddress address)
 	{
-		ipAddresses.remove(address.getHostAddress());
+		this.ipAddresses.remove(address.getHostName());
 	}
 
 	@Override
@@ -109,7 +104,7 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 
 	public void update(Player player)
 	{
-		addIPAddress(player.getAddress().getAddress());
-		lastKnownName = player.getDisplayName();
+		addIPAddress(player.getAddress().getHostName());
+		this.lastKnownName = player.getDisplayName();
 	}
 }

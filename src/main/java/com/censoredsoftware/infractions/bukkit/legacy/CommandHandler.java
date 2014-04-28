@@ -21,8 +21,12 @@ import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
+import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyCompleteDossier;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.util.*;
+import com.censoredsoftware.library.helper.MojangIdProvider;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -38,7 +42,9 @@ import org.bukkit.entity.Player;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class CommandHandler implements TabExecutor
@@ -233,52 +239,63 @@ public class CommandHandler implements TabExecutor
 			{
 				Integer maxScore = MiscUtil.getMaxScore(Infractions.getCompleteDossier(player).getId());
 				String chatLevel = InfractionsPlugin.getLevelForChat(player);
-				MiscUtil.sendMessage(p, ChatColor.WHITE + (chatLevel.equals("") ? "" : chatLevel + " ") + ChatColor.YELLOW + player + ChatColor.WHITE + " - " + MiscUtil.getScore(player) + (maxScore == null ? " points towards a ban." : "points out of " + maxScore + " until a ban."));
+				MiscUtil.sendMessage(p, ChatColor.WHITE + (chatLevel.equals("") ? "" : chatLevel + " ") + ChatColor.YELLOW + player + ChatColor.WHITE + " - " + MiscUtil.getScore(player) + (maxScore == null ? " points towards a ban." : " points out of " + maxScore + " until a ban."));
 
 				try
 				{
 					boolean staff = MiscUtil.hasPermissionOrOP(p, "infractions.mod");
 					CompleteDossier dossier = Infractions.getCompleteDossier(player);
 					Set<Infraction> infractions = dossier.getInfractions();
-					if(infractions.isEmpty())
+					if(!infractions.isEmpty())
 					{
-						MiscUtil.sendMessage(p, ChatColor.DARK_GREEN + "✔ " + ChatColor.WHITE + " No infractions found for this player.");
-						return true;
-					}
-					for(Infraction infraction : infractions)
-					{
-						MiscUtil.sendMessage(p, ChatColor.DARK_RED + "✘ " + ChatColor.DARK_AQUA + StringUtils.capitalize(infraction.getReason()) + ChatColor.GRAY + " - " + ChatColor.WHITE + infraction.getDateCreated());
-						MiscUtil.sendMessage(p, ChatColor.GRAY + "     Score: " + ChatColor.WHITE + infraction.getScore());
-						MiscUtil.sendMessage(p, ChatColor.GRAY + "     Proof: " + ChatColor.WHITE + Iterables.getFirst(Collections2.transform(infraction.getEvidence(), new Function<Evidence, Object>()
+						for(Infraction infraction : infractions)
 						{
-							@Override
-							public String apply(Evidence evidence)
+							MiscUtil.sendMessage(p, ChatColor.DARK_RED + "✘ " + ChatColor.DARK_AQUA + StringUtils.capitalize(infraction.getReason()) + ChatColor.GRAY + " - " + ChatColor.WHITE + infraction.getDateCreated());
+							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Score: " + ChatColor.WHITE + infraction.getScore());
+							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Proof: " + ChatColor.WHITE + Iterables.getFirst(Collections2.transform(infraction.getEvidence(), new Function<Evidence, Object>()
 							{
-								return evidence.getRawData();
+								@Override
+								public String apply(Evidence evidence)
+								{
+									return evidence.getRawData();
+								}
+							}), "No Proof."));
+							if(staff)
+							{
+								String id = MiscUtil.getInfractionId(infraction);
+								MiscUtil.sendMessage(p, ChatColor.GRAY + "     Key: " + ChatColor.WHITE + id);
+								String issuerId = infraction.getIssuer().getId();
+								if(IssuerType.STAFF.equals(infraction.getIssuer().getType()))
+								{
+									UUID issuerUUID = UUID.fromString(issuerId);
+									Map<UUID, LegacyDossier> map = DataManager.getManager().getMapFor(LegacyDossier.class);
+									if(map.containsKey(issuerUUID) && map.get(issuerUUID) instanceof CompleteDossier)
+									{
+										CompleteDossier issuerDossier = (LegacyCompleteDossier) map.get(issuerUUID);
+										issuerId = issuerDossier.getLastKnownName();
+									}
+								}
+								MiscUtil.sendMessage(p, ChatColor.GRAY + "     Issuer: " + ChatColor.WHITE + issuerId);
 							}
-						}), "No Proof."));
-						if(staff)
-						{
-							String id = MiscUtil.getInfractionId(infraction);
-							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Key: " + ChatColor.WHITE + id);
-							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Issuer: " + ChatColor.WHITE + infraction.getIssuer().getId());
 						}
 					}
+					else MiscUtil.sendMessage(p, ChatColor.DARK_GREEN + "✔ " + ChatColor.WHITE + " No infractions found for this player.");
+					if(!staff) return true;
 					Set<InetAddress> addresses = dossier.getAssociatedIPAddresses();
-					if(addresses.size() > 1)
+					if(!addresses.isEmpty())
 					{
-						MiscUtil.sendMessage(p, ChatColor.BLUE + "⌘ " + ChatColor.WHITE + "Associated IP Addresses");
+						MiscUtil.sendMessage(p, ChatColor.BLUE + "⌘ " + ChatColor.WHITE + " Associated IP Addresses");
 						for(InetAddress address : addresses)
 						{
-							MiscUtil.sendMessage(p, ChatColor.GRAY + "  " + ChatColor.WHITE + address.getHostAddress());
+							MiscUtil.sendMessage(p, ChatColor.GRAY + "    " + address.getHostAddress());
 							Set<CompleteDossier> others = Infractions.getCompleteDossiers(address);
 							if(others.size() > 1)
 							{
-								MiscUtil.sendMessage(p, ChatColor.GRAY + "    Also associated with:");
+								MiscUtil.sendMessage(p, ChatColor.GRAY + "      ...also associated with:");
 								for(CompleteDossier other : others)
 								{
 									if(other.getId().equals(dossier.getId())) continue;
-									MiscUtil.sendMessage(p, ChatColor.GRAY + "    - " + ChatColor.YELLOW + other.getLastKnownName());
+									MiscUtil.sendMessage(p, ChatColor.GRAY + "      - " + ChatColor.YELLOW + other.getLastKnownName());
 								}
 							}
 						}
@@ -292,7 +309,7 @@ public class CommandHandler implements TabExecutor
 			}
 			else
 			{
-				MiscUtil.sendMessage(p, "No player found with that name.");
+				MiscUtil.sendMessage(p, "A player with the name \"" + args[0] + "\" cannot be found.");
 				return true;
 			}
 		}
@@ -301,7 +318,7 @@ public class CommandHandler implements TabExecutor
 			try
 			{
 				Player remove = Bukkit.getServer().matchPlayer(args[0]).get(0);
-				Infractions.removeDossier(remove.getUniqueId());
+				Infractions.removeDossier(MojangIdProvider.getId(remove.getName()));
 				remove.kickPlayer(ChatColor.GREEN + "Your Infractions history has been reset--please join again.");
 				return true;
 			}
@@ -319,6 +336,7 @@ public class CommandHandler implements TabExecutor
 	public List<String> onTabComplete(CommandSender commandSender, Command command, String s, final String[] args)
 	{
 		List<String> list = Lists.newArrayList();
+		if(!commandSender.hasPermission("infractions.mod")) return list;
 		if(args.length == 1 && ("cite".equals(command.getName()) || "uncite".equals(command.getName()) || "history".equals(command.getName())))
 		{
 			list.addAll(Collections2.transform(Collections2.filter(Infractions.allDossiers(), new Predicate<Dossier>()

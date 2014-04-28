@@ -149,7 +149,7 @@ public class InfractionsPlugin extends JavaPlugin
 	public static String getLevelForChat(Player player)
 	{
 		if(player.hasPermission("infractions.ignore")) return SettingUtil.getSettingString("chat_score_ignore");
-		return getLevelForChat(player.getUniqueId());
+		return getLevelForChat(MojangIdProvider.getId(player.getName()));
 	}
 
 	public static String getLevelForChat(String playerName)

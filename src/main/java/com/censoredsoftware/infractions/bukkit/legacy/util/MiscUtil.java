@@ -141,7 +141,7 @@ public class MiscUtil
 		{
 			maxScore = 20;
 		}
-		ServerData.put(p.getUniqueId().toString(), "MAXSCORE", maxScore);
+		ServerData.put(MojangIdProvider.getId(p.getName()).toString(), "MAXSCORE", maxScore);
 		return maxScore;
 	}
 
@@ -177,7 +177,7 @@ public class MiscUtil
 
 	public static Issuer getIssuer(CommandSender sender)
 	{
-		if(sender instanceof Player) return new Issuer(IssuerType.STAFF, ((Player) sender).getUniqueId().toString());
+		if(sender instanceof Player) return new Issuer(IssuerType.STAFF, MojangIdProvider.getId(sender.getName()).toString());
 		return new Issuer(IssuerType.UNKNOWN, sender.getName());
 	}
 

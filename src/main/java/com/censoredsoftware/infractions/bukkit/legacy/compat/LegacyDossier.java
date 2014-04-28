@@ -39,10 +39,6 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	protected Set<String> ipAddresses;
 	protected String lastKnownName;
 
-	protected LegacyDossier()
-	{
-	}
-
 	public LegacyDossier(UUID mojangId, Infraction... infractions)
 	{
 		this(mojangId, Sets.newHashSet(infractions));
@@ -61,6 +57,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 				return id;
 			}
 		}));
+		this.ipAddresses = Sets.newHashSet();
 	}
 
 	@Register(idType = IdType.UUID)
@@ -87,6 +84,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	@Override
 	public Set<Infraction> getInfractions()
 	{
+		if(infractions.isEmpty()) return Sets.newHashSet();
 		return Sets.newHashSet(Collections2.transform(infractions, new Function<String, Infraction>()
 		{
 			@Override
@@ -154,20 +152,16 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	@SuppressWarnings("unchecked")
 	public static Dossier unserialize(UUID id, Map<String, Object> map)
 	{
-		LegacyDossier dossier;
+		LegacyDossier dossier = new LegacyDossier(id);
 		if(map.containsKey("lastKnownName"))
-		{
-			dossier = new LegacyCompleteDossier();
-			dossier.lastKnownName = map.get("lastKnownName").toString();
-		}
-		else dossier = new LegacyDossier();
+			dossier = (LegacyDossier) dossier.complete(map.get("lastKnownName").toString());
 
 		if(map.containsKey("infractions"))
 			dossier.infractions = Sets.newHashSet((List<String>) map.get("infractions"));
 		else dossier.infractions = Sets.newHashSet();
 
 		if(map.containsKey("addresses"))
-			dossier.infractions = Sets.newHashSet((List<String>) map.get("addresses"));
+			dossier.ipAddresses = Sets.newHashSet((List<String>) map.get("addresses"));
 		else dossier.ipAddresses = Sets.newHashSet();
 
 		dossier.mojangid = id;

@@ -81,23 +81,27 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 		try
 		{
 			UUID playerId = UUID.fromString(map.get("playerId").toString());
-			Issuer issuer = DataManager.getManager().getFor(LegacyIssuer.class, map.get("issuer").toString());
+			Issuer issuer = ((LegacyIssuer) DataManager.getManager().getFor(LegacyIssuer.class, map.get("issuer").toString())).toIssuer();
 			Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
 			String reason = map.get("reason").toString();
 			Integer score = Integer.parseInt(map.get("score").toString());
-			Set<Evidence> evidence = Sets.newHashSet(Collections2.transform((List<Map<String, Object>>) map.get("evidence"), new Function<Map<String, Object>, Evidence>()
+			Set<Evidence> evidence = Sets.newHashSet();
+			if(map.containsKey("evidence") && !((List<Map<String, Object>>) map.get("evidence")).isEmpty())
 			{
-				@Override
-				public Evidence apply(Map<String, Object> map)
+				evidence = Sets.newHashSet(Collections2.transform((List<Map<String, Object>>) map.get("evidence"), new Function<Map<String, Object>, Evidence>()
 				{
-					Issuer issuer = DataManager.getManager().getFor(LegacyIssuer.class, map.get("issuer").toString());
-					EvidenceType type = EvidenceType.valueOf(map.get("type").toString());
-					Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
-					String data = map.get("data").toString();
-					return new Evidence(issuer, type, timeCreated, data);
-				}
-			}));
-			List<String> notes = (List<String>) map.get("notes");
+					@Override
+					public Evidence apply(Map<String, Object> map)
+					{
+						Issuer issuer = ((LegacyIssuer) DataManager.getManager().getFor(LegacyIssuer.class, map.get("issuer").toString())).toIssuer();
+						EvidenceType type = EvidenceType.valueOf(map.get("type").toString());
+						Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
+						String data = map.get("data").toString();
+						return new Evidence(issuer, type, timeCreated, data);
+					}
+				}));
+			}
+			List<String> notes = (List<String>) (map.containsKey("notes") ? map.get("notes") : Lists.newArrayList());
 			Infraction infraction = new Infraction(playerId, timeCreated, reason, score, issuer, evidence);
 			infraction.setNotes(notes);
 			return infraction;
@@ -112,6 +116,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 	{
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("playerId", infraction.getPlayerId().toString());
+		LegacyIssuer.of(infraction.getIssuer()).saveIfAbsent();
 		map.put("issuer", infraction.getIssuer().getId());
 		map.put("timeCreated", infraction.getTimeCreated());
 		map.put("reason", infraction.getReason());
@@ -123,6 +128,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 			{
 				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("data", evidence.getRawData());
+				LegacyIssuer.of(evidence.getIssuer()).saveIfAbsent();
 				map.put("issuer", evidence.getIssuer().getId());
 				map.put("timeCreated", evidence.getTimeCreated());
 				map.put("type", evidence.getType().name());

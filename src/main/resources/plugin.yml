@@ -12,12 +12,15 @@ commands:
         description: Cite a player with an infraction.
         usage: /cite <player> <infraction> [proof-url]
         permission: infractions.mod
+        aliases: [ci, infract]
     uncite:
         description: Remove an infraction from a player.
         usage: /uncite <player> <key>
+        aliases: [unc, uninfract, acquit, aq]
     history:
         description: Check a player's infraction history.
         usage: /history [player]
+        aliases: [hist, dossier, doss]
     clearhistory:
         description: Clear a player's infraction history.
         usage: /clearhistory <player>
@@ -28,7 +31,7 @@ permissions:
     infractions.banexempt:
         default: false
     infractions.mod:
-        description: Gives access to all Inferno commands
+        description: Gives access to most staff commands.
         default: op
     infractions.maxscore.1:
         default: false
@@ -73,4 +76,4 @@ permissions:
     infractions.*:
         default: false
     infractions.clearhistory:
-        default: op
+        default: false

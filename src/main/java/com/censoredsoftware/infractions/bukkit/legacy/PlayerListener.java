@@ -19,8 +19,6 @@ package com.censoredsoftware.infractions.bukkit.legacy;
 import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyCompleteDossier;
-import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
-import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.data.ServerData;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
@@ -29,25 +27,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 
 public class PlayerListener implements Listener
 {
-	@EventHandler
-	public void onPlayerConnect(PlayerLoginEvent e)
-	{
-		// Create data that we track
-		boolean update = DataManager.getManager().getMapFor(LegacyDossier.class).containsKey(e.getPlayer().getUniqueId());
-		CompleteDossier dossier = Infractions.getCompleteDossier(e.getPlayer());
-		if(update && dossier instanceof LegacyCompleteDossier) ((LegacyCompleteDossier) dossier).update(e.getPlayer());
-		MiscUtil.getMaxScore(e.getPlayer());
-	}
-
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e)
 	{
 		// sync to master file
 		final Player p = e.getPlayer();
+
+		// Create data that we track
+		CompleteDossier dossier = Infractions.getCompleteDossier(p);
+		((LegacyCompleteDossier) dossier).update(p);
+		MiscUtil.getMaxScore(p);
+
 		if(SettingUtil.getSettingBoolean("motd"))
 		{
 			// TODO Consolidate this into some sort of useful notification system.

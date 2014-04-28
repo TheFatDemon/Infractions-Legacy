@@ -52,8 +52,9 @@ public class LegacyDatabase implements Database
 		{
 			Dossier dossier = getDossier(id);
 			if(!(dossier instanceof LegacyCompleteDossier))
-				((LegacyCompleteDossier) dossier.complete(playerName)).save();
-			return getCompleteDossier(id);
+				dossier = dossier.complete(playerName);
+			DataManager.getManager().getMapFor(LegacyDossier.class).put(dossier.getId(), dossier.complete(playerName));
+			return (CompleteDossier) dossier;
 		}
 		throw new NullPointerException("No such player exists.");
 	}
