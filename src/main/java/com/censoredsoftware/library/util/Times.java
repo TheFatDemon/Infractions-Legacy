@@ -76,14 +76,14 @@ public class Times
 		long diff = (System.currentTimeMillis() - time) / 1000;
 		double day_diff = Math.floor(diff / 86400);
 
-		if(day_diff == 0 && diff < 60) return "a few seconds";
-		if(diff < 120) return "a minute";
-		if(diff < 3600) return Math.floor(diff / 60) + " minutes";
-		if(diff < 7200) return "an hour";
-		if(diff < 86400) return Math.floor(diff / 3600) + " hours";
-		if(day_diff == 1) return "a day";
-		if(day_diff < 7) return day_diff + " days";
-		return Math.ceil(day_diff / 7) + " weeks";
+		if(day_diff == 0 && diff < 60) return "few seconds";
+		if(diff < 120) return "minute";
+		if(diff < 3600) return (int) Math.floor(diff / 60) + " minutes";
+		if(diff < 7200) return "hour";
+		if(diff < 86400) return (int) Math.floor(diff / 3600) + " hours";
+		if(day_diff == 1) return "day";
+		if(day_diff < 7) return (int) day_diff + " days";
+		return (int) Math.ceil(day_diff / 7) + " weeks";
 	}
 
 	public static String prettyDate(long time)
@@ -93,12 +93,12 @@ public class Times
 
 		if(day_diff == 0 && diff < 60) return "just now";
 		if(diff < 120) return "1 minute ago";
-		if(diff < 3600) return Math.floor(diff / 60) + " minutes ago";
+		if(diff < 3600) return (int) Math.floor(diff / 60) + " minutes ago";
 		if(diff < 7200) return "1 hour ago";
-		if(diff < 86400) return Math.floor(diff / 3600) + " hours ago";
+		if(diff < 86400) return (int) Math.floor(diff / 3600) + " hours ago";
 		if(day_diff == 1) return "Yesterday";
-		if(day_diff < 7) return day_diff + " days ago";
-		if(day_diff < 31) return Math.ceil(day_diff / 7) + " weeks ago";
+		if(day_diff < 7) return (int) day_diff + " days ago";
+		if(day_diff < 31) return (int) Math.ceil(day_diff / 7) + " weeks ago";
 
 		return new SimpleDateFormat("yyyy-MM-dd").format(new Date(time));
 	}

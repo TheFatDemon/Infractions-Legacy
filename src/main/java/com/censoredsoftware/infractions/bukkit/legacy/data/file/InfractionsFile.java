@@ -99,6 +99,11 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 		dataStore.put(key, value);
 	}
 
+	public final void putIfAbsent(K key, I value)
+	{
+		dataStore.putIfAbsent(key, value);
+	}
+
 	public final void remove(K key)
 	{
 		dataStore.remove(key);

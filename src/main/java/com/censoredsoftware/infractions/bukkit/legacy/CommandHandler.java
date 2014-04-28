@@ -36,6 +36,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -237,7 +238,8 @@ public class CommandHandler implements TabExecutor
 				try
 				{
 					boolean staff = MiscUtil.hasPermissionOrOP(p, "infractions.mod");
-					Set<Infraction> infractions = Infractions.getCompleteDossier(player).getInfractions();
+					CompleteDossier dossier = Infractions.getCompleteDossier(player);
+					Set<Infraction> infractions = dossier.getInfractions();
 					if(infractions.isEmpty())
 					{
 						MiscUtil.sendMessage(p, ChatColor.DARK_GREEN + "✔ " + ChatColor.WHITE + " No infractions found for this player.");
@@ -260,6 +262,25 @@ public class CommandHandler implements TabExecutor
 							String id = MiscUtil.getInfractionId(infraction);
 							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Key: " + ChatColor.WHITE + id);
 							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Issuer: " + ChatColor.WHITE + infraction.getIssuer().getId());
+						}
+					}
+					Set<InetAddress> addresses = dossier.getAssociatedIPAddresses();
+					if(addresses.size() > 1)
+					{
+						MiscUtil.sendMessage(p, ChatColor.BLUE + "⌘ " + ChatColor.WHITE + "Associated IP Addresses");
+						for(InetAddress address : addresses)
+						{
+							MiscUtil.sendMessage(p, ChatColor.GRAY + "  " + ChatColor.WHITE + address.getHostAddress());
+							Set<CompleteDossier> others = Infractions.getCompleteDossiers(address);
+							if(others.size() > 1)
+							{
+								MiscUtil.sendMessage(p, ChatColor.GRAY + "    Also associated with:");
+								for(CompleteDossier other : others)
+								{
+									if(other.getId().equals(dossier.getId())) continue;
+									MiscUtil.sendMessage(p, ChatColor.GRAY + "    - " + ChatColor.YELLOW + other.getLastKnownName());
+								}
+							}
 						}
 					}
 					return true;

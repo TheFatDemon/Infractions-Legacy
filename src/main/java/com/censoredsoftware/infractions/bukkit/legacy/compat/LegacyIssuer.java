@@ -16,7 +16,6 @@
 
 package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
-import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
@@ -110,9 +109,12 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 		return map;
 	}
 
+	private static final DataAccess<String, LegacyIssuer> DATA_ACCESS = new LegacyIssuer();
+
 	public static Issuer of(final String id)
 	{
-		LegacyIssuer issuer = Iterables.find(((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().values(), new Predicate<LegacyIssuer>()
+
+		LegacyIssuer issuer = Iterables.find(DATA_ACCESS.allDirect(), new Predicate<LegacyIssuer>()
 		{
 			@Override
 			public boolean apply(LegacyIssuer legacyIssuer)
@@ -126,7 +128,7 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 	public static LegacyIssuer of(Issuer issuer)
 	{
 		LegacyIssuer legacyIssuer = new LegacyIssuer(issuer);
-		((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().putIfAbsent(issuer.getId(), legacyIssuer);
+		legacyIssuer.saveIfAbsent();
 		return legacyIssuer;
 	}
 }

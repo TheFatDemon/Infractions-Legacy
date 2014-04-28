@@ -17,11 +17,11 @@
 package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
 import com.censoredsoftware.infractions.bukkit.Infraction;
-import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
 import com.censoredsoftware.infractions.bukkit.evidence.EvidenceType;
 import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
 import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
@@ -81,7 +81,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 		try
 		{
 			UUID playerId = UUID.fromString(map.get("playerId").toString());
-			Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().get(map.get("issuer").toString()).toIssuer();
+			Issuer issuer = DataManager.getManager().getFor(LegacyIssuer.class, map.get("issuer").toString());
 			Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
 			String reason = map.get("reason").toString();
 			Integer score = Integer.parseInt(map.get("score").toString());
@@ -90,7 +90,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 				@Override
 				public Evidence apply(Map<String, Object> map)
 				{
-					Issuer issuer = ((LegacyDatabase) Infractions.getDatabase()).getIssuerMap().get(map.get("issuer").toString()).toIssuer();
+					Issuer issuer = DataManager.getManager().getFor(LegacyIssuer.class, map.get("issuer").toString());
 					EvidenceType type = EvidenceType.valueOf(map.get("type").toString());
 					Long timeCreated = Long.parseLong(map.get("timeCreated").toString());
 					String data = map.get("data").toString();
@@ -112,7 +112,6 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 	{
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("playerId", infraction.getPlayerId().toString());
-		LegacyIssuer.of(infraction.getIssuer());
 		map.put("issuer", infraction.getIssuer().getId());
 		map.put("timeCreated", infraction.getTimeCreated());
 		map.put("reason", infraction.getReason());

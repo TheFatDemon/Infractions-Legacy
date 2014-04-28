@@ -44,7 +44,7 @@ public class LegacyData implements Runnable
 
 	public static void asyncConvert()
 	{
-		if(InfractionsPlugin.getInst().getConfig().getBoolean("convert"))
+		if(!InfractionsPlugin.getInst().getConfig().getBoolean("convert.done"))
 		{
 			// New thread
 			new Thread(new LegacyData()).start();
@@ -53,7 +53,7 @@ public class LegacyData implements Runnable
 
 	public static void syncConvert()
 	{
-		if(InfractionsPlugin.getInst().getConfig().getBoolean("convert"))
+		if(!InfractionsPlugin.getInst().getConfig().getBoolean("convert.done"))
 		{
 			// Main thread
 			new LegacyData().run();
@@ -62,6 +62,7 @@ public class LegacyData implements Runnable
 
 	private static Issuer LEGACY_ISSUER = new Issuer(IssuerType.LEGACY, "LEGACY");
 	private static Logger messageLog = Logger.getLogger("Minecraft");
+	private static boolean all = InfractionsPlugin.getInst().getConfig().getBoolean("convert.all");
 
 	@Override
 	public void run()
@@ -100,26 +101,18 @@ public class LegacyData implements Runnable
 
 			if(messages) messageLog.info("We've finished organizing the dossiers sir, and it only took " + Times.prettyTime(startTime) + ".");
 
+			log.info("DOSSIERS HAVE BEEN ORGANIZED.");
+
 			Set<Dossier> dossiers = Infractions.allDossiers();
 
-			count = 0;
 			messages = dossiers.size() >= 1000;
-
-			quarter = dossiers.size() / 4;
-			half = dossiers.size() / 2;
-			lastquarter = dossiers.size() - quarter;
 
 			long halfTime = System.currentTimeMillis();
 
 			log.info("CONSOLIDATING INFRACTIONS (SIT TIGHT).");
+			if(messages) messageLog.info("We're nearly done, this part is much easier.");
 			for(Dossier dossier : dossiers)
-			{
-				count++;
-				if(messages && count == quarter) messageLog.info("Avast! We still have about 1/4 of the infractions left!");
-				else if(messages && count == half) messageLog.info("Half of the infractions are left, sir.");
-				else if(messages && count == lastquarter) messageLog.info("We're nearly done, only the last 1/4 of the infractions are left!");
 				if(dossier instanceof CompleteDossier) error += consolodateLegacyInfractions((CompleteDossier) dossier);
-			}
 
 			if(messages)
 			{
@@ -127,7 +120,7 @@ public class LegacyData implements Runnable
 				messageLog.info("We've compiled a report for you sir:");
 			}
 
-			log.info("END REPORT: PROCESS COMPLETED " + Times.timeSincePretty(startTime).toUpperCase() + " WITH " + error + " ERRORS.");
+			log.info("PROCESS COMPLETED " + Times.timeSincePretty(startTime).toUpperCase() + " WITH " + error + " ERRORS.");
 			if(error > 0)
 			{
 				log.info("Sometimes an error or two is expected.");
@@ -136,7 +129,7 @@ public class LegacyData implements Runnable
 
 			if(messages) messageLog.info("Everything is ready, Captain. Should we set sail?");
 
-			InfractionsPlugin.getInst().getConfig().set("convert", false);
+			InfractionsPlugin.getInst().getConfig().set("convert.done", true);
 			InfractionsPlugin.getInst().saveConfig();
 		}
 
@@ -147,12 +140,20 @@ public class LegacyData implements Runnable
 		legacyData.clear();
 	}
 
+	private static String tryAgain = "";
+
 	@SuppressWarnings("unchecked")
 	public static int organizeDossier(String target)
 	{
+		if(all && !hasData(target, "INFRACTIONS")) return 0;
 		UUID id = MojangIdProvider.getId(target);
 		if(id == null)
 		{
+			if(!tryAgain.equals(target))
+			{
+				tryAgain = target;
+				return organizeDossier(target);
+			}
 			log.warning("Is \"" + target + "\" an actual player?");
 			return 1;
 		}

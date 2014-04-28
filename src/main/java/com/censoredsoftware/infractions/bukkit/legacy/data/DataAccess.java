@@ -64,6 +64,11 @@ public abstract class DataAccess<K extends Comparable, V extends DataAccess<K, V
 		DataManager.DATA_MANAGER.putFor(clazz, key, value);
 	}
 
+	public void putDirectIfAbsent(K key, V value)
+	{
+		DataManager.DATA_MANAGER.putForIfAbsent(clazz, key, value);
+	}
+
 	public void removeDirect(K key)
 	{
 		DataManager.DATA_MANAGER.removeFor(clazz, key);
@@ -76,6 +81,11 @@ public abstract class DataAccess<K extends Comparable, V extends DataAccess<K, V
 	public void save()
 	{
 		putDirect(getId(), (V) this);
+	}
+
+	public void saveIfAbsent()
+	{
+		putDirectIfAbsent(getId(), (V) this);
 	}
 
 	public void remove()

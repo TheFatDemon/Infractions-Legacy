@@ -21,12 +21,14 @@ import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataType;
 import com.censoredsoftware.infractions.bukkit.legacy.data.TempDataManager;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -55,6 +57,9 @@ public class FileDataManager extends DataManager
 		// Check if init has happened already...
 		if(didInit) throw new RuntimeException("Data tried to initialize more than once.");
 
+		// Preserve the load order.
+		List<Class> fileOrder = Lists.newArrayList();
+
 		// Create YAML files.
 		yamlFiles = Maps.newConcurrentMap();
 		for(DataType dataType : DataType.values())
@@ -63,11 +68,13 @@ public class FileDataManager extends DataManager
 			if(file == null) continue;
 			InfractionsPlugin.getInst().getLogger().info("Marked \"" + dataType.name() + "\" for data import.");
 			yamlFiles.put(dataType.getDataClass(), file);
+			fileOrder.add(dataType.getDataClass());
 		}
 
 		// Load YAML files.
-		for(InfractionsFile file : yamlFiles.values())
+		for(Class clazz : fileOrder)
 		{
+			InfractionsFile file = yamlFiles.get(clazz);
 			try
 			{
 				file.loadDataFromFile();
@@ -142,6 +149,11 @@ public class FileDataManager extends DataManager
 	public <K extends Comparable, V extends DataAccess<K, V>> void putFor(final Class<V> clazz, final K key, final V value)
 	{
 		getFile(clazz).put(key, value);
+	}
+
+	@Override protected <K extends Comparable, V extends DataAccess<K, V>> void putForIfAbsent(Class<V> clazz, K key, V value)
+	{
+		getFile(clazz).putIfAbsent(key, value);
 	}
 
 	@Override

@@ -18,10 +18,15 @@ package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,6 +61,41 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 	}
 
 	@Override
+	public Set<InetAddress> getAssociatedIPAddresses()
+	{
+		return Sets.newHashSet(Collections2.transform(this.ipAddresses, new Function<String, InetAddress>()
+		{
+			@Override
+			public InetAddress apply(String s)
+			{
+				try
+				{
+					return InetAddress.getByName(s);
+				}
+				catch(UnknownHostException e)
+				{
+					return null;
+				}
+			}
+		}));
+	}
+
+	public Set<String> getRawAssociatedIPAddresses()
+	{
+		return this.ipAddresses;
+	}
+
+	public void addIPAddress(InetAddress address)
+	{
+		ipAddresses.add(address.getHostAddress());
+	}
+
+	public void removeIPAddress(InetAddress address)
+	{
+		ipAddresses.remove(address.getHostAddress());
+	}
+
+	@Override
 	public CompleteDossier complete(String playerName)
 	{
 		return this;
@@ -65,5 +105,11 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 	public CompleteDossier complete()
 	{
 		return this;
+	}
+
+	public void update(Player player)
+	{
+		addIPAddress(player.getAddress().getAddress());
+		lastKnownName = player.getDisplayName();
 	}
 }

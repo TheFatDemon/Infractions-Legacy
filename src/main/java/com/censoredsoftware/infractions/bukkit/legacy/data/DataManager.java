@@ -67,6 +67,8 @@ public abstract class DataManager
 
 	protected abstract <K extends Comparable, V extends DataAccess<K, V>> void putFor(Class<V> clazz, K key, V value);
 
+	protected abstract <K extends Comparable, V extends DataAccess<K, V>> void putForIfAbsent(Class<V> clazz, K key, V value);
+
 	protected abstract <K extends Comparable, V extends DataAccess<K, V>> void removeFor(Class<V> clazz, K key);
 
 	public static DataManager getManager()

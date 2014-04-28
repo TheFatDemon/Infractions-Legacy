@@ -17,6 +17,10 @@
 package com.censoredsoftware.infractions.bukkit.legacy;
 
 import com.censoredsoftware.infractions.bukkit.Infractions;
+import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyCompleteDossier;
+import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.data.ServerData;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
@@ -29,10 +33,13 @@ import org.bukkit.event.player.PlayerLoginEvent;
 
 public class PlayerListener implements Listener
 {
+	@EventHandler
 	public void onPlayerConnect(PlayerLoginEvent e)
 	{
 		// Create data that we track
-		Infractions.getCompleteDossier(e.getPlayer());
+		boolean update = DataManager.getManager().getMapFor(LegacyDossier.class).containsKey(e.getPlayer().getUniqueId());
+		CompleteDossier dossier = Infractions.getCompleteDossier(e.getPlayer());
+		if(update && dossier instanceof LegacyCompleteDossier) ((LegacyCompleteDossier) dossier).update(e.getPlayer());
 		MiscUtil.getMaxScore(e.getPlayer());
 	}
 

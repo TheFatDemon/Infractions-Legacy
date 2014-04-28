@@ -17,10 +17,10 @@
 package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
 import com.censoredsoftware.infractions.bukkit.Infraction;
-import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
 import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
@@ -36,6 +36,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 {
 	private UUID mojangid;
 	private Set<String> infractions;
+	protected Set<String> ipAddresses;
 	protected String lastKnownName;
 
 	protected LegacyDossier()
@@ -56,7 +57,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 			public String apply(Infraction infraction)
 			{
 				String id = MiscUtil.getInfractionId(infraction);
-				((LegacyDatabase) Infractions.getDatabase()).getInfractionMap().put(id, LegacyInfraction.of(infraction));
+				LegacyInfraction.of(infraction).save();
 				return id;
 			}
 		}));
@@ -91,7 +92,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 			@Override
 			public Infraction apply(String s)
 			{
-				return ((LegacyDatabase) Infractions.getDatabase()).getInfractionMap().get(s).toInfraction();
+				return ((LegacyInfraction) DataManager.getManager().getFor(LegacyInfraction.class, s)).toInfraction();
 			}
 		}));
 	}
@@ -105,7 +106,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public void cite(Infraction infraction)
 	{
 		String id = MiscUtil.getInfractionId(infraction);
-		((LegacyDatabase) Infractions.getDatabase()).getInfractionMap().put(id, LegacyInfraction.of(infraction));
+		LegacyInfraction.of(infraction).save();
 		infractions.add(id);
 	}
 
@@ -113,7 +114,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public void acquit(Infraction infraction)
 	{
 		String id = MiscUtil.getInfractionId(infraction);
-		((LegacyDatabase) Infractions.getDatabase()).getInfractionMap().remove(id);
+		LegacyInfraction.of(infraction).remove();
 		infractions.remove(id);
 	}
 
@@ -121,7 +122,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public CompleteDossier complete(String playerName)
 	{
 		CompleteDossier dossier = new LegacyCompleteDossier(getId(), playerName, getInfractions());
-		((LegacyDatabase) Infractions.getDatabase()).getDossierMap().put(getId(), dossier);
+		DataManager.getManager().getMapFor(LegacyDossier.class).put(getId(), dossier);
 		return dossier;
 	}
 
@@ -140,8 +141,12 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 		List<String> infractionList;
 		if(infractions != null) infractionList = Lists.newArrayList(infractions);
 		else infractionList = Lists.newArrayList();
+		List<String> ipList;
+		if(ipAddresses != null) ipList = Lists.newArrayList(ipAddresses);
+		else ipList = Lists.newArrayList();
 
 		map.put("infractions", infractionList);
+		map.put("addresses", ipList);
 
 		return map;
 	}
@@ -156,11 +161,15 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 			dossier.lastKnownName = map.get("lastKnownName").toString();
 		}
 		else dossier = new LegacyDossier();
+
 		if(map.containsKey("infractions"))
-		{
 			dossier.infractions = Sets.newHashSet((List<String>) map.get("infractions"));
-		}
 		else dossier.infractions = Sets.newHashSet();
+
+		if(map.containsKey("addresses"))
+			dossier.infractions = Sets.newHashSet((List<String>) map.get("addresses"));
+		else dossier.ipAddresses = Sets.newHashSet();
+
 		dossier.mojangid = id;
 		return dossier;
 	}
