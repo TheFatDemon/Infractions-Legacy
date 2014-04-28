@@ -3,7 +3,8 @@
 #Global Settings
 update: true
 motd: true
-save_interval_seconds: 30
+start_delay_seconds: 5
+save_interval_seconds: 10
 kick_on_cite: false
 ban: true
 ban_at_score: 5
