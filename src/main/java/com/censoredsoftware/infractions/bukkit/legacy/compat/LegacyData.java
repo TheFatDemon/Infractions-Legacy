@@ -18,7 +18,6 @@ package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.Infractions;
-import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
 import com.censoredsoftware.infractions.bukkit.evidence.EvidenceType;
@@ -30,6 +29,8 @@ import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.minecraft.util.com.google.common.base.Predicate;
+import net.minecraft.util.com.google.common.collect.Iterables;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,7 +64,6 @@ public class LegacyData implements Runnable
 
 	private static Issuer LEGACY_ISSUER = new Issuer(IssuerType.LEGACY, "LEGACY");
 	private static Logger messageLog = Logger.getLogger("Minecraft");
-	private static boolean all = InfractionsPlugin.getInst().getConfig().getBoolean("convert.all");
 
 	@Override
 	public void run()
@@ -91,13 +91,17 @@ public class LegacyData implements Runnable
 			long startTime = System.currentTimeMillis();
 
 			log.info("ORGANIZING DOSSIERS (THIS CAN TAKE AWHILE).");
-			for(String player : playerList)
+			for(String player : Lists.newArrayList(playerList))
 			{
 				count++;
 				if(messages && count == quarter) messageLog.info("Captain! We're about 1/4 of the way through these things.");
 				else if(messages && count == half) messageLog.info("Sir, we still have about half of the pile left.");
 				else if(messages && count == lastquarter) messageLog.info("Almost done! We're at 3/4 completion.");
-				error += organizeDossier(player);
+
+				int result = organizeDossier(player);
+				if(result == 1) playerList.remove(player);
+				error += result;
+				error += consolodateLegacyInfractions(player);
 			}
 
 			if(messages) messageLog.info("We've finished organizing the dossiers sir, and it only took " + MiscUtil.prettyTime(startTime) + ".");
@@ -112,14 +116,16 @@ public class LegacyData implements Runnable
 
 			log.info("CONSOLIDATING INFRACTIONS (SIT TIGHT).");
 			if(messages) messageLog.info("We're nearly done, this part is much easier.");
-			for(Dossier dossier : dossiers)
-				if(dossier instanceof CompleteDossier) error += consolodateLegacyInfractions((CompleteDossier) dossier);
+			for(String player : playerList)
+				error += consolodateLegacyInfractions(player);
 
 			if(messages)
 			{
 				messageLog.info("After another " + MiscUtil.prettyTime(halfTime) + " we're finally done!");
 				messageLog.info("We've compiled a report for you sir:");
 			}
+
+			DataManager.saveAllData();
 
 			log.info("PROCESS COMPLETED " + MiscUtil.timeSincePretty(startTime).toUpperCase() + " WITH " + error + " ERRORS.");
 			if(error > 0)
@@ -161,9 +167,11 @@ public class LegacyData implements Runnable
 	@SuppressWarnings("unchecked")
 	private static int organizeDossier(String target)
 	{
-		if(all && !hasData(target, "INFRACTIONS")) return 0;
-		UUID id = McIdProvider.getId(target);
-		if(id == null)
+		try
+		{
+			Infractions.getCompleteDossier(target);
+		}
+		catch(NullPointerException ex)
 		{
 			if(!tryAgain.equals(target))
 			{
@@ -173,69 +181,76 @@ public class LegacyData implements Runnable
 			log.warning("Is \"" + target + "\" an actual player?");
 			return 1;
 		}
-
-		Dossier dossier = Infractions.getDossier(id);
-		if(!(dossier instanceof CompleteDossier)) DataManager.getManager().getMapFor(LegacyDossier.class).put(id, dossier.complete(target));
 		return 0;
 	}
 
-	private static int consolodateLegacyInfractions(CompleteDossier dossier)
+	private static int consolodateLegacyInfractions(final String target)
 	{
 		int error = 0;
 		int count = 0;
 
-		if(hasData(dossier.getLastKnownName(), "INFRACTIONS"))
+		if(hasData(target, "INFRACTIONS"))
 		{
-			// Data to get and return.
-			for(Map.Entry<String, HashMap<String, Object>> entry : getLegacyData().entrySet())
-			{
-				if(!entry.getKey().equalsIgnoreCase(dossier.getLastKnownName())) continue;
-				for(Map.Entry<String, Object> entry_ : entry.getValue().entrySet())
-				{
-					if(!entry_.getKey().equals("INFRACTIONS")) continue;
-					for(String legacyData : ((HashMap<String, String>) entry_.getValue()).values())
-					{
-						// Get info from legacy infraction.
-						String[] dataList = legacyData.substring(2).split(" - ");
-						List<String> otherData = Lists.newArrayList(Arrays.asList(dataList));
+			Set<Map.Entry<String, HashMap<String, Object>>> entrySet = getLegacyData().entrySet();
 
+			Map.Entry<String, HashMap<String, Object>> entry = Iterables.find(entrySet, new Predicate<Map.Entry<String, HashMap<String, Object>>>()
+			{
+				@Override
+				public boolean apply(Map.Entry<String, HashMap<String, Object>> entry)
+				{
+					return entry.getKey().equalsIgnoreCase(target);
+				}
+			}, null);
+
+			if(entry == null) return 1;
+
+			for(Map.Entry<String, Object> entry_ : entry.getValue().entrySet())
+			{
+				if(!entry_.getKey().equals("INFRACTIONS")) continue;
+				for(String legacyData : ((HashMap<String, String>) entry_.getValue()).values())
+				{
+					// Get info from legacy infraction.
+					String[] dataList = legacyData.substring(2).split(" - ");
+					List<String> otherData = Lists.newArrayList(Arrays.asList(dataList));
+
+					try
+					{
+						count++;
+
+						// Convert score to new % system.
+						int score;
+						if(!legacyData.substring(0, 1).equals("-")) score = (Integer.parseInt(legacyData.substring(0, 1)));
+						else score = (Integer.parseInt(legacyData.substring(0, 2)));
+
+						// don't convert virtues
+						if(score <= 0) continue;
+
+						String reason = otherData.get(0);
+						String proof = otherData.get(1);
+						String date = otherData.get(2);
+
+						Long dateTime = null;
 						try
 						{
-							count++;
-
-							// Convert score to new % system.
-							int score;
-							if(!legacyData.substring(0, 1).equals("-")) score = (Integer.parseInt(legacyData.substring(0, 1)));
-							else score = (Integer.parseInt(legacyData.substring(0, 2)));
-
-							// don't convert virtues
-							if(score <= 0) continue;
-
-							String reason = otherData.get(0);
-							String proof = otherData.get(1);
-							String date = otherData.get(2);
-
-							Long dateTime = null;
-							try
-							{
-								dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date).getTime();
-							}
-							catch(Exception ignored)
-							{
-							}
-
-							Infraction infraction = new Infraction(dossier.getId(), dateTime != null ? dateTime : System.currentTimeMillis(), reason, score, LEGACY_ISSUER, new Evidence(LEGACY_ISSUER, EvidenceType.UNKNOWN, dateTime != null ? dateTime : System.currentTimeMillis(), proof));
-							dossier.cite(infraction);
+							dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date).getTime();
 						}
-						catch(Exception e)
+						catch(Exception ignored)
 						{
-							error++;
-							e.printStackTrace();
 						}
+
+						Dossier dossier = Infractions.getDossier(target);
+
+						Infraction infraction = new Infraction(dossier.getId(), dateTime != null ? dateTime : System.currentTimeMillis(), reason, score, LEGACY_ISSUER, new Evidence(LEGACY_ISSUER, EvidenceType.UNKNOWN, dateTime != null ? dateTime : System.currentTimeMillis(), proof));
+						dossier.cite(infraction);
+					}
+					catch(Exception e)
+					{
+						error++;
+						e.printStackTrace();
 					}
 				}
 			}
-			if(error > 0) log.warning("Error converting " + error + " of " + count + " infractions for " + dossier.getLastKnownName() + ".");
+			if(error > 0) log.warning("Error converting " + error + " of " + count + " infractions for " + target + ".");
 		}
 		return (error > 0 ? 1 : 0);
 	}

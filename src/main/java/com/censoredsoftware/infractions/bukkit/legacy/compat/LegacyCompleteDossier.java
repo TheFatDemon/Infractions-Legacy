@@ -39,6 +39,12 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 		this.lastKnownName = lastKnownName;
 	}
 
+	public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Set<String> rawInfractions, Void ignored)
+	{
+		super(mojangId, rawInfractions, ignored);
+		this.lastKnownName = lastKnownName;
+	}
+
 	@Override
 	public OfflinePlayer getOfflinePlayer()
 	{

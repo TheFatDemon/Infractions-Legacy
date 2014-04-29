@@ -123,11 +123,14 @@ public class InfractionsPlugin extends JavaPlugin
 		Infractions.setDefaultOrigin(new Origin(Bukkit.getServerName(), Bukkit.getServerName(), OriginType.SERVER));
 
 		getLogger().info("Initializing.");
+
 		DataManager.initAllData();
 		LegacyData.syncConvert();
+
 		loadCommands();
 		loadListeners();
 		loadMetrics();
+
 		initializeThreads();
 
 		Map<Integer, String> scores = Maps.newHashMap();
@@ -135,8 +138,7 @@ public class InfractionsPlugin extends JavaPlugin
 			scores.put(i, ChatColor.translateAlternateColorCodes('&', SettingUtil.getSettingString("chat_score_" + i)));
 		CHAT_SCORES = ImmutableMap.copyOf(scores);
 
-		if(SettingUtil.getSettingBoolean("update"))
-			new Updater(this, 44721, getFile(), Updater.UpdateType.DEFAULT, true);
+		if(SettingUtil.getSettingBoolean("update")) new Updater(this, 44721, getFile(), Updater.UpdateType.DEFAULT, true);
 
 		message("enabled");
 	}

@@ -48,4 +48,3 @@ chat_score_ignore: '&7[&3:3&7]' #Plugin ignores this player
 #Convert
 convert:
     done: false
-    all: true

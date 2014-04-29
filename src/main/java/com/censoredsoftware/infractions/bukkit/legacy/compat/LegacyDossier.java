@@ -60,6 +60,13 @@ public class LegacyDossier implements DataSerializable<UUID>, Dossier
 		this.ipAddresses = Sets.newHashSet();
 	}
 
+	public LegacyDossier(UUID mojangId, Set<String> rawInfractions, Void ignored)
+	{
+		this.mojangid = mojangId;
+		this.infractions = rawInfractions;
+		this.ipAddresses = Sets.newHashSet();
+	}
+
 	@DataProvider(idType = IdType.UUID)
 	public static LegacyDossier of(UUID id, ConfigurationSection conf)
 	{
@@ -103,7 +110,7 @@ public class LegacyDossier implements DataSerializable<UUID>, Dossier
 	public void cite(Infraction infraction)
 	{
 		String id = MiscUtil.getInfractionId(infraction);
-		DataManager.getManager().getMapFor(LegacyInfraction.class).put(MiscUtil.getInfractionId(infraction), LegacyInfraction.of(infraction));
+		DataManager.getManager().getMapFor(LegacyInfraction.class).put(id, LegacyInfraction.of(infraction));
 		infractions.add(id);
 	}
 
@@ -111,14 +118,14 @@ public class LegacyDossier implements DataSerializable<UUID>, Dossier
 	public void acquit(Infraction infraction)
 	{
 		String id = MiscUtil.getInfractionId(infraction);
-		DataManager.getManager().getMapFor(LegacyInfraction.class).remove(MiscUtil.getInfractionId(infraction));
+		DataManager.getManager().getMapFor(LegacyInfraction.class).remove(id);
 		infractions.remove(id);
 	}
 
 	@Override
 	public CompleteDossier complete(String playerName)
 	{
-		return new LegacyCompleteDossier(getId(), playerName, getInfractions());
+		return new LegacyCompleteDossier(getId(), playerName, infractions, null);
 	}
 
 	@Override

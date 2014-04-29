@@ -118,10 +118,6 @@ public class FileDataManager extends DataManager
 		TempDataManager.purge();
 
 		save();
-
-		// Reload the PLUGIN
-		Bukkit.getServer().getPluginManager().disablePlugin(InfractionsPlugin.getInst());
-		Bukkit.getServer().getPluginManager().enablePlugin(InfractionsPlugin.getInst());
 	}
 
 	@SuppressWarnings("unchecked")
