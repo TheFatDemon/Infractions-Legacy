@@ -16,14 +16,18 @@
 
 package com.censoredsoftware.infractions.bukkit.legacy.data.file;
 
-import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
-import com.censoredsoftware.library.serializable.yaml.TieredStringConvertableGenericYamlFile;
+import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataSerializable;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -32,7 +36,7 @@ import java.util.concurrent.ConcurrentMap;
  * @param <K> The id type.
  * @param <V> The data type.
  */
-public abstract class InfractionsFile<K extends Comparable, V extends DataAccess<K, V>, I> extends TieredStringConvertableGenericYamlFile<K, I>
+public abstract class InfractionsFile<K, V extends DataSerializable<K>, I>
 {
 	private final String name;
 	private final String fileName, fileType, savePath;
@@ -53,32 +57,27 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 		return name;
 	}
 
-	@Override
 	public final ConcurrentMap<K, I> getLoadedData()
 	{
 		return dataStore;
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public final Map<String, Object> serialize(K id)
 	{
 		return ((V) getLoadedData().get(id)).serialize();
 	}
 
-	@Override
 	public String getDirectoryPath()
 	{
 		return savePath;
 	}
 
-	@Override
 	public final String getFullFileName()
 	{
 		return fileName + fileType;
 	}
 
-	@Override
 	public final void loadDataFromFile()
 	{
 		dataStore = getCurrentFileData();
@@ -99,21 +98,6 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 		dataStore.put(key, value);
 	}
 
-	public final void putIfAbsent(K key, I value)
-	{
-		dataStore.putIfAbsent(key, value);
-	}
-
-	public final void remove(K key)
-	{
-		dataStore.remove(key);
-	}
-
-	public final Set<Map.Entry<K, I>> entrySet()
-	{
-		return dataStore.entrySet();
-	}
-
 	public final Collection<I> values()
 	{
 		return dataStore.values();
@@ -123,4 +107,80 @@ public abstract class InfractionsFile<K extends Comparable, V extends DataAccess
 	{
 		dataStore.clear();
 	}
+
+	public ConcurrentMap<K, I> getCurrentFileData()
+	{
+		// Grab the current file.
+		FileConfiguration data = YamlFileUtil.getConfiguration(getDirectoryPath(), getFullFileName());
+
+		// Convert the raw file data into more usable data, in map form.
+		ConcurrentHashMap<K, I> map = new ConcurrentHashMap<K, I>();
+		for(String stringId : data.getKeys(false))
+		{
+			try
+			{
+				I v = valueFromData(stringId, data.getConfigurationSection(stringId));
+				if(v == null)
+				{
+					InfractionsPlugin.getInst().getLogger().warning("Corrupt: " + stringId + ", in file: " + getFullFileName());
+					continue;
+				}
+				map.put(keyFromString(stringId), valueFromData(stringId, data.getConfigurationSection(stringId)));
+			}
+			catch(Exception ignored)
+			{
+				ignored.printStackTrace();
+			}
+		}
+		return map;
+	}
+
+	public boolean saveDataToFile()
+	{
+		// Grab the current file, and its data as a usable map.
+		FileConfiguration currentFile = YamlFileUtil.getConfiguration(getDirectoryPath(), getFullFileName());
+		final Map<K, I> currentFileMap = getCurrentFileData();
+
+		// Create/overwrite a configuration section if new data exists.
+		for(K key : Collections2.filter(getLoadedData().keySet(), new Predicate<K>()
+		{
+			@Override
+			public boolean apply(K key)
+			{
+				return !currentFileMap.containsKey(key) || !currentFileMap.get(key).equals(getLoadedData().get(key));
+			}
+		}))
+			currentFile.createSection(key.toString(), serialize(key));
+
+		// Remove old unneeded data.
+		for(K key : Collections2.filter(currentFileMap.keySet(), new Predicate<K>()
+		{
+			@Override
+			public boolean apply(K key)
+			{
+				return !getLoadedData().keySet().contains(key);
+			}
+		}))
+			currentFile.set(key.toString(), null);
+
+		// Save the file!
+		return YamlFileUtil.saveFile(getDirectoryPath(), getFullFileName(), currentFile);
+	}
+
+	/**
+	 * Convert a key from a string.
+	 *
+	 * @param stringKey The provided string.
+	 * @return The converted key.
+	 */
+	public abstract K keyFromString(String stringKey);
+
+	/**
+	 * Convert to a get from a number of objects representing the data.
+	 *
+	 * @param stringKey The string key for the data.
+	 * @param data      The provided data object.
+	 * @return The converted get.
+	 */
+	public abstract I valueFromData(String stringKey, ConfigurationSection data);
 }

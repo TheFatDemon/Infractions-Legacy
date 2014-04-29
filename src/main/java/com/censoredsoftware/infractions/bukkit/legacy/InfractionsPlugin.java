@@ -20,16 +20,14 @@ import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyData;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDatabase;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
-import com.censoredsoftware.infractions.bukkit.legacy.util.LevelUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
-import com.censoredsoftware.infractions.bukkit.legacy.util.Updater;
 import com.censoredsoftware.infractions.bukkit.origin.Origin;
 import com.censoredsoftware.infractions.bukkit.origin.OriginType;
-import com.censoredsoftware.library.helper.MojangIdProvider;
-import com.censoredsoftware.library.util.Times;
+import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import net.gravitydevelopment.updater.Updater;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -80,7 +78,7 @@ public class InfractionsPlugin extends JavaPlugin
 		CommandHandler ce = new CommandHandler();
 		// info
 		getCommand("infractions").setExecutor(ce);
-		getCommand("virtues").setExecutor(ce);
+		getCommand("reasons").setExecutor(ce);
 		getCommand("history").setExecutor(ce);
 		getCommand("history").setTabCompleter(ce);
 		// actions
@@ -108,7 +106,7 @@ public class InfractionsPlugin extends JavaPlugin
 		DataManager.saveAllData();
 		HandlerList.unregisterAll(this);
 		Bukkit.getScheduler().cancelTasks(this);
-		getLogger().info("Disabled cleanly.");
+		message("disabled");
 	}
 
 	@Override
@@ -116,14 +114,14 @@ public class InfractionsPlugin extends JavaPlugin
 	{
 		inst = this;
 
+		// Config
+		getConfig().options().copyDefaults(true);
+		saveConfig();
+
 		// Setup database
 		Infractions.setDatabase(new LegacyDatabase());
 		Infractions.setDefaultOrigin(new Origin(Bukkit.getServerName(), Bukkit.getServerName(), OriginType.SERVER));
 
-		//LevelUtil
-		new LevelUtil();
-
-		long firstTime = System.currentTimeMillis();
 		getLogger().info("Initializing.");
 		DataManager.initAllData();
 		LegacyData.syncConvert();
@@ -140,7 +138,7 @@ public class InfractionsPlugin extends JavaPlugin
 		if(SettingUtil.getSettingBoolean("update"))
 			new Updater(this, 44721, getFile(), Updater.UpdateType.DEFAULT, true);
 
-		getLogger().info("Preparation completed " + Times.timeSincePretty(firstTime) + ".");
+		message("enabled");
 	}
 
 	/**
@@ -149,12 +147,12 @@ public class InfractionsPlugin extends JavaPlugin
 	public static String getLevelForChat(Player player)
 	{
 		if(player.hasPermission("infractions.ignore")) return SettingUtil.getSettingString("chat_score_ignore");
-		return getLevelForChat(MojangIdProvider.getId(player.getName()));
+		return getLevelForChat(McIdProvider.getId(player.getName()));
 	}
 
 	public static String getLevelForChat(String playerName)
 	{
-		UUID id = MojangIdProvider.getId(playerName);
+		UUID id = McIdProvider.getId(playerName);
 		if(id != null) return getLevelForChat(id);
 		return "";
 	}
@@ -168,5 +166,15 @@ public class InfractionsPlugin extends JavaPlugin
 		if(chatScore < 1) chatScore = 1;
 		if(chatScore > 5) chatScore = 5;
 		return CHAT_SCORES.get(chatScore);
+	}
+
+	private void message(String status)
+	{
+		getLogger().info("      _      ___             __  _");
+		getLogger().info("     (_)__  / _/______ _____/ /_(_)__  ___  ___");
+		getLogger().info("    / / _ \\/ _/ __/ _ `/ __/ __/ / _ \\/ _ \\(_-<");
+		getLogger().info("   /_/_//_/_//_/  \\_,_/\\__/\\__/_/\\___/_//_/___/");
+		getLogger().info("  ");
+		getLogger().info(" ...version " + getDescription().getVersion() + " has " + status + " successfully!");
 	}
 }

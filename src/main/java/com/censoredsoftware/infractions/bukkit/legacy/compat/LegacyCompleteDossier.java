@@ -18,6 +18,7 @@ package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
+import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
@@ -32,11 +33,6 @@ import java.util.UUID;
 
 public class LegacyCompleteDossier extends LegacyDossier implements CompleteDossier
 {
-	public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Infraction... infractions)
-	{
-		this(mojangId, lastKnownName, Sets.newHashSet(infractions));
-	}
-
 	public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Set<Infraction> infractions)
 	{
 		super(mojangId, infractions);
@@ -75,11 +71,6 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 		}));
 	}
 
-	public Set<String> getRawAssociatedIPAddresses()
-	{
-		return this.ipAddresses;
-	}
-
 	public void addIPAddress(String address)
 	{
 		this.ipAddresses.add(address);
@@ -91,7 +82,7 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 	}
 
 	@Override
-	public CompleteDossier complete(String playerName)
+	public CompleteDossier complete(String ignored)
 	{
 		return this;
 	}
@@ -102,9 +93,16 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 		return this;
 	}
 
-	public void update(Player player)
+	public void update(final Player player)
 	{
-		addIPAddress(player.getAddress().getHostName());
-		this.lastKnownName = player.getDisplayName();
+		final LegacyCompleteDossier dossier = this;
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(InfractionsPlugin.getInst(), new Runnable()
+		{
+			@Override public void run()
+			{
+				if(player.isOnline()) addIPAddress(player.getAddress().getHostName());
+				dossier.lastKnownName = player.getName();
+			}
+		}, 40);
 	}
 }

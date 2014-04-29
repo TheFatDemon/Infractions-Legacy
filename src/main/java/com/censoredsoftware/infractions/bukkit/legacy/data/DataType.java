@@ -19,10 +19,6 @@ package com.censoredsoftware.infractions.bukkit.legacy.data;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyInfraction;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyIssuer;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
-import java.util.Arrays;
 
 /**
  * Meta data for each data type.
@@ -62,7 +58,7 @@ public enum DataType
 	 * @param idType The id type this data type uses.
 	 * @param abbr   The abbreviation for use in certain data managers.
 	 */
-	private <V extends DataAccess<?, V>> DataType(Class<V> clazz, IdType idType, String abbr)
+	private <V extends DataSerializable<?>> DataType(Class<V> clazz, IdType idType, String abbr)
 	{
 		this.clazz = clazz;
 		this.idType = idType;
@@ -88,25 +84,5 @@ public enum DataType
 	public String getAbbreviation()
 	{
 		return abbr;
-	}
-
-	public static <V extends DataAccess> Class<V>[] classes()
-	{
-		Class<V>[] classes = new Class[values().length];
-		for(int i = 0; i < values().length; i++)
-			classes[i] = values()[i].clazz;
-		return classes;
-	}
-
-	public static <V extends DataAccess> DataType typeFromClass(final Class<V> clazz)
-	{
-		return Iterables.find(Arrays.asList(values()), new Predicate<DataType>()
-		{
-			@Override
-			public boolean apply(DataType dataType)
-			{
-				return clazz.equals(dataType.clazz);
-			}
-		}, INVALID);
 	}
 }

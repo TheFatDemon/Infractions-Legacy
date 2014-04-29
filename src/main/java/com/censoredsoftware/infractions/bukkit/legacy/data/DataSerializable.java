@@ -16,14 +16,17 @@
 
 package com.censoredsoftware.infractions.bukkit.legacy.data;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Map;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Register
+@SuppressWarnings("unchecked")
+public interface DataSerializable<K>
 {
-	IdType idType();
+	K getId();
+
+	/**
+	 * Serialize the data held in the child class.
+	 *
+	 * @return Map of serialized data for the child class's current instance.
+	 */
+	Map<String, Object> serialize();
 }

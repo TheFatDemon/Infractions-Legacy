@@ -26,7 +26,7 @@ import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
 import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
 import com.censoredsoftware.infractions.bukkit.legacy.data.ServerData;
-import com.censoredsoftware.library.helper.MojangIdProvider;
+import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import org.bukkit.Bukkit;
@@ -141,7 +141,7 @@ public class MiscUtil
 		{
 			maxScore = 20;
 		}
-		ServerData.put(MojangIdProvider.getId(p.getName()).toString(), "MAXSCORE", maxScore);
+		ServerData.put(McIdProvider.getId(p.getName()).toString(), "MAXSCORE", maxScore);
 		return maxScore;
 	}
 
@@ -150,7 +150,7 @@ public class MiscUtil
 	{
 		try
 		{
-			UUID id = MojangIdProvider.getId(target);
+			UUID id = McIdProvider.getId(target);
 			Issuer issuer = getIssuer(sender);
 			Infractions.getCompleteDossier(target).cite(new Infraction(id, System.currentTimeMillis(), reason, score, issuer, createEvidence(issuer, proof)));
 			return true;
@@ -177,7 +177,7 @@ public class MiscUtil
 
 	public static Issuer getIssuer(CommandSender sender)
 	{
-		if(sender instanceof Player) return new Issuer(IssuerType.STAFF, MojangIdProvider.getId(sender.getName()).toString());
+		if(sender instanceof Player) return new Issuer(IssuerType.STAFF, McIdProvider.getId(sender.getName()).toString());
 		return new Issuer(IssuerType.UNKNOWN, sender.getName());
 	}
 
@@ -232,33 +232,26 @@ public class MiscUtil
 
 	public static void kickNotify(String p, String reason)
 	{
-		if(!VirtueUtil.getVirtues().contains(reason))
+		try
 		{
-			try
+			Player player = Bukkit.getPlayer(p);
+			if(getMaxScore(player) <= getScore(player))
 			{
-				Player player = Bukkit.getPlayer(p);
-				if(getMaxScore(player) <= getScore(player))
-				{
-					checkScore(player);
-				}
-				else if(SettingUtil.getSettingBoolean("kick_on_cite"))
-				{
-					player.kickPlayer(ChatColor.GOLD + "⚠" + ChatColor.WHITE + " You've been cited for " + reason + ".");
-				}
-				else
-				{
-					player.sendMessage(ChatColor.GOLD + "⚠" + ChatColor.RED + " You've been cited for " + reason + ".");
-					player.sendMessage(ChatColor.GOLD + "⚠" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
-				}
+				checkScore(player);
 			}
-			catch(NullPointerException e)
+			else if(SettingUtil.getSettingBoolean("kick_on_cite"))
 			{
-				ServerData.put(p, "NEWINFRACTION", true);
+				player.kickPlayer(ChatColor.GOLD + "⚠" + ChatColor.WHITE + " You've been cited for " + reason + ".");
+			}
+			else
+			{
+				player.sendMessage(ChatColor.GOLD + "⚠" + ChatColor.RED + " You've been cited for " + reason + ".");
+				player.sendMessage(ChatColor.GOLD + "⚠" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
 			}
 		}
-		else
+		catch(NullPointerException e)
 		{
-			VirtueUtil.rewardPlayer(p, reason);
+			ServerData.put(p, "NEWINFRACTION", true);
 		}
 	}
 
@@ -337,5 +330,25 @@ public class MiscUtil
 		if(num == '8') return "W";
 		if(num == '9') return "j";
 		return "b"; // 0
+	}
+
+	public static String prettyTime(long time)
+	{
+		long diff = (System.currentTimeMillis() - time) / 1000;
+		double day_diff = Math.floor(diff / 86400);
+
+		if(day_diff == 0 && diff < 60) return "few seconds";
+		if(diff < 120) return "minute";
+		if(diff < 3600) return (int) Math.floor(diff / 60) + " minutes";
+		if(diff < 7200) return "hour";
+		if(diff < 86400) return (int) Math.floor(diff / 3600) + " hours";
+		if(day_diff == 1) return "day";
+		if(day_diff < 7) return (int) day_diff + " days";
+		return (int) Math.ceil(day_diff / 7) + " weeks";
+	}
+
+	public static String timeSincePretty(long time)
+	{
+		return "in " + prettyTime(time);
 	}
 }

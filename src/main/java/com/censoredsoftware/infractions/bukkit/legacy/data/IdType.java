@@ -82,12 +82,6 @@ public enum IdType
 		return (K) fromString.apply(string);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <K> K cast(Object o)
-	{
-		return (K) cast.cast(o);
-	}
-
 	public Class getCastClass()
 	{
 		return cast;

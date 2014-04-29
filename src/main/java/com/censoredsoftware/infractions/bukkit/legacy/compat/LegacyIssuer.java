@@ -18,24 +18,25 @@ package com.censoredsoftware.infractions.bukkit.legacy.compat;
 
 import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
-import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataProvider;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataSerializable;
 import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
-import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
 import com.censoredsoftware.infractions.bukkit.origin.Origin;
 import com.censoredsoftware.infractions.bukkit.origin.OriginType;
-import com.censoredsoftware.library.serializable.DataSerializable;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 // FIXME Origin is ignored in version 0.5.
 
-public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements DataSerializable
+public class LegacyIssuer implements DataSerializable<String>
 {
 	private Issuer issuer;
 
@@ -48,7 +49,7 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 		this.issuer = issuer;
 	}
 
-	@Register(idType = IdType.STRING)
+	@DataProvider(idType = IdType.STRING)
 	public static LegacyIssuer of(String ignored, ConfigurationSection conf)
 	{
 		LegacyIssuer data = new LegacyIssuer();
@@ -57,7 +58,7 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 	}
 
 	@Override
-	protected String getId()
+	public String getId()
 	{
 		return issuer.getId();
 	}
@@ -109,12 +110,10 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 		return map;
 	}
 
-	private static final DataAccess<String, LegacyIssuer> DATA_ACCESS = new LegacyIssuer();
-
+	@SuppressWarnings("unchecked")
 	public static Issuer of(final String id)
 	{
-
-		LegacyIssuer issuer = Iterables.find(DATA_ACCESS.allDirect(), new Predicate<LegacyIssuer>()
+		LegacyIssuer issuer = Iterables.find((Collection<LegacyIssuer>) (Collection) DataManager.getManager().getAllOf(LegacyIssuer.class), new Predicate<LegacyIssuer>()
 		{
 			@Override
 			public boolean apply(LegacyIssuer legacyIssuer)
@@ -128,7 +127,11 @@ public class LegacyIssuer extends DataAccess<String, LegacyIssuer> implements Da
 	public static LegacyIssuer of(Issuer issuer)
 	{
 		LegacyIssuer legacyIssuer = new LegacyIssuer(issuer);
-		legacyIssuer.saveIfAbsent();
-		return legacyIssuer;
+		return (LegacyIssuer) DataManager.getManager().getMapFor(LegacyIssuer.class).putIfAbsent(issuer.getId(), legacyIssuer);
+	}
+
+	public void saveIfAbsent()
+	{
+		DataManager.getManager().getMapFor(LegacyIssuer.class).putIfAbsent(getId(), this);
 	}
 }

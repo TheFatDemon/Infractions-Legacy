@@ -20,12 +20,11 @@ import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
 import com.censoredsoftware.infractions.bukkit.evidence.EvidenceType;
 import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
-import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataProvider;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataSerializable;
 import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
-import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
-import com.censoredsoftware.library.serializable.DataSerializable;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -34,7 +33,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 
-public class LegacyInfraction extends DataAccess<String, LegacyInfraction> implements DataSerializable
+public class LegacyInfraction implements DataSerializable<String>
 {
 	private String id;
 	private Infraction infraction;
@@ -49,7 +48,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 		this.infraction = infraction;
 	}
 
-	@Register(idType = IdType.STRING)
+	@DataProvider(idType = IdType.STRING)
 	public static LegacyInfraction of(String id, ConfigurationSection conf)
 	{
 		LegacyInfraction data = new LegacyInfraction();
@@ -59,7 +58,7 @@ public class LegacyInfraction extends DataAccess<String, LegacyInfraction> imple
 	}
 
 	@Override
-	protected String getId()
+	public String getId()
 	{
 		return id;
 	}

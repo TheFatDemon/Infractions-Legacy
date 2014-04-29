@@ -6,8 +6,10 @@ author: HmmmQuestionMark
 commands:
     infractions:
         description: Important information.
-    virtues:
-        description: Important information.
+        usage: /infractions
+    reasons:
+        description: List of different approved reasons for an infraction.
+        usage: /reasons
     cite:
         description: Cite a player with an infraction.
         usage: /cite <player> <infraction> [proof-url]

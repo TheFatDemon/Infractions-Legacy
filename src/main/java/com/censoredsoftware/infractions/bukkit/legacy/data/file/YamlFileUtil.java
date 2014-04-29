@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.censoredsoftware.library.serializable.yaml;
+package com.censoredsoftware.infractions.bukkit.legacy.data.file;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

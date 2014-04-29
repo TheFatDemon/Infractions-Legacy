@@ -17,10 +17,8 @@
 package com.censoredsoftware.infractions.bukkit.legacy.util;
 
 import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
-import org.bukkit.configuration.file.FileConfiguration;
+import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class SettingUtil
@@ -30,27 +28,11 @@ public class SettingUtil
 	static
 	{
 		plugin = InfractionsPlugin.getInst();
-		plugin.getConfig().options().copyDefaults(true);
-		plugin.saveConfig();
 	}
 
-	public static <T> List<T> castList(Class<? extends T> clazz, Collection<?> c)
+	public static List<String> fetchListString(String path)
 	{
-		if(c == null)
-		{
-			return new ArrayList<T>();
-		}
-		List<T> r = new ArrayList<T>(c.size());
-		for(Object o : c)
-			r.add(clazz.cast(o));
-		return r;
-	}
-
-	public static List<String> fetchListString(FileConfiguration config, String path)
-	{
-		List<String> b = castList(String.class, config.getList(path));
-		config.set(path, b);
-		return b;
+		return plugin.getConfig().getStringList(path);
 	}
 
 	public static boolean getSettingBoolean(String id)
@@ -74,5 +56,70 @@ public class SettingUtil
 	{
 		if(plugin.getConfig().isString(id)) return plugin.getConfig().getString(id);
 		else return null;
+	}
+
+	public static Integer getLevel(String levelArg)
+	{
+		if(getLevel1().contains(levelArg)) return 1;
+		if(getLevel2().contains(levelArg)) return 2;
+		if(getLevel3().contains(levelArg)) return 3;
+		if(getLevel4().contains(levelArg)) return 4;
+		if(getLevel5().contains(levelArg)) return 5;
+
+		InfractionsPlugin.getInst().getLogger().warning("Unable to find level for reason '" + levelArg + "'.");
+		return null;
+	}
+
+	public static List<String> getLevel(int i)
+	{
+		List<String> level;
+		level = SettingUtil.fetchListString("level_" + i);
+		return level;
+	}
+
+	public static List<String> getAllLevels()
+	{
+		List<String> all = Lists.newArrayList();
+		all.addAll(getLevel1());
+		all.addAll(getLevel2());
+		all.addAll(getLevel3());
+		all.addAll(getLevel4());
+		all.addAll(getLevel5());
+		return all;
+	}
+
+	public static List<String> getLevel1()
+	{
+		List<String> level1;
+		level1 = SettingUtil.fetchListString("level_1");
+		return level1;
+	}
+
+	public static List<String> getLevel2()
+	{
+		List<String> level2;
+		level2 = SettingUtil.fetchListString("level_2");
+		return level2;
+	}
+
+	public static List<String> getLevel3()
+	{
+		List<String> level3;
+		level3 = SettingUtil.fetchListString("level_3");
+		return level3;
+	}
+
+	public static List<String> getLevel4()
+	{
+		List<String> level4;
+		level4 = SettingUtil.fetchListString("level_4");
+		return level4;
+	}
+
+	public static List<String> getLevel5()
+	{
+		List<String> level5;
+		level5 = SettingUtil.fetchListString("level_5");
+		return level5;
 	}
 }

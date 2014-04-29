@@ -25,7 +25,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class ServerData extends DataAccess<UUID, ServerData>
+public class ServerData implements DataSerializable<UUID>
 {
 	private UUID id;
 	private ServerDataType type;
@@ -38,7 +38,7 @@ public class ServerData extends DataAccess<UUID, ServerData>
 	{
 	}
 
-	@Register(idType = IdType.UUID)
+	@DataProvider(idType = IdType.UUID)
 	public static ServerData of(UUID id, ConfigurationSection conf)
 	{
 		ServerData data = new ServerData();
@@ -146,11 +146,19 @@ public class ServerData extends DataAccess<UUID, ServerData>
 		return Objects.toStringHelper(this).add("id", this.id).add("row", this.row).add("subkey", this.column).add("value", this.value).toString();
 	}
 
-	private static final DataAccess<UUID, ServerData> DATA_ACCESS = new ServerData();
-
 	public static Collection<ServerData> all()
 	{
-		return DATA_ACCESS.allDirect();
+		return DataManager.getManager().getAllOf(ServerData.class);
+	}
+
+	private void save()
+	{
+		DataManager.getManager().getMapFor(ServerData.class).put(getId(), this);
+	}
+
+	private void remove()
+	{
+		DataManager.getManager().getMapFor(ServerData.class).remove(getId());
 	}
 
 	/*

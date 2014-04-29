@@ -16,10 +16,10 @@
 
 package com.censoredsoftware.infractions.bukkit.legacy.data.file;
 
-import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataProvider;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataSerializable;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataType;
 import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
-import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.lang.reflect.Method;
@@ -59,7 +59,7 @@ public class InfractionsFileFactory
 	 * @param filePath  The path to the file directory.
 	 * @return A new DemigodsFile object.
 	 */
-	public static <K extends Comparable, V extends DataAccess<K, V>, I> InfractionsFile<K, V, I> create(final IdType idType, final Class<V> dataClass, String abbr, String filePath, String name)
+	public static <K, V extends DataSerializable<K>, I> InfractionsFile<K, V, I> create(final IdType idType, final Class<V> dataClass, String abbr, String filePath, String name)
 	{
 		// Check for void type.
 		if(IdType.VOID.equals(idType)) return null;
@@ -72,7 +72,7 @@ public class InfractionsFileFactory
 			for(Method method : dataClass.getMethods())
 			{
 				// Attempt to find a registered constructor.
-				Register methodConstructor = method.getAnnotation(Register.class);
+				DataProvider methodConstructor = method.getAnnotation(DataProvider.class);
 
 				// Is the constructor suitable for use?
 				if(methodConstructor == null || !Modifier.isStatic(method.getModifiers()) || !idType.equals(methodConstructor.idType())) continue;

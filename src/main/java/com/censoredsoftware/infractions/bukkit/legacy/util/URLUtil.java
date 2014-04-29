@@ -40,7 +40,7 @@ public class URLUtil
 		if(!SettingUtil.getSettingBoolean("bitly.use")) return input;
 		if(!input.startsWith("http://") && !input.startsWith("https://")) input = ("http://" + input);
 		Provider bitly = as(SettingUtil.getSettingString("bitly.user"), SettingUtil.getSettingString("bitly.key"));
-		Url shortUrl = (Url) bitly.call(shorten(input));
+		Url shortUrl = bitly.call(shorten(input));
 		return shortUrl.getShortUrl();
 	}
 

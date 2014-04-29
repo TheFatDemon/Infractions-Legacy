@@ -17,8 +17,8 @@
 package com.censoredsoftware.infractions.bukkit.legacy.data.file;
 
 import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
-import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataSerializable;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataType;
 import com.censoredsoftware.infractions.bukkit.legacy.data.TempDataManager;
 import com.google.common.collect.Lists;
@@ -126,7 +126,7 @@ public class FileDataManager extends DataManager
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <K extends Comparable, V extends DataAccess<K, V>, I> I getFor(final Class<V> clazz, final K key)
+	public <K, V extends DataSerializable<K>, I> I getFor(final Class<V> clazz, final K key)
 	{
 		if(getFile(clazz).containsKey(key)) return (I) getFile(clazz).get(key);
 		return null;
@@ -134,36 +134,19 @@ public class FileDataManager extends DataManager
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <K extends Comparable, V extends DataAccess<K, V>, I> Collection<I> getAllOf(final Class<V> clazz)
+	public <K, V extends DataSerializable<K>, I> Collection<I> getAllOf(final Class<V> clazz)
 	{
 		return (Collection<I>) getFile(clazz).values();
 	}
 
 	@Override
-	public <K extends Comparable, V extends DataAccess<K, V>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz)
+	public <K, V extends DataSerializable<K>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz)
 	{
 		return (ConcurrentMap<K, I>) getFile(clazz).getLoadedData();
 	}
 
-	@Override
-	public <K extends Comparable, V extends DataAccess<K, V>> void putFor(final Class<V> clazz, final K key, final V value)
-	{
-		getFile(clazz).put(key, value);
-	}
-
-	@Override protected <K extends Comparable, V extends DataAccess<K, V>> void putForIfAbsent(Class<V> clazz, K key, V value)
-	{
-		getFile(clazz).putIfAbsent(key, value);
-	}
-
-	@Override
-	public <K extends Comparable, V extends DataAccess<K, V>> void removeFor(final Class<V> clazz, final K key)
-	{
-		getFile(clazz).remove(key);
-	}
-
 	@SuppressWarnings("unchecked")
-	private <K extends Comparable, V extends DataAccess<K, V>, I> InfractionsFile<K, V, I> getFile(Class<V> clazz)
+	private <K, V extends DataSerializable<K>, I> InfractionsFile<K, V, I> getFile(Class<V> clazz)
 	{
 		if(yamlFiles.containsKey(clazz)) return (InfractionsFile<K, V, I>) yamlFiles.get(clazz);
 		throw new UnsupportedOperationException("Infractions wants a data type that does not exist.");

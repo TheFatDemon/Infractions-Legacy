@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.censoredsoftware.library.serializable;
+package com.censoredsoftware.infractions.bukkit.legacy.data;
 
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * Simple method to signify a class for holding the data.
- */
-public interface DataSerializable
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DataProvider
 {
-	/**
-	 * Serialize the data held in the child class.
-	 *
-	 * @return Map of serialized data for the child class's current instance.
-	 */
-	Map<String, Object> serialize();
+	IdType idType();
 }

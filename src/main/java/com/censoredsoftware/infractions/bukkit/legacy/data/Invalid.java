@@ -18,10 +18,10 @@ package com.censoredsoftware.infractions.bukkit.legacy.data;
 
 import java.util.Map;
 
-public class Invalid extends DataAccess<Comparable, Invalid>
+public class Invalid implements DataSerializable<Void>
 {
 	@Override
-	protected Comparable getId()
+	public Void getId()
 	{
 		throw new UnsupportedOperationException("Plugin tried accessing non-existent data type.");
 	}

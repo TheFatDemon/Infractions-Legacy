@@ -25,21 +25,28 @@ import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 public class PlayerListener implements Listener
 {
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e)
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerLogin(PlayerLoginEvent e)
 	{
-		// sync to master file
 		final Player p = e.getPlayer();
 
 		// Create data that we track
 		CompleteDossier dossier = Infractions.getCompleteDossier(p);
 		((LegacyCompleteDossier) dossier).update(p);
 		MiscUtil.getMaxScore(p);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerJoin(PlayerJoinEvent e)
+	{
+		final Player p = e.getPlayer();
 
 		if(SettingUtil.getSettingBoolean("motd"))
 		{

@@ -25,8 +25,10 @@ import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyCompleteDossier;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
-import com.censoredsoftware.infractions.bukkit.legacy.util.*;
-import com.censoredsoftware.library.helper.MojangIdProvider;
+import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
+import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
+import com.censoredsoftware.infractions.bukkit.legacy.util.URLUtil;
+import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -42,9 +44,9 @@ import org.bukkit.entity.Player;
 
 import java.net.InetAddress;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 public class CommandHandler implements TabExecutor
@@ -58,67 +60,31 @@ public class CommandHandler implements TabExecutor
 		if(sender instanceof Player) p = (Player) sender;
 		if(c.getName().equalsIgnoreCase("infractions"))
 		{
-			if(args.length == 0)
+			MiscUtil.sendMessage(p, "---------------");
+			MiscUtil.sendMessage(p, "INFRACTIONS HELP");
+			MiscUtil.sendMessage(p, "---------------");
+			if(MiscUtil.hasPermissionOrOP(p, "infractions.mod"))
 			{
-				MiscUtil.sendMessage(p, "---------------");
-				MiscUtil.sendMessage(p, "INFRACTIONS HELP");
-				MiscUtil.sendMessage(p, "---------------");
-				if(MiscUtil.hasPermissionOrOP(p, "infractions.mod"))
-				{
-					MiscUtil.sendMessage(p, ChatColor.GRAY + "/cite <player> <infraction> [proof-url]");
-					MiscUtil.sendMessage(p, ChatColor.GRAY + "/uncite <player> <key>" + ChatColor.WHITE + " - Find the key with " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
-				}
-				MiscUtil.sendMessage(p, ChatColor.GRAY + "/history [player]");
-				MiscUtil.sendMessage(p, ChatColor.GRAY + "/infractions types " + ChatColor.WHITE + "- Shows all valid infraction types.");
-				MiscUtil.sendMessage(p, ChatColor.GRAY + "/virtues " + ChatColor.WHITE + "- Shows all valid virtue types.");
-				return true;
+				MiscUtil.sendMessage(p, ChatColor.GRAY + "/cite <player> <infraction> [proof-url]");
+				MiscUtil.sendMessage(p, ChatColor.GRAY + "/uncite <player> <key>" + ChatColor.WHITE + " - Find the key with " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
 			}
-			else if(args[0].equalsIgnoreCase("types"))
-			{
-				MiscUtil.sendMessage(p, "----------------");
-				MiscUtil.sendMessage(p, "INFRACTIONS TYPES");
-				MiscUtil.sendMessage(p, "----------------");
-				MiscUtil.sendMessage(p, ChatColor.GREEN + "Level 1:");
-				for(int i = 0; i < LevelUtil.getLevel1().size(); i++)
-				{
-					MiscUtil.sendMessage(p, LevelUtil.getLevel1().get(i));
-				}
-				MiscUtil.sendMessage(p, ChatColor.YELLOW + "Level 2:");
-				for(int i = 0; i < LevelUtil.getLevel2().size(); i++)
-				{
-					MiscUtil.sendMessage(p, LevelUtil.getLevel2().get(i));
-				}
-				MiscUtil.sendMessage(p, ChatColor.GOLD + "Level 3:");
-				for(int i = 0; i < LevelUtil.getLevel3().size(); i++)
-				{
-					MiscUtil.sendMessage(p, LevelUtil.getLevel3().get(i));
-				}
-				MiscUtil.sendMessage(p, ChatColor.RED + "Level 4:");
-				for(int i = 0; i < LevelUtil.getLevel4().size(); i++)
-				{
-					MiscUtil.sendMessage(p, LevelUtil.getLevel4().get(i));
-				}
-				MiscUtil.sendMessage(p, ChatColor.DARK_RED + "Level 5:");
-				for(int i = 0; i < LevelUtil.getLevel5().size(); i++)
-				{
-					MiscUtil.sendMessage(p, LevelUtil.getLevel5().get(i));
-				}
-				return true;
-			}
-			else
-			{
-				MiscUtil.sendMessage(p, "Too many arguments.");
-				return false;
-			}
+			MiscUtil.sendMessage(p, ChatColor.GRAY + "/history [player]");
+			MiscUtil.sendMessage(p, ChatColor.GRAY + "/reasons " + ChatColor.WHITE + "- Shows all valid infraction reasons.");
+			MiscUtil.sendMessage(p, ChatColor.GRAY + "/virtues " + ChatColor.WHITE + "- Shows all valid virtue types.");
+			return true;
 		}
-		else if(c.getName().equalsIgnoreCase("virtues"))
+		else if(c.getName().equalsIgnoreCase("reasons"))
 		{
-			MiscUtil.sendMessage(p, "----------------");
-			MiscUtil.sendMessage(p, "VIRTUES TYPES");
-			MiscUtil.sendMessage(p, "----------------");
-			for(int i = 0; i < VirtueUtil.getVirtues().size(); i++)
+			MiscUtil.sendMessage(p, "------------------");
+			MiscUtil.sendMessage(p, "INFRACTION REASONS");
+			MiscUtil.sendMessage(p, "------------------");
+			MiscUtil.sendMessage(p, ChatColor.GREEN + "Level 1:");
+
+			for(int i = 1; i < 6; i++)
 			{
-				MiscUtil.sendMessage(p, VirtueUtil.getVirtues().get(i));
+				MiscUtil.sendMessage(p, ChatColor.YELLOW + "Level " + i + ":");
+				for(int j = 0; j < SettingUtil.getLevel(i).size(); j++)
+					MiscUtil.sendMessage(p, SettingUtil.getLevel(i).get(j));
 			}
 			return true;
 		}
@@ -154,7 +120,7 @@ public class CommandHandler implements TabExecutor
 				return true;
 			}
 			// Levels
-			Integer level = LevelUtil.getLevel(args[1]);
+			Integer level = SettingUtil.getLevel(args[1]);
 			if(level != null)
 			{
 				if(args.length == 3)
@@ -237,6 +203,8 @@ public class CommandHandler implements TabExecutor
 			String player = MiscUtil.getInfractionsPlayer(args[0]);
 			if(player != null)
 			{
+				sender.sendMessage("   ");
+
 				Integer maxScore = MiscUtil.getMaxScore(Infractions.getCompleteDossier(player).getId());
 				String chatLevel = InfractionsPlugin.getLevelForChat(player);
 				MiscUtil.sendMessage(p, ChatColor.WHITE + (chatLevel.equals("") ? "" : chatLevel + " ") + ChatColor.YELLOW + player + ChatColor.WHITE + " - " + MiscUtil.getScore(player) + (maxScore == null ? " points towards a ban." : " points out of " + maxScore + " until a ban."));
@@ -268,7 +236,7 @@ public class CommandHandler implements TabExecutor
 								if(IssuerType.STAFF.equals(infraction.getIssuer().getType()))
 								{
 									UUID issuerUUID = UUID.fromString(issuerId);
-									Map<UUID, LegacyDossier> map = DataManager.getManager().getMapFor(LegacyDossier.class);
+									ConcurrentMap<UUID, LegacyDossier> map = DataManager.getManager().getMapFor(LegacyDossier.class);
 									if(map.containsKey(issuerUUID) && map.get(issuerUUID) instanceof CompleteDossier)
 									{
 										CompleteDossier issuerDossier = (LegacyCompleteDossier) map.get(issuerUUID);
@@ -284,22 +252,24 @@ public class CommandHandler implements TabExecutor
 					Set<InetAddress> addresses = dossier.getAssociatedIPAddresses();
 					if(!addresses.isEmpty())
 					{
-						MiscUtil.sendMessage(p, ChatColor.BLUE + "⌘ " + ChatColor.WHITE + " Associated IP Addresses");
+						MiscUtil.sendMessage(p, ChatColor.BLUE + "✔ " + ChatColor.YELLOW + "Associated IP Addresses.");
 						for(InetAddress address : addresses)
 						{
 							MiscUtil.sendMessage(p, ChatColor.GRAY + "    " + address.getHostAddress());
 							Set<CompleteDossier> others = Infractions.getCompleteDossiers(address);
 							if(others.size() > 1)
 							{
-								MiscUtil.sendMessage(p, ChatColor.GRAY + "      ...also associated with:");
+								MiscUtil.sendMessage(p, ChatColor.GRAY + "      - also associated with:");
 								for(CompleteDossier other : others)
 								{
 									if(other.getId().equals(dossier.getId())) continue;
-									MiscUtil.sendMessage(p, ChatColor.GRAY + "      - " + ChatColor.YELLOW + other.getLastKnownName());
+									MiscUtil.sendMessage(p, ChatColor.GRAY + "        " + ChatColor.YELLOW + other.getLastKnownName());
 								}
 							}
 						}
 					}
+
+					sender.sendMessage("   ");
 					return true;
 				}
 				catch(NullPointerException e)
@@ -318,7 +288,7 @@ public class CommandHandler implements TabExecutor
 			try
 			{
 				Player remove = Bukkit.getServer().matchPlayer(args[0]).get(0);
-				Infractions.removeDossier(MojangIdProvider.getId(remove.getName()));
+				Infractions.removeDossier(McIdProvider.getId(remove.getName()));
 				remove.kickPlayer(ChatColor.GREEN + "Your Infractions history has been reset--please join again.");
 				return true;
 			}
@@ -374,7 +344,7 @@ public class CommandHandler implements TabExecutor
 				}
 			};
 			if("cite".equals(command.getName()))
-				list.addAll(Collections2.filter(LevelUtil.getAll(), predicate));
+				list.addAll(Collections2.filter(SettingUtil.getAllLevels(), predicate));
 			else if("uncite".equals(command.getName()) && step1Done)
 				list.addAll(Collections2.filter(((LegacyDossier) Infractions.getCompleteDossier(args[0])).getInfractionIds(), predicate));
 		}

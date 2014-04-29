@@ -59,17 +59,11 @@ public abstract class DataManager
 
 	protected abstract void flushData();
 
-	public abstract <K extends Comparable, V extends DataAccess<K, V>, I> I getFor(final Class<V> clazz, final K key);
+	public abstract <K, V extends DataSerializable<K>, I> I getFor(final Class<V> clazz, final K key);
 
-	public abstract <K extends Comparable, V extends DataAccess<K, V>, I> Collection<I> getAllOf(final Class<V> clazz);
+	public abstract <K, V extends DataSerializable<K>, I> Collection<I> getAllOf(final Class<V> clazz);
 
-	public abstract <K extends Comparable, V extends DataAccess<K, V>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz);
-
-	protected abstract <K extends Comparable, V extends DataAccess<K, V>> void putFor(Class<V> clazz, K key, V value);
-
-	protected abstract <K extends Comparable, V extends DataAccess<K, V>> void putForIfAbsent(Class<V> clazz, K key, V value);
-
-	protected abstract <K extends Comparable, V extends DataAccess<K, V>> void removeFor(Class<V> clazz, K key);
+	public abstract <K, V extends DataSerializable<K>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz);
 
 	public static DataManager getManager()
 	{

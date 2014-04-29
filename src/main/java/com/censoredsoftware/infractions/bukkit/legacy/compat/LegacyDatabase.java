@@ -21,8 +21,9 @@ import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
+import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
-import com.censoredsoftware.library.helper.MojangIdProvider;
+import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
@@ -47,13 +48,11 @@ public class LegacyDatabase implements Database
 	@Override
 	public CompleteDossier getCompleteDossier(String playerName)
 	{
-		UUID id = MojangIdProvider.getId(playerName);
+		UUID id = McIdProvider.getId(playerName);
 		if(id != null)
 		{
 			Dossier dossier = getDossier(id);
-			if(!(dossier instanceof LegacyCompleteDossier))
-				dossier = dossier.complete(playerName);
-			DataManager.getManager().getMapFor(LegacyDossier.class).put(dossier.getId(), dossier.complete(playerName));
+			if(!(dossier instanceof CompleteDossier)) return (CompleteDossier) DataManager.getManager().getMapFor(LegacyDossier.class).put(dossier.getId(), dossier.complete(playerName));
 			return (CompleteDossier) dossier;
 		}
 		throw new NullPointerException("No such player exists.");
@@ -83,14 +82,13 @@ public class LegacyDatabase implements Database
 	public Dossier getDossier(UUID playerId)
 	{
 		if(playerId == null) return null;
-		new LegacyDossier(playerId).saveIfAbsent();
-		return (Dossier) DataManager.getManager().getMapFor(LegacyDossier.class).get(playerId);
+		return (Dossier) DataManager.getManager().getMapFor(LegacyDossier.class).putIfAbsent(playerId, new LegacyDossier(playerId));
 	}
 
 	@Override
 	public Dossier getDossier(String playerName)
 	{
-		UUID id = MojangIdProvider.getId(playerName);
+		UUID id = McIdProvider.getId(playerName);
 		if(id != null)
 			return getDossier(id);
 		throw new NullPointerException("No such player exists.");
@@ -141,6 +139,6 @@ public class LegacyDatabase implements Database
 	@Override
 	public Plugin getPlugin()
 	{
-		return null;
+		return InfractionsPlugin.getInst();
 	}
 }

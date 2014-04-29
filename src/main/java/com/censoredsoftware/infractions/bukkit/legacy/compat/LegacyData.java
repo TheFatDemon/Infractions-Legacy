@@ -25,8 +25,9 @@ import com.censoredsoftware.infractions.bukkit.evidence.EvidenceType;
 import com.censoredsoftware.infractions.bukkit.issuer.Issuer;
 import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
 import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
-import com.censoredsoftware.library.helper.MojangIdProvider;
-import com.censoredsoftware.library.util.Times;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
+import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -99,7 +100,7 @@ public class LegacyData implements Runnable
 				error += organizeDossier(player);
 			}
 
-			if(messages) messageLog.info("We've finished organizing the dossiers sir, and it only took " + Times.prettyTime(startTime) + ".");
+			if(messages) messageLog.info("We've finished organizing the dossiers sir, and it only took " + MiscUtil.prettyTime(startTime) + ".");
 
 			log.info("DOSSIERS HAVE BEEN ORGANIZED.");
 
@@ -116,11 +117,11 @@ public class LegacyData implements Runnable
 
 			if(messages)
 			{
-				messageLog.info("After another " + Times.prettyTime(halfTime) + " we're finally done!");
+				messageLog.info("After another " + MiscUtil.prettyTime(halfTime) + " we're finally done!");
 				messageLog.info("We've compiled a report for you sir:");
 			}
 
-			log.info("PROCESS COMPLETED " + Times.timeSincePretty(startTime).toUpperCase() + " WITH " + error + " ERRORS.");
+			log.info("PROCESS COMPLETED " + MiscUtil.timeSincePretty(startTime).toUpperCase() + " WITH " + error + " ERRORS.");
 			if(error > 0)
 			{
 				log.info("Sometimes an error or two is expected.");
@@ -142,11 +143,26 @@ public class LegacyData implements Runnable
 
 	private static String tryAgain = "";
 
+	private static int organizeDossiers(List<String> playerList)
+	{
+		int error = 0;
+		for(UUID id : McIdProvider.getIds(playerList))
+		{
+			if(id == null)
+			{
+				error += 1;
+				continue;
+			}
+			Infractions.getDossier(id);
+		}
+		return error;
+	}
+
 	@SuppressWarnings("unchecked")
-	public static int organizeDossier(String target)
+	private static int organizeDossier(String target)
 	{
 		if(all && !hasData(target, "INFRACTIONS")) return 0;
-		UUID id = MojangIdProvider.getId(target);
+		UUID id = McIdProvider.getId(target);
 		if(id == null)
 		{
 			if(!tryAgain.equals(target))
@@ -159,11 +175,11 @@ public class LegacyData implements Runnable
 		}
 
 		Dossier dossier = Infractions.getDossier(id);
-		dossier.complete(target);
+		if(!(dossier instanceof CompleteDossier)) DataManager.getManager().getMapFor(LegacyDossier.class).put(id, dossier.complete(target));
 		return 0;
 	}
 
-	public static int consolodateLegacyInfractions(CompleteDossier dossier)
+	private static int consolodateLegacyInfractions(CompleteDossier dossier)
 	{
 		int error = 0;
 		int count = 0;
@@ -230,7 +246,7 @@ public class LegacyData implements Runnable
 	private static Map<String, HashMap<String, Object>> legacyData = Maps.newHashMap();
 
 	@SuppressWarnings("unchecked")
-	public LegacyData()
+	private LegacyData()
 	{
 		File f1 = new File(PATH + "Players/");
 		File[] list = f1.listFiles();
@@ -261,7 +277,7 @@ public class LegacyData implements Runnable
 		if(f1.listFiles().length == 0) f1.delete();
 	}
 
-	public static boolean hasData(String p, String id)
+	private static boolean hasData(String p, String id)
 	{
 		return hasPlayer(p) && getLegacyData().get(p).containsKey(id);
 	}
@@ -269,7 +285,7 @@ public class LegacyData implements Runnable
 	/*
 	 * Check if the player has saved information.
 	 */
-	public static boolean hasPlayer(String p)
+	private static boolean hasPlayer(String p)
 	{
 		return getLegacyData().containsKey(p);
 	}
@@ -277,7 +293,7 @@ public class LegacyData implements Runnable
 	/*
 	 * getLegacyData() : Returns all Legacy data.
 	 */
-	public static Map<String, HashMap<String, Object>> getLegacyData()
+	private static Map<String, HashMap<String, Object>> getLegacyData()
 	{
 		return legacyData;
 	}

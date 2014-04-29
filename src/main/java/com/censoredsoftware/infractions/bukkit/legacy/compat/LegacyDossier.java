@@ -19,10 +19,10 @@ package com.censoredsoftware.infractions.bukkit.legacy.compat;
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
 import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
-import com.censoredsoftware.infractions.bukkit.legacy.data.DataAccess;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataProvider;
+import com.censoredsoftware.infractions.bukkit.legacy.data.DataSerializable;
 import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
-import com.censoredsoftware.infractions.bukkit.legacy.data.Register;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -32,7 +32,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 
-public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Dossier
+public class LegacyDossier implements DataSerializable<UUID>, Dossier
 {
 	private UUID mojangid;
 	private Set<String> infractions;
@@ -53,14 +53,14 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 			public String apply(Infraction infraction)
 			{
 				String id = MiscUtil.getInfractionId(infraction);
-				LegacyInfraction.of(infraction).save();
+				DataManager.getManager().getMapFor(LegacyInfraction.class).put(MiscUtil.getInfractionId(infraction), LegacyInfraction.of(infraction));
 				return id;
 			}
 		}));
 		this.ipAddresses = Sets.newHashSet();
 	}
 
-	@Register(idType = IdType.UUID)
+	@DataProvider(idType = IdType.UUID)
 	public static LegacyDossier of(UUID id, ConfigurationSection conf)
 	{
 		return (LegacyDossier) unserialize(id, conf.getValues(true));
@@ -84,7 +84,6 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	@Override
 	public Set<Infraction> getInfractions()
 	{
-		if(infractions.isEmpty()) return Sets.newHashSet();
 		return Sets.newHashSet(Collections2.transform(infractions, new Function<String, Infraction>()
 		{
 			@Override
@@ -104,7 +103,7 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public void cite(Infraction infraction)
 	{
 		String id = MiscUtil.getInfractionId(infraction);
-		LegacyInfraction.of(infraction).save();
+		DataManager.getManager().getMapFor(LegacyInfraction.class).put(MiscUtil.getInfractionId(infraction), LegacyInfraction.of(infraction));
 		infractions.add(id);
 	}
 
@@ -112,16 +111,14 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public void acquit(Infraction infraction)
 	{
 		String id = MiscUtil.getInfractionId(infraction);
-		LegacyInfraction.of(infraction).remove();
+		DataManager.getManager().getMapFor(LegacyInfraction.class).remove(MiscUtil.getInfractionId(infraction));
 		infractions.remove(id);
 	}
 
 	@Override
 	public CompleteDossier complete(String playerName)
 	{
-		CompleteDossier dossier = new LegacyCompleteDossier(getId(), playerName, getInfractions());
-		DataManager.getManager().getMapFor(LegacyDossier.class).put(getId(), dossier);
-		return dossier;
+		return new LegacyCompleteDossier(getId(), playerName, getInfractions());
 	}
 
 	@Override
@@ -153,15 +150,12 @@ public class LegacyDossier extends DataAccess<UUID, LegacyDossier> implements Do
 	public static Dossier unserialize(UUID id, Map<String, Object> map)
 	{
 		LegacyDossier dossier = new LegacyDossier(id);
-		if(map.containsKey("lastKnownName"))
-			dossier = (LegacyDossier) dossier.complete(map.get("lastKnownName").toString());
+		if(map.containsKey("lastKnownName")) dossier = (LegacyDossier) dossier.complete(map.get("lastKnownName").toString());
 
-		if(map.containsKey("infractions"))
-			dossier.infractions = Sets.newHashSet((List<String>) map.get("infractions"));
+		if(map.containsKey("infractions")) dossier.infractions = Sets.newHashSet((List<String>) map.get("infractions"));
 		else dossier.infractions = Sets.newHashSet();
 
-		if(map.containsKey("addresses"))
-			dossier.ipAddresses = Sets.newHashSet((List<String>) map.get("addresses"));
+		if(map.containsKey("addresses")) dossier.ipAddresses = Sets.newHashSet((List<String>) map.get("addresses"));
 		else dossier.ipAddresses = Sets.newHashSet();
 
 		dossier.mojangid = id;
