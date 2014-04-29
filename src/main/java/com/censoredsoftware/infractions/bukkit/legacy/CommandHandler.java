@@ -219,7 +219,7 @@ public class CommandHandler implements TabExecutor
 						for(Infraction infraction : infractions)
 						{
 							MiscUtil.sendMessage(p, ChatColor.DARK_RED + "✘ " + ChatColor.DARK_AQUA + StringUtils.capitalize(infraction.getReason()) + ChatColor.GRAY + " - " + ChatColor.WHITE + infraction.getDateCreated());
-							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Score: " + ChatColor.WHITE + infraction.getScore());
+							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Penalty: " + ChatColor.WHITE + infraction.getScore());
 							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Proof: " + ChatColor.WHITE + Iterables.getFirst(Collections2.transform(infraction.getEvidence(), new Function<Evidence, Object>()
 							{
 								@Override
