@@ -218,7 +218,7 @@ public class CommandHandler implements TabExecutor
 					{
 						for(Infraction infraction : infractions)
 						{
-							MiscUtil.sendMessage(p, ChatColor.DARK_RED + "✘ " + ChatColor.DARK_AQUA + StringUtils.capitalize(infraction.getReason()) + ChatColor.GRAY + " - " + ChatColor.WHITE + infraction.getDateCreated());
+							MiscUtil.sendMessage(p, ChatColor.DARK_RED + "✘ " + ChatColor.DARK_PURPLE + StringUtils.capitalize(infraction.getReason()) + ChatColor.GRAY + " - " + ChatColor.WHITE + infraction.getDateCreated());
 							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Penalty: " + ChatColor.WHITE + infraction.getScore());
 							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Proof: " + ChatColor.WHITE + Iterables.getFirst(Collections2.transform(infraction.getEvidence(), new Function<Evidence, Object>()
 							{
@@ -247,24 +247,22 @@ public class CommandHandler implements TabExecutor
 							}
 						}
 					}
-					else MiscUtil.sendMessage(p, ChatColor.DARK_GREEN + "✔ " + ChatColor.WHITE + " No infractions found for this player.");
+					else MiscUtil.sendMessage(p, ChatColor.DARK_GREEN + "✔ " + ChatColor.WHITE + "No infractions found for this player.");
 					if(!staff) return true;
 					Set<InetAddress> addresses = dossier.getAssociatedIPAddresses();
-					if(!addresses.isEmpty())
+					MiscUtil.sendMessage(p, ChatColor.BLUE + "✔ " + ChatColor.DARK_AQUA + "Associated IP Addresses:");
+					if(addresses.isEmpty()) MiscUtil.sendMessage(p, ChatColor.GRAY + "    No currently known addresses.");
+					else for(InetAddress address : addresses)
 					{
-						MiscUtil.sendMessage(p, ChatColor.BLUE + "✔ " + ChatColor.YELLOW + "Associated IP Addresses.");
-						for(InetAddress address : addresses)
+						MiscUtil.sendMessage(p, ChatColor.GRAY + "    " + address.getHostAddress());
+						Set<CompleteDossier> others = Infractions.getCompleteDossiers(address);
+						if(others.size() > 1)
 						{
-							MiscUtil.sendMessage(p, ChatColor.GRAY + "    " + address.getHostAddress());
-							Set<CompleteDossier> others = Infractions.getCompleteDossiers(address);
-							if(others.size() > 1)
+							MiscUtil.sendMessage(p, ChatColor.GRAY + "      - also associated with:");
+							for(CompleteDossier other : others)
 							{
-								MiscUtil.sendMessage(p, ChatColor.GRAY + "      - also associated with:");
-								for(CompleteDossier other : others)
-								{
-									if(other.getId().equals(dossier.getId())) continue;
-									MiscUtil.sendMessage(p, ChatColor.GRAY + "        " + ChatColor.YELLOW + other.getLastKnownName());
-								}
+								if(other.getId().equals(dossier.getId())) continue;
+								MiscUtil.sendMessage(p, ChatColor.GRAY + "        " + ChatColor.YELLOW + other.getLastKnownName());
 							}
 						}
 					}

@@ -40,6 +40,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spigot.version>1.7.9-R0.1-SNAPSHOT</spigot.version>
+        <censoredlib.version>1.0.0-SNAPSHOT</censoredlib.version>
         <mcstats.version>R7</mcstats.version>
     </properties>
 
@@ -88,7 +89,7 @@
         <dependency>
             <groupId>com.censoredsoftware.library</groupId>
             <artifactId>mc-id-provider</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${censoredlib.version}</version>
         </dependency>
         <dependency>
             <groupId>net.gravitydevelopment.updater</groupId>
@@ -136,7 +137,7 @@
                             <artifactSet>
                                 <includes>
                                     <include>com.censoredsoftware:infractions-bukkit-api</include>
-                                    <include>com.censoredsoftware.library:mc-id-provider</include>
+                                    <include>com.censoredsoftware.library:*</include>
                                     <include>org.mcstats.bukkit:metrics-lite</include>
                                     <include>net.gravitydevelopment.updater:updater</include>
                                     <include>com.rosaloves:bitlyj</include>
@@ -147,6 +148,10 @@
                 </executions>
                 <configuration>
                     <relocations>
+                        <relocation>
+                            <pattern>com.censoredsoftware.library</pattern>
+                            <shadedPattern>infractions.shaded.com.censoredsoftware.library</shadedPattern>
+                        </relocation>
                         <relocation>
                             <pattern>com.rosaloves</pattern>
                             <shadedPattern>infractions.shaded.com.rosaloves</shadedPattern>

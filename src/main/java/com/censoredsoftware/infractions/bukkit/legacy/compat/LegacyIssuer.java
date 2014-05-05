@@ -25,12 +25,9 @@ import com.censoredsoftware.infractions.bukkit.legacy.data.IdType;
 import com.censoredsoftware.infractions.bukkit.origin.Origin;
 import com.censoredsoftware.infractions.bukkit.origin.OriginType;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +35,8 @@ import java.util.Map;
 
 public class LegacyIssuer implements DataSerializable<String>
 {
+	private static final Issuer UNKNOWN = new Issuer(IssuerType.UNKNOWN, "UNKNOWN");
+
 	private Issuer issuer;
 
 	private LegacyIssuer()
@@ -113,21 +112,17 @@ public class LegacyIssuer implements DataSerializable<String>
 	@SuppressWarnings("unchecked")
 	public static Issuer of(final String id)
 	{
-		LegacyIssuer issuer = Iterables.find((Collection<LegacyIssuer>) (Collection) DataManager.getManager().getAllOf(LegacyIssuer.class), new Predicate<LegacyIssuer>()
-		{
-			@Override
-			public boolean apply(LegacyIssuer legacyIssuer)
-			{
-				return id.equals(legacyIssuer.getId());
-			}
-		}, null);
-		return issuer != null ? issuer.toIssuer() : null;
+		Map<String, LegacyIssuer> data = DataManager.getManager().getMapFor(LegacyIssuer.class);
+		return data.containsKey(id) ? data.get(id).toIssuer() : UNKNOWN;
 	}
 
 	public static LegacyIssuer of(Issuer issuer)
 	{
 		LegacyIssuer legacyIssuer = new LegacyIssuer(issuer);
-		return (LegacyIssuer) DataManager.getManager().getMapFor(LegacyIssuer.class).putIfAbsent(issuer.getId(), legacyIssuer);
+		legacyIssuer.saveIfAbsent();
+
+		Map<String, LegacyIssuer> data = DataManager.getManager().getMapFor(LegacyIssuer.class);
+		return data.containsKey(issuer.getId()) ? data.get(issuer.getId()) : legacyIssuer;
 	}
 
 	public void saveIfAbsent()

@@ -27,6 +27,7 @@ import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -54,6 +55,9 @@ public class LegacyDatabase implements Database
 			Dossier dossier = getDossier(id);
 			if(!(dossier instanceof CompleteDossier))
 			{
+				Validate.notNull(dossier, "DOSSIER");
+				Validate.notNull(id, "ID");
+				Validate.notNull(playerName, "PLAYER NAME");
 				dossier = dossier.complete(playerName);
 				DataManager.getManager().getMapFor(LegacyDossier.class).put(dossier.getId(), dossier);
 			}
@@ -86,7 +90,9 @@ public class LegacyDatabase implements Database
 	public Dossier getDossier(UUID playerId)
 	{
 		if(playerId == null) return null;
-		return (Dossier) DataManager.getManager().getMapFor(LegacyDossier.class).putIfAbsent(playerId, new LegacyDossier(playerId));
+		LegacyDossier dossier = new LegacyDossier(playerId);
+		Dossier answer = (Dossier) DataManager.getManager().getMapFor(LegacyDossier.class).putIfAbsent(playerId, dossier);
+		return answer != null ? answer : dossier;
 	}
 
 	@Override

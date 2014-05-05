@@ -101,7 +101,6 @@ public class LegacyData implements Runnable
 				int result = organizeDossier(player);
 				if(result == 1) playerList.remove(player);
 				error += result;
-				error += consolodateLegacyInfractions(player);
 			}
 
 			if(messages) messageLog.info("We've finished organizing the dossiers sir, and it only took " + MiscUtil.prettyTime(startTime) + ".");
@@ -251,6 +250,7 @@ public class LegacyData implements Runnable
 				}
 			}
 			if(error > 0) log.warning("Error converting " + error + " of " + count + " infractions for " + target + ".");
+			else log.info("Converted " + count + " infractions for " + target + ".");
 		}
 		return (error > 0 ? 1 : 0);
 	}

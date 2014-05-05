@@ -29,6 +29,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
@@ -115,6 +116,8 @@ public class LegacyInfraction implements DataSerializable<String>
 	{
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("playerId", infraction.getPlayerId().toString());
+		Validate.notNull(infraction, "Infraction");
+		Validate.notNull(infraction.getIssuer(), "Issuer");
 		LegacyIssuer.of(infraction.getIssuer()).saveIfAbsent();
 		map.put("issuer", infraction.getIssuer().getId());
 		map.put("timeCreated", infraction.getTimeCreated());
