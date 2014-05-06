@@ -9,7 +9,6 @@ kick_on_cite: false
 ban: true
 ban_at_score: 5
 require_proof: false
-virtue_value: -1
 bitly:
     use: false
     user: '' #Sign-up for bit.ly
@@ -34,10 +33,6 @@ level_4:
 level_5:
   - lg-hacking
   - lg-griefing
-virtues:
-  - helping-admin
-  - fixing-grief
-  - reporting-hacks
 #Define Chat Scores
 chat_score_5: '&7[&cBANNED&7]' #Banned
 chat_score_4: '&7[&6:(&7]' #Almost banned
@@ -48,3 +43,4 @@ chat_score_ignore: '&7[&3:3&7]' #Plugin ignores this player
 #Convert
 convert:
     done: false
+    all: true
