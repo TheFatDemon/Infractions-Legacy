@@ -43,6 +43,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -52,6 +53,7 @@ import java.util.logging.Logger;
 public class CommandHandler implements TabExecutor
 {
 	static Logger log = InfractionsPlugin.getInst().getLogger();
+	static SimpleDateFormat FORMAT = new SimpleDateFormat("MMM dd, yyyy @ hh:mm aa");
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command c, String label, String[] args)
@@ -65,12 +67,12 @@ public class CommandHandler implements TabExecutor
 			MiscUtil.sendMessage(p, "---------------");
 			if(MiscUtil.hasPermissionOrOP(p, "infractions.mod"))
 			{
-				MiscUtil.sendMessage(p, ChatColor.GRAY + "/cite <player> <infraction> [proof-url]");
-				MiscUtil.sendMessage(p, ChatColor.GRAY + "/uncite <player> <key>" + ChatColor.WHITE + " - Find the key with " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
+				MiscUtil.sendMessage(p, ChatColor.GRAY + "  /cite <player> <infraction> [proof-url]");
+				MiscUtil.sendMessage(p, ChatColor.GRAY + "  /uncite <player> <key>" + ChatColor.WHITE + " - Find the key with " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + ".");
 			}
-			MiscUtil.sendMessage(p, ChatColor.GRAY + "/history [player]");
-			MiscUtil.sendMessage(p, ChatColor.GRAY + "/reasons " + ChatColor.WHITE + "- Shows all valid infraction reasons.");
-			MiscUtil.sendMessage(p, ChatColor.GRAY + "/virtues " + ChatColor.WHITE + "- Shows all valid virtue types.");
+			MiscUtil.sendMessage(p, ChatColor.GRAY + "  /history [player]");
+			MiscUtil.sendMessage(p, ChatColor.GRAY + "  /reasons " + ChatColor.WHITE + "- Shows all valid infraction reasons.");
+			MiscUtil.sendMessage(p, ChatColor.GRAY + "  /virtues " + ChatColor.WHITE + "- Shows all valid virtue types.");
 			return true;
 		}
 		else if(c.getName().equalsIgnoreCase("reasons"))
@@ -78,13 +80,12 @@ public class CommandHandler implements TabExecutor
 			MiscUtil.sendMessage(p, "------------------");
 			MiscUtil.sendMessage(p, "INFRACTION REASONS");
 			MiscUtil.sendMessage(p, "------------------");
-			MiscUtil.sendMessage(p, ChatColor.GREEN + "Level 1:");
 
 			for(int i = 1; i < 6; i++)
 			{
-				MiscUtil.sendMessage(p, ChatColor.YELLOW + "Level " + i + ":");
+				MiscUtil.sendMessage(p, (i < 3 ? ChatColor.GREEN : i < 5 ? ChatColor.YELLOW : ChatColor.RED) + "Level " + i + ":");
 				for(int j = 0; j < SettingUtil.getLevel(i).size(); j++)
-					MiscUtil.sendMessage(p, SettingUtil.getLevel(i).get(j));
+					MiscUtil.sendMessage(p, "  " + SettingUtil.getLevel(i).get(j));
 			}
 			return true;
 		}
@@ -130,14 +131,13 @@ public class CommandHandler implements TabExecutor
 						MiscUtil.sendMessage(p, "You must provide a valid URL as proof.");
 						return false;
 					}
-					MiscUtil.sendMessage(p, "Proof URL: " + ChatColor.GOLD + URLUtil.convertURL(args[2]));
 					MiscUtil.addInfraction(MiscUtil.getInfractionsPlayer(args[0]), sender, level, args[1], URLUtil.convertURL(args[2]));
 				}
 				else
 				{
 					MiscUtil.addInfraction(MiscUtil.getInfractionsPlayer(args[0]), sender, level, args[1], "No proof.");
 				}
-				MiscUtil.sendMessage(p, ChatColor.GOLD + "Success! " + ChatColor.WHITE + "The level " + level + " infraction has been recieved.");
+				MiscUtil.sendMessage(p, ChatColor.GOLD + "Success! " + ChatColor.WHITE + "The level " + level + " infraction has been received.");
 				MiscUtil.kickNotify(MiscUtil.getInfractionsPlayer(args[0]), args[1]);
 				return true;
 			}
@@ -157,7 +157,7 @@ public class CommandHandler implements TabExecutor
 
 			if(MiscUtil.removeInfraction(MiscUtil.getInfractionsPlayer(args[0]), args[1]))
 			{
-				MiscUtil.sendMessage(p, "Removed!");
+				MiscUtil.sendMessage(p, "Infraction removed!");
 				try
 				{
 					MiscUtil.checkScore(MiscUtil.getInfractionsPlayer(args[0]));
@@ -218,9 +218,9 @@ public class CommandHandler implements TabExecutor
 					{
 						for(Infraction infraction : infractions)
 						{
-							MiscUtil.sendMessage(p, ChatColor.DARK_RED + "✘ " + ChatColor.DARK_PURPLE + StringUtils.capitalize(infraction.getReason()) + ChatColor.GRAY + " - " + ChatColor.WHITE + infraction.getDateCreated());
-							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Penalty: " + ChatColor.WHITE + infraction.getScore());
-							MiscUtil.sendMessage(p, ChatColor.GRAY + "     Proof: " + ChatColor.WHITE + Iterables.getFirst(Collections2.transform(infraction.getEvidence(), new Function<Evidence, Object>()
+							MiscUtil.sendMessage(p, ChatColor.DARK_RED + "✘ " + ChatColor.DARK_PURPLE + StringUtils.capitalize(infraction.getReason()) + ChatColor.DARK_GRAY + " - " + ChatColor.BLUE + FORMAT.format(infraction.getDateCreated()));
+							MiscUtil.sendMessage(p, ChatColor.DARK_GRAY + "     Penalty: " + ChatColor.GRAY + infraction.getScore());
+							MiscUtil.sendMessage(p, ChatColor.DARK_GRAY + "     Proof: " + ChatColor.GRAY + Iterables.getFirst(Collections2.transform(infraction.getEvidence(), new Function<Evidence, Object>()
 							{
 								@Override
 								public String apply(Evidence evidence)
@@ -231,7 +231,7 @@ public class CommandHandler implements TabExecutor
 							if(staff)
 							{
 								String id = MiscUtil.getInfractionId(infraction);
-								MiscUtil.sendMessage(p, ChatColor.GRAY + "     Key: " + ChatColor.WHITE + id);
+								MiscUtil.sendMessage(p, ChatColor.DARK_GRAY + "     Key: " + ChatColor.GRAY + id);
 								String issuerId = infraction.getIssuer().getId();
 								if(IssuerType.STAFF.equals(infraction.getIssuer().getType()))
 								{
@@ -243,7 +243,7 @@ public class CommandHandler implements TabExecutor
 										issuerId = issuerDossier.getLastKnownName();
 									}
 								}
-								MiscUtil.sendMessage(p, ChatColor.GRAY + "     Issuer: " + ChatColor.WHITE + issuerId);
+								MiscUtil.sendMessage(p, ChatColor.DARK_GRAY + "     Issuer: " + ChatColor.GRAY + issuerId);
 							}
 						}
 					}
@@ -251,18 +251,18 @@ public class CommandHandler implements TabExecutor
 					if(!staff) return true;
 					Set<InetAddress> addresses = dossier.getAssociatedIPAddresses();
 					MiscUtil.sendMessage(p, ChatColor.BLUE + "✔ " + ChatColor.DARK_AQUA + "Associated IP Addresses:");
-					if(addresses.isEmpty()) MiscUtil.sendMessage(p, ChatColor.GRAY + "    No currently known addresses.");
+					if(addresses.isEmpty()) MiscUtil.sendMessage(p, ChatColor.GRAY + "     No currently known addresses.");
 					else for(InetAddress address : addresses)
 					{
-						MiscUtil.sendMessage(p, ChatColor.GRAY + "    " + address.getHostAddress());
+						MiscUtil.sendMessage(p, ChatColor.GRAY + "     " + address.getHostAddress());
 						Set<CompleteDossier> others = Infractions.getCompleteDossiers(address);
 						if(others.size() > 1)
 						{
-							MiscUtil.sendMessage(p, ChatColor.GRAY + "      - also associated with:");
+							MiscUtil.sendMessage(p, ChatColor.DARK_GRAY + "       - also associated with:");
 							for(CompleteDossier other : others)
 							{
 								if(other.getId().equals(dossier.getId())) continue;
-								MiscUtil.sendMessage(p, ChatColor.GRAY + "        " + ChatColor.YELLOW + other.getLastKnownName());
+								MiscUtil.sendMessage(p, ChatColor.GRAY + "         " + ChatColor.YELLOW + other.getLastKnownName());
 							}
 						}
 					}
