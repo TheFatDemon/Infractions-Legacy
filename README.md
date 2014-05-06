@@ -25,7 +25,7 @@ Use the following commands in-game, or in the console.
 * **/cite [player] [infraction] [proof]** - Gives an infraction.
 * **/uncite [player] [key]** - Removes an infraction, key is found with /history [player].
 * **/infractions** - Help page.
-* **/infractions types** - Shows every valid type of infraction.
+* **/reasons** - Shows every valid reason for an infraction.
 * **/history [player]** - View a players infraction history.
 
 ## Permissions ##
