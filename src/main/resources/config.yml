@@ -5,6 +5,7 @@ update: true
 motd: true
 start_delay_seconds: 5
 save_interval_seconds: 10
+cache_interval_minutes: 10
 kick_on_cite: false
 ban: true
 ban_at_score: 5

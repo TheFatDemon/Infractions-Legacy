@@ -39,6 +39,7 @@ import org.mcstats.MetricsLite;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class InfractionsPlugin extends JavaPlugin
 {
@@ -66,7 +67,7 @@ public class InfractionsPlugin extends JavaPlugin
 				DataManager.saveAllData();
 			}
 		}, startdelay, savefrequency);
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new AsyncIPMatcherTask(), 50, 600);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new AsyncIPMatcherTask(), 50, TimeUnit.MINUTES.toMillis(getConfig().getInt("cache_interval_seconds", 10)));
 	}
 
 	public void loadListeners()
