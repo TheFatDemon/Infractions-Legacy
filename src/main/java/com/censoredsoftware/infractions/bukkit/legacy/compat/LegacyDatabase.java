@@ -25,7 +25,6 @@ import com.censoredsoftware.infractions.bukkit.legacy.InfractionsPlugin;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
 import com.censoredsoftware.library.mcidprovider.McIdProvider;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
@@ -76,14 +75,14 @@ public class LegacyDatabase implements Database
 	@Override
 	public Set<CompleteDossier> getCompleteDossiers(final InetAddress address)
 	{
-		return (Set<CompleteDossier>) (Set) Sets.newHashSet(Collections2.filter(allDossiers(), new Predicate<Dossier>()
+		return (Set<CompleteDossier>) (Set) Sets.filter(allDossiers(), new Predicate<Dossier>()
 		{
 			@Override
 			public boolean apply(Dossier dossier)
 			{
 				return dossier instanceof CompleteDossier && ((CompleteDossier) dossier).getAssociatedIPAddresses().contains(address);
 			}
-		}));
+		});
 	}
 
 	@Override

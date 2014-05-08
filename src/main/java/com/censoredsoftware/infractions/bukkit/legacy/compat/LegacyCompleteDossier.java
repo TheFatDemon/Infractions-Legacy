@@ -77,6 +77,11 @@ public class LegacyCompleteDossier extends LegacyDossier implements CompleteDoss
 		}));
 	}
 
+	public Set<String> getRawAssociatedIPAddresses()
+	{
+		return this.ipAddresses;
+	}
+
 	public void addIPAddress(String address)
 	{
 		this.ipAddresses.add(address);

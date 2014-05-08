@@ -22,7 +22,7 @@
 
     <groupId>com.censoredsoftware</groupId>
     <artifactId>Infractions</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.0</version>
     <packaging>jar</packaging>
 
     <name>Infractions</name>

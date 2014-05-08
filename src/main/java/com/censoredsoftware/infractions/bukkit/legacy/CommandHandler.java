@@ -19,12 +19,12 @@ package com.censoredsoftware.infractions.bukkit.legacy;
 import com.censoredsoftware.infractions.bukkit.Infraction;
 import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.dossier.CompleteDossier;
-import com.censoredsoftware.infractions.bukkit.dossier.Dossier;
 import com.censoredsoftware.infractions.bukkit.evidence.Evidence;
 import com.censoredsoftware.infractions.bukkit.issuer.IssuerType;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyCompleteDossier;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDossier;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.data.thread.AsyncIPMatcherTask;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.URLUtil;
@@ -44,6 +44,7 @@ import org.bukkit.entity.Player;
 
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -205,6 +206,8 @@ public class CommandHandler implements TabExecutor
 			{
 				sender.sendMessage("   ");
 
+				CompleteDossier dossier = Infractions.getCompleteDossier(player);
+
 				Integer maxScore = MiscUtil.getMaxScore(Infractions.getCompleteDossier(player).getId());
 				String chatLevel = InfractionsPlugin.getLevelForChat(player);
 				MiscUtil.sendMessage(p, ChatColor.WHITE + (chatLevel.equals("") ? "" : chatLevel + " ") + ChatColor.YELLOW + player + ChatColor.WHITE + " - " + MiscUtil.getScore(player) + (maxScore == null ? " points towards a ban." : " points out of " + maxScore + " until a ban."));
@@ -212,7 +215,6 @@ public class CommandHandler implements TabExecutor
 				try
 				{
 					boolean staff = MiscUtil.hasPermissionOrOP(p, "infractions.mod");
-					CompleteDossier dossier = Infractions.getCompleteDossier(player);
 					Set<Infraction> infractions = dossier.getInfractions();
 					if(!infractions.isEmpty())
 					{
@@ -255,14 +257,14 @@ public class CommandHandler implements TabExecutor
 					else for(InetAddress address : addresses)
 					{
 						MiscUtil.sendMessage(p, ChatColor.GRAY + "     " + address.getHostAddress());
-						Set<CompleteDossier> others = Infractions.getCompleteDossiers(address);
+						Collection<String> others = AsyncIPMatcherTask.getRelatives(dossier.getId());
 						if(others.size() > 1)
 						{
 							MiscUtil.sendMessage(p, ChatColor.DARK_GRAY + "       - also associated with:");
-							for(CompleteDossier other : others)
+							for(String other : others)
 							{
-								if(other.getId().equals(dossier.getId())) continue;
-								MiscUtil.sendMessage(p, ChatColor.GRAY + "         " + ChatColor.YELLOW + other.getLastKnownName());
+								if(other.equals(player)) continue;
+								MiscUtil.sendMessage(p, ChatColor.GRAY + "         " + ChatColor.YELLOW + other);
 							}
 						}
 					}
@@ -300,28 +302,17 @@ public class CommandHandler implements TabExecutor
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> onTabComplete(CommandSender commandSender, Command command, String s, final String[] args)
 	{
+
 		List<String> list = Lists.newArrayList();
 		if(!commandSender.hasPermission("infractions.mod")) return list;
-		if(args.length == 1 && ("cite".equals(command.getName()) || "uncite".equals(command.getName()) || "history".equals(command.getName())))
+		if(args.length == 1 && ("cite".equals(command.getName()) || "uncite".equals(command.getName()) || "history".equals(command.getName()) || "clearhistory".equals(command.getName())))
 		{
-			list.addAll(Collections2.transform(Collections2.filter(Infractions.allDossiers(), new Predicate<Dossier>()
-			{
-				@Override
-				public boolean apply(Dossier dossier)
-				{
-					return dossier instanceof CompleteDossier && ((CompleteDossier) dossier).getLastKnownName().toLowerCase().startsWith(args[0].toLowerCase());
-				}
-			}), new Function<Dossier, String>()
-			{
-				@Override
-				public String apply(Dossier dossier)
-				{
-					return ((CompleteDossier) dossier).getLastKnownName();
-				}
-			}));
+			for(Player player : Bukkit.getOnlinePlayers())
+				if(player.getName().toLowerCase().startsWith(args[0].toLowerCase())) list.add(player.getName());
 		}
 		else if(args.length == 2)
 		{

@@ -20,6 +20,7 @@ import com.censoredsoftware.infractions.bukkit.Infractions;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyData;
 import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyDatabase;
 import com.censoredsoftware.infractions.bukkit.legacy.data.DataManager;
+import com.censoredsoftware.infractions.bukkit.legacy.data.thread.AsyncIPMatcherTask;
 import com.censoredsoftware.infractions.bukkit.legacy.util.MiscUtil;
 import com.censoredsoftware.infractions.bukkit.legacy.util.SettingUtil;
 import com.censoredsoftware.infractions.bukkit.origin.Origin;
@@ -57,7 +58,7 @@ public class InfractionsPlugin extends JavaPlugin
 		if(startdelay <= 0) startdelay = 1;
 		if(savefrequency <= 0) savefrequency = 300;
 		// data
-		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable()
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable()
 		{
 			@Override
 			public void run()
@@ -65,6 +66,7 @@ public class InfractionsPlugin extends JavaPlugin
 				DataManager.saveAllData();
 			}
 		}, startdelay, savefrequency);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new AsyncIPMatcherTask(), 50, 600);
 	}
 
 	public void loadListeners()
