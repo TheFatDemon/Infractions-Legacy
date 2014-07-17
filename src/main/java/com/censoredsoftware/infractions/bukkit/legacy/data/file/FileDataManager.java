@@ -35,116 +35,103 @@ import java.util.concurrent.ConcurrentMap;
  * This is the data management file for Demigods.
  */
 @SuppressWarnings("unchecked")
-public class FileDataManager extends DataManager
-{
-	// -- VARIABLES -- //
+public class FileDataManager extends DataManager {
+    // -- VARIABLES -- //
 
-	// Data Folder
-	public static final String SAVE_PATH = InfractionsPlugin.getInst().getDataFolder() + "/data/"; // Don't change this.
+    // Data Folder
+    public static final String SAVE_PATH = InfractionsPlugin.getInst().getDataFolder() + "/data/"; // Don't change this.
 
-	// -- YAML FILES -- //
+    // -- YAML FILES -- //
 
-	ConcurrentMap<Class, InfractionsFile> yamlFiles;
+    public ConcurrentMap<Class, InfractionsFile> yamlFiles;
 
-	// -- UTIL METHODS -- //
+    // -- UTIL METHODS -- //
 
-	// Prevent accidental double init.
-	private static boolean didInit = false;
+    // Prevent accidental double init.
+    private static boolean didInit = false;
 
-	@Override
-	public void init()
-	{
-		// Check if init has happened already...
-		if(didInit) throw new RuntimeException("Data tried to initialize more than once.");
+    @Override
+    public void init() {
+        // Check if init has happened already...
+        if (didInit) throw new RuntimeException("Data tried to initialize more than once.");
 
-		// Preserve the load order.
-		List<Class> fileOrder = Lists.newArrayList();
+        // Preserve the load order.
+        List<Class> fileOrder = Lists.newArrayList();
 
-		// Create YAML files.
-		yamlFiles = Maps.newConcurrentMap();
-		for(DataType dataType : DataType.values())
-		{
-			InfractionsFile file = InfractionsFileFactory.create(dataType, SAVE_PATH);
-			if(file == null) continue;
-			InfractionsPlugin.getInst().getLogger().info("Marked \"" + dataType.name() + "\" for data import.");
-			yamlFiles.put(dataType.getDataClass(), file);
-			fileOrder.add(dataType.getDataClass());
-		}
+        // Create YAML files.
+        yamlFiles = Maps.newConcurrentMap();
+        for (DataType dataType : DataType.values()) {
+            InfractionsFile file = InfractionsFileFactory.create(dataType, SAVE_PATH);
+            if (file == null) continue;
+            InfractionsPlugin.getInst().getLogger().info("Marked \"" + dataType.name() + "\" for data import.");
+            yamlFiles.put(dataType.getDataClass(), file);
+            fileOrder.add(dataType.getDataClass());
+        }
 
-		// Load YAML files.
-		for(Class clazz : fileOrder)
-		{
-			InfractionsFile file = yamlFiles.get(clazz);
-			try
-			{
-				file.loadDataFromFile();
-			}
-			catch(Exception ex)
-			{
-				InfractionsPlugin.getInst().getLogger().severe("Failure to import data from \"" + file.getName() + "\" file.");
-				continue;
-			}
-			InfractionsPlugin.getInst().getLogger().info("Data import from \"" + file.getName() + "\" file complete.");
-		}
+        // Load YAML files.
+        for (Class clazz : fileOrder) {
+            InfractionsFile file = yamlFiles.get(clazz);
+            try {
+                file.loadDataFromFile();
+            } catch (Exception ex) {
+                InfractionsPlugin.getInst().getLogger().severe("Failure to import data from \"" + file.getName() + "\" file.");
+                continue;
+            }
+            InfractionsPlugin.getInst().getLogger().info("Data import from \"" + file.getName() + "\" file complete.");
+        }
 
-		// Let the plugin know that this has finished.
-		didInit = true;
-	}
+        // Let the plugin know that this has finished.
+        didInit = true;
+    }
 
-	@Override
-	public void save()
-	{
-		// Make sure data actually is loaded.
-		if(!didInit) return;
+    @Override
+    public void save() {
+        // Make sure data actually is loaded.
+        if (!didInit) return;
 
-		// Save all data.
-		for(InfractionsFile data : yamlFiles.values())
-			data.saveDataToFile();
-	}
+        // Save all data.
+        for (InfractionsFile data : yamlFiles.values())
+            data.saveDataToFile();
+    }
 
-	@Override
-	public void flushData()
-	{
-		// Make sure data actually is loaded.
-		if(!didInit) return;
+    @Override
+    public void flushData() {
+        // Make sure data actually is loaded.
+        if (!didInit) return;
 
-		// Kick everyone
-		for(Player player : Bukkit.getOnlinePlayers())
-			player.kickPlayer(ChatColor.GREEN + "Resetting data.");
+        // Kick everyone
+        for (Player player : Bukkit.getOnlinePlayers())
+            player.kickPlayer(ChatColor.GREEN + "Resetting data.");
 
-		// Clear the data
-		for(InfractionsFile data : yamlFiles.values())
-			data.clear();
-		TempDataManager.purge();
+        // Clear the data
+        for (InfractionsFile data : yamlFiles.values())
+            data.clear();
+        TempDataManager.purge();
 
-		save();
-	}
+        save();
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <K, V extends DataSerializable<K>, I> I getFor(final Class<V> clazz, final K key)
-	{
-		if(getFile(clazz).containsKey(key)) return (I) getFile(clazz).get(key);
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public <K, V extends DataSerializable<K>, I> I getFor(final Class<V> clazz, final K key) {
+        if (getFile(clazz).containsKey(key)) return (I) getFile(clazz).get(key);
+        return null;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <K, V extends DataSerializable<K>, I> Collection<I> getAllOf(final Class<V> clazz)
-	{
-		return (Collection<I>) getFile(clazz).values();
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public <K, V extends DataSerializable<K>, I> Collection<I> getAllOf(final Class<V> clazz) {
+        return (Collection<I>) getFile(clazz).values();
+    }
 
-	@Override
-	public <K, V extends DataSerializable<K>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz)
-	{
-		return (ConcurrentMap<K, I>) getFile(clazz).getLoadedData();
-	}
+    @Override
+    public <K, V extends DataSerializable<K>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz) {
+        return (ConcurrentMap<K, I>) getFile(clazz).getLoadedData();
+    }
 
-	@SuppressWarnings("unchecked")
-	private <K, V extends DataSerializable<K>, I> InfractionsFile<K, V, I> getFile(Class<V> clazz)
-	{
-		if(yamlFiles.containsKey(clazz)) return (InfractionsFile<K, V, I>) yamlFiles.get(clazz);
-		throw new UnsupportedOperationException("Infractions wants a data type that does not exist.");
-	}
+    @SuppressWarnings("unchecked")
+    private <K, V extends DataSerializable<K>, I> InfractionsFile<K, V, I> getFile(Class<V> clazz) {
+        if (yamlFiles.containsKey(clazz)) return (InfractionsFile<K, V, I>) yamlFiles.get(clazz);
+        throw new UnsupportedOperationException("Infractions wants a data type that does not exist.");
+    }
 }

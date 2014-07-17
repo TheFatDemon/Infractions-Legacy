@@ -23,7 +23,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DataProvider
-{
-	IdType idType();
+public @interface DataProvider {
+    IdType idType();
 }

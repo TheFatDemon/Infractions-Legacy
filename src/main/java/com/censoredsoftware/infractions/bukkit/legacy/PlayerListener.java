@@ -30,47 +30,39 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-public class PlayerListener implements Listener
-{
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerLogin(PlayerLoginEvent e)
-	{
-		final Player p = e.getPlayer();
+public class PlayerListener implements Listener {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerLogin(PlayerLoginEvent e) {
+        final Player p = e.getPlayer();
 
-		// Create data that we track
-		CompleteDossier dossier = Infractions.getCompleteDossier(p);
-		((LegacyCompleteDossier) dossier).update(p);
-		MiscUtil.getMaxScore(p);
-	}
+        // Create data that we track
+        CompleteDossier dossier = Infractions.getCompleteDossier(p);
+        ((LegacyCompleteDossier) dossier).update(p);
+        MiscUtil.getMaxScore(p);
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerJoin(PlayerJoinEvent e)
-	{
-		final Player p = e.getPlayer();
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        final Player p = e.getPlayer();
 
-		if(SettingUtil.getSettingBoolean("motd"))
-		{
-			// TODO Consolidate this into some sort of useful notification system.
-			p.sendMessage(ChatColor.YELLOW + "⚠" + ChatColor.WHITE + " This server is policed with infractions.");
-		}
-		if(ServerData.exists(p.getName(), "NEWINFRACTION"))
-		{
-			if((Boolean) ServerData.get(p.getName(), "NEWINFRACTION"))
-			{
-				p.sendMessage(ChatColor.YELLOW + "⚠" + ChatColor.RED + " You have a new infraction!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
-				ServerData.remove(p.getName(), "NEWINFRACTION");
-			}
-		}
-		if(ServerData.exists(p.getName(), "NEWVIRTUE"))
-		{
-			if((Boolean) ServerData.get(p.getName(), "NEWVIRTUE"))
-			{
-				p.sendMessage(ChatColor.DARK_AQUA + "✉" + ChatColor.RED + " You have a new virtue!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
-				ServerData.remove(p.getName(), "NEWVIRTUE");
-			}
-		}
+        if (SettingUtil.getSettingBoolean("motd")) {
+            // TODO Consolidate this into some sort of useful notification system.
+            p.sendMessage(ChatColor.YELLOW + "⚠" + ChatColor.WHITE + " This server is policed with infractions.");
+        }
+        if (ServerData.exists(p.getName(), "NEWINFRACTION")) {
+            if ((Boolean) ServerData.get(p.getName(), "NEWINFRACTION")) {
+                p.sendMessage(ChatColor.YELLOW + "⚠" + ChatColor.RED + " You have a new infraction!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
+                ServerData.remove(p.getName(), "NEWINFRACTION");
+            }
+        }
+        if (ServerData.exists(p.getName(), "NEWVIRTUE")) {
+            if ((Boolean) ServerData.get(p.getName(), "NEWVIRTUE")) {
+                p.sendMessage(ChatColor.DARK_AQUA + "✉" + ChatColor.RED + " You have a new virtue!" + ChatColor.WHITE + " Use " + ChatColor.YELLOW + "/history" + ChatColor.WHITE + " for more information.");
+                ServerData.remove(p.getName(), "NEWVIRTUE");
+            }
+        }
 
-		ServerData.put(p.getName(), "LASTLOGINTIME", System.currentTimeMillis());
-		MiscUtil.checkScore(p);
-	}
+        ServerData.put(p.getName(), "LASTLOGINTIME", System.currentTimeMillis());
+        MiscUtil.checkScore(p);
+    }
 }

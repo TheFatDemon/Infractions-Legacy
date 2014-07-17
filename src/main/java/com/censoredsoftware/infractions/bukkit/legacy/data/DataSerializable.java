@@ -19,14 +19,13 @@ package com.censoredsoftware.infractions.bukkit.legacy.data;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-public interface DataSerializable<K>
-{
-	K getId();
+public interface DataSerializable<K> {
+    K getId();
 
-	/**
-	 * Serialize the data held in the child class.
-	 *
-	 * @return Map of serialized data for the child class's current instance.
-	 */
-	Map<String, Object> serialize();
+    /**
+     * Serialize the data held in the child class.
+     *
+     * @return Map of serialized data for the child class's current instance.
+     */
+    Map<String, Object> serialize();
 }

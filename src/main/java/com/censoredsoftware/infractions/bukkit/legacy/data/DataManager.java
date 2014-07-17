@@ -22,66 +22,55 @@ import com.censoredsoftware.infractions.bukkit.legacy.data.file.FileDataManager;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentMap;
 
-public abstract class DataManager
-{
-	static final DataManager DATA_MANAGER = findManager();
+public abstract class DataManager {
+    static final DataManager DATA_MANAGER = findManager();
 
-	private static DataManager findManager()
-	{
-		// Get the correct data manager.
-		String saveMethod = InfractionsPlugin.getInst().getConfig().getString("saving.method", "file");
-		if("file".equals(saveMethod.toLowerCase()))
-		{
-			InfractionsPlugin.getInst().getLogger().info("Enabling file save method.");
-			return trainManager(FileDataManager.class);
-		}
-		InfractionsPlugin.getInst().getLogger().severe("\"" + saveMethod + "\" is not a valid save method.");
-		InfractionsPlugin.getInst().getLogger().severe("Defaulting to file save method.");
-		return trainManager(FileDataManager.class);
-	}
+    private static DataManager findManager() {
+        // Get the correct data manager.
+        String saveMethod = InfractionsPlugin.getInst().getConfig().getString("saving.method", "file");
+        if ("file".equals(saveMethod.toLowerCase())) {
+            InfractionsPlugin.getInst().getLogger().info("Enabling file save method.");
+            return trainManager(FileDataManager.class);
+        }
+        InfractionsPlugin.getInst().getLogger().severe("\"" + saveMethod + "\" is not a valid save method.");
+        InfractionsPlugin.getInst().getLogger().severe("Defaulting to file save method.");
+        return trainManager(FileDataManager.class);
+    }
 
-	private static DataManager trainManager(Class<? extends DataManager> manager)
-	{
-		try
-		{
-			return manager.newInstance();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return null;
-	}
+    private static DataManager trainManager(Class<? extends DataManager> manager) {
+        try {
+            return manager.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	protected abstract void init();
+    protected abstract void init();
 
-	protected abstract void save();
+    protected abstract void save();
 
-	protected abstract void flushData();
+    protected abstract void flushData();
 
-	public abstract <K, V extends DataSerializable<K>, I> I getFor(final Class<V> clazz, final K key);
+    public abstract <K, V extends DataSerializable<K>, I> I getFor(final Class<V> clazz, final K key);
 
-	public abstract <K, V extends DataSerializable<K>, I> Collection<I> getAllOf(final Class<V> clazz);
+    public abstract <K, V extends DataSerializable<K>, I> Collection<I> getAllOf(final Class<V> clazz);
 
-	public abstract <K, V extends DataSerializable<K>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz);
+    public abstract <K, V extends DataSerializable<K>, I> ConcurrentMap<K, I> getMapFor(final Class<V> clazz);
 
-	public static DataManager getManager()
-	{
-		return DATA_MANAGER;
-	}
+    public static DataManager getManager() {
+        return DATA_MANAGER;
+    }
 
-	public static void initAllData()
-	{
-		DATA_MANAGER.init();
-	}
+    public static void initAllData() {
+        DATA_MANAGER.init();
+    }
 
-	public static void saveAllData()
-	{
-		DATA_MANAGER.save();
-	}
+    public static void saveAllData() {
+        DATA_MANAGER.save();
+    }
 
-	public static void flushAllData()
-	{
-		DATA_MANAGER.flushData();
-	}
+    public static void flushAllData() {
+        DATA_MANAGER.flushData();
+    }
 }

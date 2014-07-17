@@ -32,140 +32,128 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 
-public class LegacyDossier implements DataSerializable<UUID>, Dossier
-{
-	private UUID mojangid;
-	private Set<String> infractions;
-	protected Set<String> ipAddresses;
-	protected String lastKnownName;
+public class LegacyDossier implements DataSerializable<UUID>, Dossier {
+    private UUID mojangid;
+    private Set<String> infractions;
+    protected Set<String> ipAddresses;
+    protected String lastKnownName;
+    protected Boolean confirmedValid = false;
 
-	public LegacyDossier(UUID mojangId, Infraction... infractions)
-	{
-		this(mojangId, Sets.newHashSet(infractions));
-	}
+    public LegacyDossier(UUID mojangId, Infraction... infractions) {
+        this(mojangId, Sets.newHashSet(infractions));
+    }
 
-	public LegacyDossier(UUID mojangId, Set<Infraction> infractions)
-	{
-		this.mojangid = mojangId;
-		this.infractions = Sets.newHashSet(Collections2.transform(infractions, new Function<Infraction, String>()
-		{
-			@Override
-			public String apply(Infraction infraction)
-			{
-				String id = MiscUtil.getInfractionId(infraction);
-				DataManager.getManager().getMapFor(LegacyInfraction.class).put(MiscUtil.getInfractionId(infraction), LegacyInfraction.of(infraction));
-				return id;
-			}
-		}));
-		this.ipAddresses = Sets.newHashSet();
-	}
+    public LegacyDossier(UUID mojangId, Set<Infraction> infractions) {
+        this.mojangid = mojangId;
+        this.infractions = Sets.newHashSet(Collections2.transform(infractions, new Function<Infraction, String>() {
+            @Override
+            public String apply(Infraction infraction) {
+                String id = MiscUtil.getInfractionId(infraction);
+                DataManager.getManager().getMapFor(LegacyInfraction.class).put(MiscUtil.getInfractionId(infraction), LegacyInfraction.of(infraction));
+                return id;
+            }
+        }));
+        this.ipAddresses = Sets.newHashSet();
+    }
 
-	public LegacyDossier(UUID mojangId, Set<String> rawInfractions, Void ignored)
-	{
-		this.mojangid = mojangId;
-		this.infractions = rawInfractions;
-		this.ipAddresses = Sets.newHashSet();
-	}
+    public LegacyDossier(UUID mojangId, Set<String> rawInfractions, Void ignored) {
+        this.mojangid = mojangId;
+        this.infractions = rawInfractions;
+        this.ipAddresses = Sets.newHashSet();
+    }
 
-	@DataProvider(idType = IdType.UUID)
-	public static LegacyDossier of(UUID id, ConfigurationSection conf)
-	{
-		return (LegacyDossier) unserialize(id, conf.getValues(true));
-	}
+    @DataProvider(idType = IdType.UUID)
+    public static LegacyDossier of(UUID id, ConfigurationSection conf) {
+        return (LegacyDossier) unserialize(id, conf.getValues(true));
+    }
 
-	@Override
-	public UUID getId()
-	{
-		return mojangid;
-	}
+    @Override
+    public UUID getId() {
+        return mojangid;
+    }
 
-	@Override
-	public int getScore()
-	{
-		int score = 0;
-		for(Infraction infraction : getInfractions())
-			score += infraction.getScore();
-		return score;
-	}
+    @Override
+    public int getScore() {
+        int score = 0;
+        for (Infraction infraction : getInfractions())
+            score += infraction.getScore();
+        return score;
+    }
 
-	@Override
-	public Set<Infraction> getInfractions()
-	{
-		return Sets.newHashSet(Collections2.transform(infractions, new Function<String, Infraction>()
-		{
-			@Override
-			public Infraction apply(String s)
-			{
-				return ((LegacyInfraction) DataManager.getManager().getFor(LegacyInfraction.class, s)).toInfraction();
-			}
-		}));
-	}
+    @Override
+    public Set<Infraction> getInfractions() {
+        return Sets.newHashSet(Collections2.transform(infractions, new Function<String, Infraction>() {
+            @Override
+            public Infraction apply(String s) {
+                return ((LegacyInfraction) DataManager.getManager().getFor(LegacyInfraction.class, s)).toInfraction();
+            }
+        }));
+    }
 
-	public Set<String> getInfractionIds()
-	{
-		return infractions;
-	}
+    public Set<String> getInfractionIds() {
+        return infractions;
+    }
 
-	@Override
-	public void cite(Infraction infraction)
-	{
-		String id = MiscUtil.getInfractionId(infraction);
-		DataManager.getManager().getMapFor(LegacyInfraction.class).put(id, LegacyInfraction.of(infraction));
-		infractions.add(id);
-	}
+    @Override
+    public void cite(Infraction infraction) {
+        String id = MiscUtil.getInfractionId(infraction);
+        DataManager.getManager().getMapFor(LegacyInfraction.class).put(id, LegacyInfraction.of(infraction));
+        infractions.add(id);
+    }
 
-	@Override
-	public void acquit(Infraction infraction)
-	{
-		String id = MiscUtil.getInfractionId(infraction);
-		DataManager.getManager().getMapFor(LegacyInfraction.class).remove(id);
-		infractions.remove(id);
-	}
+    @Override
+    public void acquit(Infraction infraction) {
+        String id = MiscUtil.getInfractionId(infraction);
+        DataManager.getManager().getMapFor(LegacyInfraction.class).remove(id);
+        infractions.remove(id);
+    }
 
-	@Override
-	public CompleteDossier complete(String playerName)
-	{
-		return new LegacyCompleteDossier(getId(), playerName, infractions, null);
-	}
+    @Override
+    public CompleteDossier complete(String playerName) {
+        return new LegacyCompleteDossier(getId(), playerName, infractions, null);
+    }
 
-	@Override
-	public CompleteDossier complete() throws ClassCastException
-	{
-		return (CompleteDossier) this;
-	}
+    @Override
+    public CompleteDossier complete() throws ClassCastException {
+        return (CompleteDossier) this;
+    }
 
-	@Override
-	public Map<String, Object> serialize()
-	{
-		Map<String, Object> map = new HashMap<String, Object>();
-		if(lastKnownName != null) map.put("lastKnownName", lastKnownName);
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        if (lastKnownName != null) map.put("lastKnownName", lastKnownName);
+        map.put("confirmedValid", confirmedValid);
 
-		List<String> infractionList;
-		if(infractions != null) infractionList = Lists.newArrayList(infractions);
-		else infractionList = Lists.newArrayList();
-		List<String> ipList;
-		if(ipAddresses != null) ipList = Lists.newArrayList(ipAddresses);
-		else ipList = Lists.newArrayList();
+        List<String> infractionList;
+        if (infractions != null) infractionList = Lists.newArrayList(infractions);
+        else infractionList = Lists.newArrayList();
+        List<String> ipList;
+        if (ipAddresses != null) ipList = Lists.newArrayList(ipAddresses);
+        else ipList = Lists.newArrayList();
 
-		map.put("infractions", infractionList);
-		map.put("addresses", ipList);
+        map.put("infractions", infractionList);
+        map.put("addresses", ipList);
 
-		return map;
-	}
+        return map;
+    }
 
-	@SuppressWarnings("unchecked")
-	public static Dossier unserialize(UUID id, Map<String, Object> map)
-	{
-		LegacyDossier dossier = new LegacyDossier(id);
-		if(map.containsKey("lastKnownName")) dossier = (LegacyDossier) dossier.complete(map.get("lastKnownName").toString());
+    @SuppressWarnings("unchecked")
+    public static Dossier unserialize(UUID id, Map<String, Object> map) {
+        LegacyDossier dossier = new LegacyDossier(id);
+        if (map.containsKey("lastKnownName"))
+            dossier = (LegacyDossier) dossier.complete(map.get("lastKnownName").toString());
 
-		if(map.containsKey("infractions")) dossier.infractions = Sets.newHashSet((List<String>) map.get("infractions"));
-		else dossier.infractions = Sets.newHashSet();
+        if (map.containsKey("confirmedValid"))
+            dossier.confirmedValid = Boolean.parseBoolean(map.get("confirmedValid").toString());
 
-		if(map.containsKey("addresses")) dossier.ipAddresses = Sets.newHashSet((List<String>) map.get("addresses"));
-		else dossier.ipAddresses = Sets.newHashSet();
+        if (map.containsKey("infractions"))
+            dossier.infractions = Sets.newHashSet((List<String>) map.get("infractions"));
+        else dossier.infractions = Sets.newHashSet();
 
-		dossier.mojangid = id;
-		return dossier;
-	}
+        if (map.containsKey("addresses")) dossier.ipAddresses = Sets.newHashSet((List<String>) map.get("addresses"));
+        else dossier.ipAddresses = Sets.newHashSet();
+
+        dossier.mojangid = id;
+        return dossier;
+    }
 }

@@ -36,151 +36,127 @@ import java.util.concurrent.ConcurrentMap;
  * @param <K> The id type.
  * @param <V> The data type.
  */
-public abstract class InfractionsFile<K, V extends DataSerializable<K>, I>
-{
-	private final String name;
-	private final String fileName, fileType, savePath;
-	ConcurrentMap<K, I> dataStore = Maps.newConcurrentMap();
-	Method valueConstructor;
+public abstract class InfractionsFile<K, V extends DataSerializable<K>, I> {
+    private final String name;
+    private final String fileName, fileType, savePath;
+    ConcurrentMap<K, I> dataStore = Maps.newConcurrentMap();
+    Method valueConstructor;
 
-	public InfractionsFile(String fileName, String fileType, String savePath, String name, Method valueConstructor)
-	{
-		this.fileName = fileName;
-		this.fileType = fileType;
-		this.savePath = savePath;
-		this.name = name;
-		this.valueConstructor = valueConstructor;
-	}
+    public InfractionsFile(String fileName, String fileType, String savePath, String name, Method valueConstructor) {
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.savePath = savePath;
+        this.name = name;
+        this.valueConstructor = valueConstructor;
+    }
 
-	public final String getName()
-	{
-		return name;
-	}
+    public final String getName() {
+        return name;
+    }
 
-	public final ConcurrentMap<K, I> getLoadedData()
-	{
-		return dataStore;
-	}
+    public final ConcurrentMap<K, I> getLoadedData() {
+        return dataStore;
+    }
 
-	@SuppressWarnings("unchecked")
-	public final Map<String, Object> serialize(K id)
-	{
-		return ((V) getLoadedData().get(id)).serialize();
-	}
+    @SuppressWarnings("unchecked")
+    public final Map<String, Object> serialize(K id) {
+        return ((V) getLoadedData().get(id)).serialize();
+    }
 
-	public String getDirectoryPath()
-	{
-		return savePath;
-	}
+    public String getDirectoryPath() {
+        return savePath;
+    }
 
-	public final String getFullFileName()
-	{
-		return fileName + fileType;
-	}
+    public final String getFullFileName() {
+        return fileName + fileType;
+    }
 
-	public final void loadDataFromFile()
-	{
-		dataStore = getCurrentFileData();
-	}
+    public final void loadDataFromFile() {
+        dataStore = getCurrentFileData();
+    }
 
-	public final boolean containsKey(K key)
-	{
-		return key != null && dataStore.containsKey(key);
-	}
+    public final boolean containsKey(K key) {
+        return key != null && dataStore.containsKey(key);
+    }
 
-	public final I get(K key)
-	{
-		return dataStore.get(key);
-	}
+    public final I get(K key) {
+        return dataStore.get(key);
+    }
 
-	public final void put(K key, I value)
-	{
-		dataStore.put(key, value);
-	}
+    public final void put(K key, I value) {
+        dataStore.put(key, value);
+    }
 
-	public final Collection<I> values()
-	{
-		return dataStore.values();
-	}
+    public final Collection<I> values() {
+        return dataStore.values();
+    }
 
-	public final void clear()
-	{
-		dataStore.clear();
-	}
+    public final void clear() {
+        dataStore.clear();
+    }
 
-	public ConcurrentMap<K, I> getCurrentFileData()
-	{
-		// Grab the current file.
-		FileConfiguration data = YamlFileUtil.getConfiguration(getDirectoryPath(), getFullFileName());
+    public ConcurrentMap<K, I> getCurrentFileData() {
+        // Grab the current file.
+        FileConfiguration data = YamlFileUtil.getConfiguration(getDirectoryPath(), getFullFileName());
 
-		// Convert the raw file data into more usable data, in map form.
-		ConcurrentHashMap<K, I> map = new ConcurrentHashMap<K, I>();
-		for(String stringId : data.getKeys(false))
-		{
-			try
-			{
-				I v = valueFromData(stringId, data.getConfigurationSection(stringId));
-				if(v == null)
-				{
-					InfractionsPlugin.getInst().getLogger().warning("Corrupt: " + stringId + ", in file: " + getFullFileName());
-					continue;
-				}
-				map.put(keyFromString(stringId), valueFromData(stringId, data.getConfigurationSection(stringId)));
-			}
-			catch(Exception ignored)
-			{
-				ignored.printStackTrace();
-			}
-		}
-		return map;
-	}
+        // Convert the raw file data into more usable data, in map form.
+        ConcurrentHashMap<K, I> map = new ConcurrentHashMap<K, I>();
+        for (String stringId : data.getKeys(false)) {
+            try {
+                I v = valueFromData(stringId, data.getConfigurationSection(stringId));
+                if (v == null) {
+                    InfractionsPlugin.getInst().getLogger().warning("Corrupt: " + stringId + ", in file: " + getFullFileName());
+                    continue;
+                }
+                map.put(keyFromString(stringId), valueFromData(stringId, data.getConfigurationSection(stringId)));
+            } catch (Exception ignored) {
+                ignored.printStackTrace();
+            }
+        }
+        return map;
+    }
 
-	public boolean saveDataToFile()
-	{
-		// Grab the current file, and its data as a usable map.
-		FileConfiguration currentFile = YamlFileUtil.getConfiguration(getDirectoryPath(), getFullFileName());
-		final Map<K, I> currentFileMap = getCurrentFileData();
+    public boolean saveDataToFile() {
+        // Grab the current file, and its data as a usable map.
+        FileConfiguration currentFile = YamlFileUtil.getConfiguration(getDirectoryPath(), getFullFileName());
+        final Map<K, I> currentFileMap = getCurrentFileData();
 
-		// Create/overwrite a configuration section if new data exists.
-		for(K key : Collections2.filter(getLoadedData().keySet(), new Predicate<K>()
-		{
-			@Override
-			public boolean apply(K key)
-			{
-				return !currentFileMap.containsKey(key) || !currentFileMap.get(key).equals(getLoadedData().get(key));
-			}
-		}))
-			currentFile.createSection(key.toString(), serialize(key));
+        // Create/overwrite a configuration section if new data exists.
+        for (K key : Collections2.filter(getLoadedData().keySet(), new Predicate<K>() {
+            @Override
+            public boolean apply(K key) {
+                return !currentFileMap.containsKey(key) || !currentFileMap.get(key).equals(getLoadedData().get(key));
+            }
+        }))
+            currentFile.createSection(key.toString(), serialize(key));
 
-		// Remove old unneeded data.
-		for(K key : Collections2.filter(currentFileMap.keySet(), new Predicate<K>()
-		{
-			@Override
-			public boolean apply(K key)
-			{
-				return !getLoadedData().keySet().contains(key);
-			}
-		}))
-			currentFile.set(key.toString(), null);
+        // Remove old unneeded data.
+        for (K key : Collections2.filter(currentFileMap.keySet(), new Predicate<K>() {
+            @Override
+            public boolean apply(K key) {
+                return !getLoadedData().keySet().contains(key);
+            }
+        }))
+            currentFile.set(key.toString(), null);
 
-		// Save the file!
-		return YamlFileUtil.saveFile(getDirectoryPath(), getFullFileName(), currentFile);
-	}
+        // Save the file!
+        return YamlFileUtil.saveFile(getDirectoryPath(), getFullFileName(), currentFile);
+    }
 
-	/**
-	 * Convert a key from a string.
-	 *
-	 * @param stringKey The provided string.
-	 * @return The converted key.
-	 */
-	public abstract K keyFromString(String stringKey);
+    /**
+     * Convert a key from a string.
+     *
+     * @param stringKey The provided string.
+     * @return The converted key.
+     */
+    public abstract K keyFromString(String stringKey);
 
-	/**
-	 * Convert to a get from a number of objects representing the data.
-	 *
-	 * @param stringKey The string key for the data.
-	 * @param data      The provided data object.
-	 * @return The converted get.
-	 */
-	public abstract I valueFromData(String stringKey, ConfigurationSection data);
+    /**
+     * Convert to a get from a number of objects representing the data.
+     *
+     * @param stringKey The string key for the data.
+     * @param data      The provided data object.
+     * @return The converted get.
+     */
+    public abstract I valueFromData(String stringKey, ConfigurationSection data);
 }

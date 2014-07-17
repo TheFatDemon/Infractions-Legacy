@@ -33,100 +33,86 @@ import java.util.Map;
 
 // FIXME Origin is ignored in version 0.5.
 
-public class LegacyIssuer implements DataSerializable<String>
-{
-	private static final Issuer UNKNOWN = new Issuer(IssuerType.UNKNOWN, "UNKNOWN");
+public class LegacyIssuer implements DataSerializable<String> {
+    private static final Issuer UNKNOWN = new Issuer(IssuerType.UNKNOWN, "UNKNOWN");
 
-	private Issuer issuer;
+    private Issuer issuer;
 
-	private LegacyIssuer()
-	{
-	}
+    private LegacyIssuer() {
+    }
 
-	private LegacyIssuer(Issuer issuer)
-	{
-		this.issuer = issuer;
-	}
+    private LegacyIssuer(Issuer issuer) {
+        this.issuer = issuer;
+    }
 
-	@DataProvider(idType = IdType.STRING)
-	public static LegacyIssuer of(String ignored, ConfigurationSection conf)
-	{
-		LegacyIssuer data = new LegacyIssuer();
-		data.issuer = unserialize(conf.getValues(true));
-		return data;
-	}
+    @DataProvider(idType = IdType.STRING)
+    public static LegacyIssuer of(String ignored, ConfigurationSection conf) {
+        LegacyIssuer data = new LegacyIssuer();
+        data.issuer = unserialize(conf.getValues(true));
+        return data;
+    }
 
-	@Override
-	public String getId()
-	{
-		return issuer.getId();
-	}
+    @Override
+    public String getId() {
+        return issuer.getId();
+    }
 
-	@Override
-	public Map<String, Object> serialize()
-	{
-		return serialize(issuer);
-	}
+    @Override
+    public Map<String, Object> serialize() {
+        return serialize(issuer);
+    }
 
-	public Issuer toIssuer()
-	{
-		return issuer;
-	}
+    public Issuer toIssuer() {
+        return issuer;
+    }
 
-	@SuppressWarnings("unchecked")
-	public static Issuer unserialize(Map<String, Object> map)
-	{
-		IssuerType type = IssuerType.valueOf(map.get("type").toString());
-		String id = map.get("id").toString();
-		Origin origin = unpackOrigin(((MemorySection) map.get("origin")).getValues(true));
-		return new Issuer(type, id, origin);
-	}
+    @SuppressWarnings("unchecked")
+    public static Issuer unserialize(Map<String, Object> map) {
+        IssuerType type = IssuerType.valueOf(map.get("type").toString());
+        String id = map.get("id").toString();
+        Origin origin = unpackOrigin(((MemorySection) map.get("origin")).getValues(true));
+        return new Issuer(type, id, origin);
+    }
 
-	public static Origin unpackOrigin(Map<String, Object> map)
-	{
-		String id = map.get("id").toString();
-		String name = map.get("name").toString();
-		OriginType type = OriginType.valueOf(map.get("type").toString());
-		return new Origin(id, name, type);
-	}
+    public static Origin unpackOrigin(Map<String, Object> map) {
+        String id = map.get("id").toString();
+        String name = map.get("name").toString();
+        OriginType type = OriginType.valueOf(map.get("type").toString());
+        return new Origin(id, name, type);
+    }
 
-	public static Map<String, Object> serialize(Issuer issuer)
-	{
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("type", issuer.getType().name());
-		map.put("id", issuer.getId());
-		map.put("origin", new Function<Origin, Map<String, Object>>()
-		{
-			@Override public Map<String, Object> apply(Origin origin)
-			{
-				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("id", origin.getId());
-				map.put("name", origin.getName());
-				map.put("type", origin.getType().name());
-				return map;
-			}
-		}.apply(issuer.getOrigin()));
-		return map;
-	}
+    public static Map<String, Object> serialize(Issuer issuer) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("type", issuer.getType().name());
+        map.put("id", issuer.getId());
+        map.put("origin", new Function<Origin, Map<String, Object>>() {
+            @Override
+            public Map<String, Object> apply(Origin origin) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("id", origin.getId());
+                map.put("name", origin.getName());
+                map.put("type", origin.getType().name());
+                return map;
+            }
+        }.apply(issuer.getOrigin()));
+        return map;
+    }
 
-	@SuppressWarnings("unchecked")
-	public static Issuer of(final String id)
-	{
-		Map<String, LegacyIssuer> data = DataManager.getManager().getMapFor(LegacyIssuer.class);
-		return data.containsKey(id) ? data.get(id).toIssuer() : UNKNOWN;
-	}
+    @SuppressWarnings("unchecked")
+    public static Issuer of(final String id) {
+        Map<String, LegacyIssuer> data = DataManager.getManager().getMapFor(LegacyIssuer.class);
+        return data.containsKey(id) ? data.get(id).toIssuer() : UNKNOWN;
+    }
 
-	public static LegacyIssuer of(Issuer issuer)
-	{
-		LegacyIssuer legacyIssuer = new LegacyIssuer(issuer);
-		legacyIssuer.saveIfAbsent();
+    public static LegacyIssuer of(Issuer issuer) {
+        LegacyIssuer legacyIssuer = new LegacyIssuer(issuer);
+        legacyIssuer.saveIfAbsent();
 
-		Map<String, LegacyIssuer> data = DataManager.getManager().getMapFor(LegacyIssuer.class);
-		return data.containsKey(issuer.getId()) ? data.get(issuer.getId()) : legacyIssuer;
-	}
+        Map<String, LegacyIssuer> data = DataManager.getManager().getMapFor(LegacyIssuer.class);
+        return data.containsKey(issuer.getId()) ? data.get(issuer.getId()) : legacyIssuer;
+    }
 
-	public void saveIfAbsent()
-	{
-		DataManager.getManager().getMapFor(LegacyIssuer.class).putIfAbsent(getId(), this);
-	}
+    public void saveIfAbsent() {
+        DataManager.getManager().getMapFor(LegacyIssuer.class).putIfAbsent(getId(), this);
+    }
 }

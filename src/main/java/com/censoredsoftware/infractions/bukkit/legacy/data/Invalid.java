@@ -18,17 +18,14 @@ package com.censoredsoftware.infractions.bukkit.legacy.data;
 
 import java.util.Map;
 
-public class Invalid implements DataSerializable<Void>
-{
-	@Override
-	public Void getId()
-	{
-		throw new UnsupportedOperationException("Plugin tried accessing non-existent data type.");
-	}
+public class Invalid implements DataSerializable<Void> {
+    @Override
+    public Void getId() {
+        throw new UnsupportedOperationException("Plugin tried accessing non-existent data type.");
+    }
 
-	@Override
-	public Map<String, Object> serialize()
-	{
-		throw new UnsupportedOperationException("Plugin tried accessing non-existent data type.");
-	}
+    @Override
+    public Map<String, Object> serialize() {
+        throw new UnsupportedOperationException("Plugin tried accessing non-existent data type.");
+    }
 }

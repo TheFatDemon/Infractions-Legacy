@@ -31,89 +31,71 @@ import java.net.UnknownHostException;
 import java.util.Set;
 import java.util.UUID;
 
-public class LegacyCompleteDossier extends LegacyDossier implements CompleteDossier
-{
-	public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Set<Infraction> infractions)
-	{
-		super(mojangId, infractions);
-		this.lastKnownName = lastKnownName;
-	}
+public class LegacyCompleteDossier extends LegacyDossier implements CompleteDossier {
+    public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Set<Infraction> infractions) {
+        super(mojangId, infractions);
+        this.lastKnownName = lastKnownName;
+    }
 
-	public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Set<String> rawInfractions, Void ignored)
-	{
-		super(mojangId, rawInfractions, ignored);
-		this.lastKnownName = lastKnownName;
-	}
+    public LegacyCompleteDossier(UUID mojangId, String lastKnownName, Set<String> rawInfractions, Void ignored) {
+        super(mojangId, rawInfractions, ignored);
+        this.lastKnownName = lastKnownName;
+    }
 
-	@Override
-	public OfflinePlayer getOfflinePlayer()
-	{
-		return Bukkit.getOfflinePlayer(this.lastKnownName);
-	}
+    @Override
+    public OfflinePlayer getOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(this.lastKnownName);
+    }
 
-	@Override
-	public String getLastKnownName()
-	{
-		return this.lastKnownName;
-	}
+    @Override
+    public String getLastKnownName() {
+        return this.lastKnownName;
+    }
 
-	@Override
-	public Set<InetAddress> getAssociatedIPAddresses()
-	{
-		return Sets.newHashSet(Collections2.transform(this.ipAddresses, new Function<String, InetAddress>()
-		{
-			@Override
-			public InetAddress apply(String s)
-			{
-				try
-				{
-					return InetAddress.getByName(s);
-				}
-				catch(UnknownHostException e)
-				{
-					return null;
-				}
-			}
-		}));
-	}
+    @Override
+    public Set<InetAddress> getAssociatedIPAddresses() {
+        return Sets.newHashSet(Collections2.transform(this.ipAddresses, new Function<String, InetAddress>() {
+            @Override
+            public InetAddress apply(String s) {
+                try {
+                    return InetAddress.getByName(s);
+                } catch (UnknownHostException e) {
+                    return null;
+                }
+            }
+        }));
+    }
 
-	public Set<String> getRawAssociatedIPAddresses()
-	{
-		return this.ipAddresses;
-	}
+    public Set<String> getRawAssociatedIPAddresses() {
+        return this.ipAddresses;
+    }
 
-	public void addIPAddress(String address)
-	{
-		this.ipAddresses.add(address);
-	}
+    public void addIPAddress(String address) {
+        this.ipAddresses.add(address);
+    }
 
-	public void removeIPAddress(InetAddress address)
-	{
-		this.ipAddresses.remove(address.getHostName());
-	}
+    public void removeIPAddress(InetAddress address) {
+        this.ipAddresses.remove(address.getHostName());
+    }
 
-	@Override
-	public CompleteDossier complete(String ignored)
-	{
-		return this;
-	}
+    @Override
+    public CompleteDossier complete(String ignored) {
+        return this;
+    }
 
-	@Override
-	public CompleteDossier complete()
-	{
-		return this;
-	}
+    @Override
+    public CompleteDossier complete() {
+        return this;
+    }
 
-	public void update(final Player player)
-	{
-		final LegacyCompleteDossier dossier = this;
-		Bukkit.getScheduler().scheduleAsyncDelayedTask(InfractionsPlugin.getInst(), new Runnable()
-		{
-			@Override public void run()
-			{
-				if(player.isOnline()) addIPAddress(player.getAddress().getHostName());
-				dossier.lastKnownName = player.getName();
-			}
-		}, 40);
-	}
+    public void update(final Player player) {
+        final LegacyCompleteDossier dossier = this;
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(InfractionsPlugin.getInst(), new Runnable() {
+            @Override
+            public void run() {
+                if (player.isOnline()) addIPAddress(player.getAddress().getHostName());
+                dossier.lastKnownName = player.getName();
+            }
+        }, 40);
+    }
 }

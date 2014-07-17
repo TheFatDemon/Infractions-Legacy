@@ -29,82 +29,65 @@ import com.google.common.collect.Sets;
 
 import java.net.InetAddress;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class AsyncIPMatcherTask implements Runnable
-{
-	private static final Multimap<InetAddress, UUID> IP_MAP;
-	private static final Multimap<InetAddress, String> IP_MAP_NAME;
-	private static final Multimap<UUID, String> RELATIVE_NAMES;
+public class AsyncIPMatcherTask implements Runnable {
+    private static final Multimap<InetAddress, UUID> IP_MAP;
+    private static final Multimap<InetAddress, String> IP_MAP_NAME;
+    private static final Multimap<UUID, String> RELATIVE_NAMES;
 
-	static
-	{
-		IP_MAP = Multimaps.newMultimap(new ConcurrentHashMap<InetAddress, Collection<UUID>>(), new Supplier<Collection<UUID>>()
-		{
-			@Override
-			public Collection<UUID> get()
-			{
-				return Lists.newArrayList();
-			}
-		});
-		IP_MAP_NAME = Multimaps.newMultimap(new ConcurrentHashMap<InetAddress, Collection<String>>(), new Supplier<Collection<String>>()
-		{
-			@Override
-			public Collection<String> get()
-			{
-				return Lists.newArrayList();
-			}
-		});
-		RELATIVE_NAMES = Multimaps.newMultimap(new ConcurrentHashMap<UUID, Collection<String>>(), new Supplier<Collection<String>>()
-		{
-			@Override
-			public Collection<String> get()
-			{
-				return Lists.newArrayList();
-			}
-		});
-	}
+    static {
+        IP_MAP = Multimaps.newMultimap(new HashMap<InetAddress, Collection<UUID>>(), new Supplier<Collection<UUID>>() {
+            @Override
+            public Collection<UUID> get() {
+                return Lists.newArrayList();
+            }
+        });
+        IP_MAP_NAME = Multimaps.newMultimap(new HashMap<InetAddress, Collection<String>>(), new Supplier<Collection<String>>() {
+            @Override
+            public Collection<String> get() {
+                return Lists.newArrayList();
+            }
+        });
+        RELATIVE_NAMES = Multimaps.newMultimap(new HashMap<UUID, Collection<String>>(), new Supplier<Collection<String>>() {
+            @Override
+            public Collection<String> get() {
+                return Lists.newArrayList();
+            }
+        });
+    }
 
-	public static Collection<UUID> getAccounts(InetAddress address)
-	{
-		return IP_MAP.get(address);
-	}
+    public static Collection<UUID> getAccounts(InetAddress address) {
+        return IP_MAP.get(address);
+    }
 
-	public static Collection<String> getRelatives(UUID id)
-	{
-		return RELATIVE_NAMES.get(id);
-	}
+    public static Collection<String> getRelatives(UUID id) {
+        return RELATIVE_NAMES.get(id);
+    }
 
-	@Override
-	public void run()
-	{
-		InfractionsPlugin.getInst().getLogger().info("Rebuilding IP relationship cache...");
-		for(Dossier dossier : Infractions.allDossiers())
-		{
-			if(dossier instanceof LegacyCompleteDossier && !((LegacyCompleteDossier) dossier).getRawAssociatedIPAddresses().isEmpty())
-			{
-				UUID id = dossier.getId();
-				String name = ((LegacyCompleteDossier) dossier).getLastKnownName();
-				for(InetAddress address : ((LegacyCompleteDossier) dossier).getAssociatedIPAddresses())
-				{
-					IP_MAP.put(address, id);
-					IP_MAP_NAME.put(address, name);
-				}
-			}
-		}
-		for(String name : Sets.newHashSet(IP_MAP_NAME.values()))
-		{
-			CompleteDossier dossier = Infractions.getCompleteDossier(name);
-			UUID id = dossier.getId();
-			for(InetAddress address : dossier.getAssociatedIPAddresses())
-			{
-				for(String other : IP_MAP_NAME.get(address))
-				{
-					if(!dossier.getLastKnownName().equals(other)) RELATIVE_NAMES.put(id, other);
-				}
-			}
-		}
-		InfractionsPlugin.getInst().getLogger().info("IP relationships have been cached successfully.");
-	}
+    @Override
+    public void run() {
+        InfractionsPlugin.getInst().getLogger().info("Rebuilding IP relationship cache...");
+        for (Dossier dossier : Infractions.allDossiers()) {
+            if (dossier instanceof LegacyCompleteDossier && !((LegacyCompleteDossier) dossier).getRawAssociatedIPAddresses().isEmpty()) {
+                UUID id = dossier.getId();
+                String name = ((LegacyCompleteDossier) dossier).getLastKnownName();
+                for (InetAddress address : ((LegacyCompleteDossier) dossier).getAssociatedIPAddresses()) {
+                    IP_MAP.put(address, id);
+                    IP_MAP_NAME.put(address, name);
+                }
+            }
+        }
+        for (String name : Sets.newHashSet(IP_MAP_NAME.values())) {
+            CompleteDossier dossier = Infractions.getCompleteDossier(name);
+            UUID id = dossier.getId();
+            for (InetAddress address : dossier.getAssociatedIPAddresses()) {
+                for (String other : IP_MAP_NAME.get(address)) {
+                    if (!dossier.getLastKnownName().equals(other)) RELATIVE_NAMES.put(id, other);
+                }
+            }
+        }
+        InfractionsPlugin.getInst().getLogger().info("IP relationships have been cached successfully.");
+    }
 }

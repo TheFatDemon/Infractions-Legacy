@@ -24,65 +24,59 @@ import com.censoredsoftware.infractions.bukkit.legacy.compat.LegacyIssuer;
  * Meta data for each data type.
  */
 @SuppressWarnings("unchecked")
-public enum DataType
-{
-	/**
-	 * Issuer.
-	 */
-	ISSUER(LegacyIssuer.class, IdType.STRING, "iss"),
-	/**
-	 * Infraction.
-	 */
-	INFRACTION(LegacyInfraction.class, IdType.STRING, "inf"),
-	/**
-	 * Dossier.
-	 */
-	DOSSIER(LegacyDossier.class, IdType.UUID, "dos"),
-	/**
-	 * ServerData.
-	 */
-	SERVER(ServerData.class, IdType.UUID, "srv"),
-	/**
-	 * Returned when no valid type can be found.
-	 */
-	INVALID(Invalid.class, IdType.VOID, "IF_YOU_SEE_THIS_PLEASE_TELL_US_ON_THE_SITE_YOU_DOWNLOADED_INFRACTIONS_FROM");
+public enum DataType {
+    /**
+     * Issuer.
+     */
+    ISSUER(LegacyIssuer.class, IdType.STRING, "iss"),
+    /**
+     * Infraction.
+     */
+    INFRACTION(LegacyInfraction.class, IdType.STRING, "inf"),
+    /**
+     * Dossier.
+     */
+    DOSSIER(LegacyDossier.class, IdType.UUID, "dos"),
+    /**
+     * ServerData.
+     */
+    SERVER(ServerData.class, IdType.UUID, "srv"),
+    /**
+     * Returned when no valid type can be found.
+     */
+    INVALID(Invalid.class, IdType.VOID, "IF_YOU_SEE_THIS_PLEASE_TELL_US_ON_THE_SITE_YOU_DOWNLOADED_INFRACTIONS_FROM");
 
-	private Class clazz;
-	private IdType idType;
-	private String abbr;
+    private Class clazz;
+    private IdType idType;
+    private String abbr;
 
-	/**
-	 * Meta data for a data type.
-	 *
-	 * @param clazz  The object class that holds the data.
-	 * @param idType The id type this data type uses.
-	 * @param abbr   The abbreviation for use in certain data managers.
-	 */
-	private <V extends DataSerializable<?>> DataType(Class<V> clazz, IdType idType, String abbr)
-	{
-		this.clazz = clazz;
-		this.idType = idType;
-		this.abbr = abbr;
-	}
+    /**
+     * Meta data for a data type.
+     *
+     * @param clazz  The object class that holds the data.
+     * @param idType The id type this data type uses.
+     * @param abbr   The abbreviation for use in certain data managers.
+     */
+    private <V extends DataSerializable<?>> DataType(Class<V> clazz, IdType idType, String abbr) {
+        this.clazz = clazz;
+        this.idType = idType;
+        this.abbr = abbr;
+    }
 
-	@Override
-	public String toString()
-	{
-		return name();
-	}
+    @Override
+    public String toString() {
+        return name();
+    }
 
-	public Class getDataClass()
-	{
-		return clazz;
-	}
+    public Class getDataClass() {
+        return clazz;
+    }
 
-	public IdType getIdType()
-	{
-		return idType;
-	}
+    public IdType getIdType() {
+        return idType;
+    }
 
-	public String getAbbreviation()
-	{
-		return abbr;
-	}
+    public String getAbbreviation() {
+        return abbr;
+    }
 }
