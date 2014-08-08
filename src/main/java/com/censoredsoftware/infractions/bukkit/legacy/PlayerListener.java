@@ -35,6 +35,12 @@ public class PlayerListener implements Listener {
     public void onPlayerLogin(PlayerLoginEvent e) {
         final Player p = e.getPlayer();
 
+        if (p.getUniqueId() == null) {
+            InfractionsPlugin.getInst().getLogger().severe(p.getName() + " apparently has no UUID.");
+            InfractionsPlugin.getInst().getLogger().severe("This player will cause a lot of errors...");
+            return;
+        }
+
         // Create data that we track
         CompleteDossier dossier = Infractions.getCompleteDossier(p);
         ((LegacyCompleteDossier) dossier).update(p);
@@ -44,6 +50,8 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent e) {
         final Player p = e.getPlayer();
+
+        if (MiscUtil.ignore(p)) return;
 
         if (SettingUtil.getSettingBoolean("motd")) {
             // TODO Consolidate this into some sort of useful notification system.

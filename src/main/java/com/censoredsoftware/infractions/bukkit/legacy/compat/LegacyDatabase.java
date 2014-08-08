@@ -28,9 +28,9 @@ import com.censoredsoftware.infractions.bukkit.legacy.data.file.FileDataManager;
 import com.censoredsoftware.infractions.bukkit.legacy.data.file.InfractionsFile;
 import com.censoredsoftware.infractions.bukkit.legacy.data.file.YamlFileUtil;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -50,11 +50,12 @@ public class LegacyDatabase implements Database {
     }
 
     @Override
+    @Deprecated
     public CompleteDossier getCompleteDossier(String playerName) {
-        UUID id;
-
-        synchronized (this) {
-            id = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        UUID id = null;
+        try {
+            id = new UUIDFetcher(Lists.newArrayList(playerName)).call().get(playerName);
+        } catch (Exception ignored) {
         }
 
         if (id != null) {
@@ -135,10 +136,10 @@ public class LegacyDatabase implements Database {
 
     @Override
     public Dossier getDossier(String playerName) {
-        UUID id;
-
-        synchronized (this) {
-            id = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        UUID id = null;
+        try {
+            id = new UUIDFetcher(Lists.newArrayList(playerName)).call().get(playerName);
+        } catch (Exception ignored) {
         }
 
         if (id != null)

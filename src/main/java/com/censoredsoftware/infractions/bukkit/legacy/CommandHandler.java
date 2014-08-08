@@ -144,7 +144,7 @@ public class CommandHandler implements TabExecutor {
             return true;
         } else if (c.getName().equalsIgnoreCase("history")) {
             if (!(args.length == 1) && !(p == null)) {
-                if (sender.hasPermission("infractions.ignore")) {
+                if (MiscUtil.ignore(p)) {
                     sender.sendMessage(ChatColor.YELLOW + "Infractions does not track your history.");
                     return true;
                 }

@@ -72,6 +72,7 @@ public class AsyncIPMatcherTask implements Runnable {
         for (Dossier dossier : Infractions.allDossiers()) {
             if (dossier instanceof LegacyCompleteDossier && !((LegacyCompleteDossier) dossier).getRawAssociatedIPAddresses().isEmpty()) {
                 UUID id = dossier.getId();
+                if (id == null) continue;
                 String name = ((LegacyCompleteDossier) dossier).getLastKnownName();
                 for (InetAddress address : ((LegacyCompleteDossier) dossier).getAssociatedIPAddresses()) {
                     IP_MAP.put(address, id);
@@ -82,6 +83,7 @@ public class AsyncIPMatcherTask implements Runnable {
         for (String name : Sets.newHashSet(IP_MAP_NAME.values())) {
             CompleteDossier dossier = Infractions.getCompleteDossier(name);
             UUID id = dossier.getId();
+            if (id == null) continue;
             for (InetAddress address : dossier.getAssociatedIPAddresses()) {
                 for (String other : IP_MAP_NAME.get(address)) {
                     if (!dossier.getLastKnownName().equals(other)) RELATIVE_NAMES.put(id, other);

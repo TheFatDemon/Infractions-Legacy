@@ -123,7 +123,7 @@ public class MiscUtil {
                 return dossier instanceof CompleteDossier && ((CompleteDossier) dossier).getLastKnownName().toLowerCase().startsWith(guess.toLowerCase());
             }
         }, null);
-        if (dossier != null) return ((CompleteDossier) dossier).getLastKnownName();
+        if (dossier != null && dossier.getId() != null) return ((CompleteDossier) dossier).getLastKnownName();
         return null;
     }
 
@@ -145,6 +145,10 @@ public class MiscUtil {
         return new Evidence(issuer, isImage ? EvidenceType.IMAGE_URL : EvidenceType.OTHER_URL, System.currentTimeMillis(), proof);
     }
 
+    public static boolean ignore(Player player) {
+        return player.getUniqueId() == null || player.hasPermission("infractions.ignore");
+    }
+
     public static void checkScore(String playerName) {
         checkScore(Bukkit.getOfflinePlayer(playerName));
     }
@@ -152,7 +156,7 @@ public class MiscUtil {
     public static void checkScore(OfflinePlayer offlinePlayer) {
         if (offlinePlayer == null || !offlinePlayer.isOnline()) return;
         Player p = offlinePlayer.getPlayer();
-        if (!SettingUtil.getSettingBoolean("ban") || p.hasPermission("infractions.ignore")) return;
+        if (!SettingUtil.getSettingBoolean("ban") || ignore(p)) return;
         if (getMaxScore(p) <= getScore(p) && (!p.hasPermission("infractions.banexempt"))) {
             p.kickPlayer(ChatColor.DARK_RED + "☠ You have been banned. ☠");
             try {
@@ -160,7 +164,7 @@ public class MiscUtil {
             } catch (NullPointerException e) {
                 log.info("Unable to set " + p.toString() + " to banned.");
             }
-        } else {
+        } else if (offlinePlayer.isBanned()) {
             try {
                 p.setBanned(false);
             } catch (NullPointerException e) {

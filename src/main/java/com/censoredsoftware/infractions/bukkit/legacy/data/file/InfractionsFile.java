@@ -104,7 +104,7 @@ public abstract class InfractionsFile<K, V extends DataSerializable<K>, I> {
         for (String stringId : data.getKeys(false)) {
             try {
                 I v = valueFromData(stringId, data.getConfigurationSection(stringId));
-                if (v == null) {
+                if (stringId.equals("null") || v == null) {
                     InfractionsPlugin.getInst().getLogger().warning("Corrupt: " + stringId + ", in file: " + getFullFileName());
                     continue;
                 }
@@ -125,7 +125,7 @@ public abstract class InfractionsFile<K, V extends DataSerializable<K>, I> {
         for (K key : Collections2.filter(getLoadedData().keySet(), new Predicate<K>() {
             @Override
             public boolean apply(K key) {
-                return !currentFileMap.containsKey(key) || !currentFileMap.get(key).equals(getLoadedData().get(key));
+                return key != null && (!currentFileMap.containsKey(key) || !currentFileMap.get(key).equals(getLoadedData().get(key)));
             }
         }))
             currentFile.createSection(key.toString(), serialize(key));
